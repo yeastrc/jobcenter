@@ -27,7 +27,7 @@ public class RetrieveClientConfiguration {
 
 	private static final String CONFIG_CLIENT_NODE_NAME  = "client.node.name";
 
-	private static final String CONFIG_MAX_NUMBER_THREADS  = "max.number.job.threads";
+	private static final String CONFIG_MAX_NUMBER_CONCURRENT_JOBS  = "max.number.concurrent.jobs";
 
 	private static final String CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS  = "sleep.time.checking.for.new.jobs";
 
@@ -107,12 +107,12 @@ public class RetrieveClientConfiguration {
 
 			try {
 
-				maxThreadsForModulesString = configProps.getProperty( CONFIG_MAX_NUMBER_THREADS );
+				maxThreadsForModulesString = configProps.getProperty( CONFIG_MAX_NUMBER_CONCURRENT_JOBS );
 
 
 			} catch ( Exception ex ) {
 
-				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_THREADS + "\") = " + maxThreadsForModulesString;
+				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxThreadsForModulesString;
 
 				log.error( msg, ex );
 
@@ -124,7 +124,7 @@ public class RetrieveClientConfiguration {
 
 			if ( maxThreadsForModulesString == null || maxThreadsForModulesString.isEmpty() ) {
 
-				String msg = "This property needs a value:\"" + CONFIG_MAX_NUMBER_THREADS + "\"";
+				String msg = "This property needs a value:\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\"";
 
 				log.error( msg );
 
@@ -141,7 +141,7 @@ public class RetrieveClientConfiguration {
 
 			} catch ( Exception ex ) {
 
-				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_THREADS + "\") = " + maxThreadsForModulesString;
+				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxThreadsForModulesString;
 
 				log.error( msg, ex );
 
