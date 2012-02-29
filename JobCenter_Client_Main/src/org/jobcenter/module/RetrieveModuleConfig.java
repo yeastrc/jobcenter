@@ -254,7 +254,7 @@ public class RetrieveModuleConfig {
 
 			configProps.load(props);
 
-			String maxNumberThreadsString = configProps.getProperty("module.max.threads.per.job.manager.client");
+			String maxNumberThreadsString = configProps.getProperty("module.max.concurrent.jobs.per.client");
 
 			try {
 
