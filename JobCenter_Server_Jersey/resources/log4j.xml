@@ -85,7 +85,7 @@
         <!-- Loggers to filter out various class paths -->
 
         <logger name="org.springframework" additivity="false">
-                <level value="trace"/>
+                <level value="warn"/>
                 <appender-ref ref="ROLL" />
                 <appender-ref ref="ROLL_ERROR" />
 <!--
@@ -117,7 +117,7 @@
         <!-- set debugging at info level to display jobs returned to clients -->
 
         <logger name="org.jobcenter.service.GetNextJobForClientServiceImpl" additivity="false">
-                <level value="info"/>
+                <level value="warn"/>
                 <appender-ref ref="ROLL" />
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
@@ -142,7 +142,7 @@
     <!--
         <level value="all" />
      -->
-        <priority value="debug" />
+        <priority value="warn" />
         <appender-ref ref="ROLL"/>
         <appender-ref ref="ROLL_ERROR" />
 <!--
