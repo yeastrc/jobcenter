@@ -1,0 +1,44 @@
+
+
+Shutting down the client.
+
+There are two options for stopping the client.
+
+1)  The kill signal - For System shutdown events
+2)  Updating the file "jobcenter_run_control.txt" in the root directory of the client.
+         (The file "jobcenter_run_control.txt" is created/re-created when the client starts up)
+
+Details:
+
+1)  Kill signal ( ctrl-c in Windows, "kill" command in linux )
+
+    The client has been programmed to respond to the kill signal primarily to support system shutdown events.
+    In this situation, the system will only allow a certain amount of time for the application to exit
+    before it is terminated.
+
+    The client utilizes the Java registration of shutdown hook:	    Runtime.getRuntime().addShutdownHook( xxxxxxxxx );
+
+    The client will call "shutdown()" on all modules actively processing jobs.
+    The client will then wait for all modules actively processing jobs to return from the "processRequest(...)" method before exiting.
+    There is a possibility that the client will be terminated by the operating system before the modules return.
+    If that happens, the job will be left in the state of "Running".
+
+
+2)  Updating the file "jobcenter_run_control.txt" in the root directory of the client.
+
+    If it is desired to have the client stop processing when all the jobs currently being processed are complete,
+    use the file "jobcenter_run_control.txt".
+    Text is added to the first line to specify that either the client is to exit, or just stop retrieving new jobs.
+    The file contains an explanation of it's contents and what text to put on the first line for either choice.
+    The file is updated and saved and the next time the client reads it, the client will follow the directive
+    and update the file to indicate that the directive was received and is being followed.
+    The file will be updated again by the client when the directive is completed.
+
+    A use for requesting that the client stop retrieving new jobs is so that if the client is run with monitoring software
+    the monitoring software will not just restart the client when the client exits.  The user can issue the command to
+    stop retrieving jobs and when the client has completed all the jobs and updated the file "jobcenter_run_control.txt"
+    to indicate that, the user can then issue a command to the monitoring software to stop the client or can stop the
+    operating system.
+
+
+
