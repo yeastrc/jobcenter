@@ -12,6 +12,11 @@
      The configuration already accounts for this by reading the files from the "config" folder
      but the initial values are provided in the "config_sample_files" folder.
 
+     **  If you are running Linux, Mac, or some other unix and are using
+         runJobCenterClient.sh to start the client, it would help to mark it as
+         executable by issuing the command "chmod +x runJobCenterClient.sh".
+
+
   Configure the client.
 
   Navigate to the sub folder "jobcenter_client_installation/jobcenter_client_code/client_main".
