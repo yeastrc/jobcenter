@@ -8,7 +8,7 @@
 <html>
   <head>
 
-    <title>Job Manager - NO SECURITY INSTALLED</title>
+    <title>Job Center - NO SECURITY INSTALLED</title>
 
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
@@ -33,13 +33,13 @@
     <a href="listJobTypes.do">list job types</a><br><br>
 
     <a href="listRequestTypes.do">list request types</a><br><br>
-    
+
     <a href="listClientsStatus.do">list client status</a><br><br>
 
 	<a href="clientsConnectedList.do">list clients that connected since the server last restarted</a><br><br>
-	
+
 	<a href="clientsFailedToConnectList.do">list clients that failed to connect since the server last restarted</a><br><br>
-	
+
 	<a href="clientsUsingSameNodeNameList.do">list clients where two or more are using the same node name that have connected since the server was last restarted</a><br><br>
 
 <%--
