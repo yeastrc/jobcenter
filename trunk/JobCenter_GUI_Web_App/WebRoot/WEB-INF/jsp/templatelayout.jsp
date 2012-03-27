@@ -15,7 +15,7 @@
 
 
 
-<title>Job Manager Maintenance</title>
+<title>JobCenter Maintenance</title>
 
  <link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/global.css">
 
@@ -46,7 +46,7 @@ function doubleClickCheck(form)
 
  <script type="text/javascript" src="${contextPath}/js/wz_tooltip/wz_tooltip.js"></script>
 
-<!-- Server URL <c:out value="${ serverURL }" ></c:out>  --> 
+<!-- Server URL <c:out value="${ serverURL }" ></c:out>  -->
 <a name="top" ></a>
 
 <tiles:insert attribute="header" ignore="true"/>
