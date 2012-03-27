@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="org.jobcenter.dto.RunMessageDTO" table="run_msg" >
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="native" />
+        </id>
+        <many-to-one name="runMsgType" class="org.jobcenter.dto.RunMsgTypeDTO" fetch="select">
+            <column name="type" />
+        </many-to-one>
+
+        <property name="runId" type="java.lang.Integer">
+            <column name="run_id" />
+        </property>
+        <property name="message" type="java.lang.String">
+            <column name="message" />
+        </property>
+    </class>
+</hibernate-mapping>
