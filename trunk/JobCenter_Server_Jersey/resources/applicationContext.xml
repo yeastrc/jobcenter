@@ -409,12 +409,6 @@
 			<ref bean="jobTypeDAO" />
 		</property>
 
-		<!-- JDBC DAO -->
-<!--
-		<property name="jobTypeJDBCDAO">
-			<ref bean="jobTypeJDBCDAO" />
-		</property>
--->
 	</bean>
 
 	<bean id="GetRequestTypesService" class="org.jobcenter.service.GetRequestTypesServiceImpl">
@@ -429,12 +423,7 @@
 			<ref bean="requestTypeDAO" />
 		</property>
 
-		<!-- JDBC DAO -->
-<!--
-		<property name="requestTypeJDBCDAO">
-			<ref bean="requestTypeJDBCDAO" />
-		</property>
--->
+
 	</bean>
 
 
@@ -460,6 +449,8 @@
 
 
 
+<!-- ================================== -->
+
 
 <!--   Internal Timer Services -->
 
@@ -474,6 +465,8 @@
 
 	<bean id="scheduledTaskSendClientsCheckinLateNotification" class="org.springframework.scheduling.timer.ScheduledTimerTask">
 
+	    <property name="timerTask" ref="sendClientsCheckinLateNotificationTimerTask" />
+
 	    <!--
 	    	For Testing:
 
@@ -481,18 +474,18 @@
 	    	 period: run every 5 seconds
 	    -->
 <!--
+-->
 	    <property name="delay" value="1000" />
 	    <property name="period" value="5000" />
--->
 
 	    <!-- delay:  wait 20 minutes before starting repeated execution
 	    	 period: run every 10 minutes
 	    -->
 <!--
--->
 	    <property name="delay" value="1200000" />
 	    <property name="period" value="600000" />
-	    <property name="timerTask" ref="sendClientsCheckinLateNotificationTimerTask" />
+-->
+
 	</bean>
 
 
@@ -505,6 +498,10 @@
 	    </list>
 	  </property>
 	</bean>
+
+
+
+	<!-- ================================== -->
 
 
 <!--   Internal services -->
@@ -550,6 +547,9 @@
 		<property name="getValueFromConfigService">
 			<ref bean="getValueFromConfigService" />
 		</property>
+		<property name="sendEmailService">
+			<ref bean="sendEmailService" />
+		</property>
 
 		<property name="nodeClientStatusDAO">
 			<ref bean="nodeClientStatusDAO" />
@@ -557,6 +557,12 @@
 	</bean>
 
 
+	<bean id="sendEmailService" class="org.jobcenter.internalservice.SendEmailServiceImpl">
+	</bean>
+
+
+
+	<!-- ================================== -->
 
 	<!--  JDBC based DAO objects -->
 

@@ -1,5 +1,7 @@
 package org.jobcenter.internalservice;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -15,6 +17,7 @@ import org.jobcenter.dto.*;
 import org.jobcenter.service.GetClientsStatusListService;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.springframework.transaction.annotation.Propagation;
@@ -44,6 +47,10 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 
 	private static Logger log = Logger.getLogger(SendClientsCheckinLateNotificationServiceImpl.class);
 
+
+	private static final String EMAIL_SUBJECT_LINE = "JobCenter clients are late for checkin";
+
+
 	//  Service
 
 //	 private ClientNodeNameCheck clientNodeNameCheck;
@@ -52,7 +59,16 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 
 	private GetValueFromConfigService getValueFromConfigService;
 
+	private SendEmailService sendEmailService;
 
+
+
+	public SendEmailService getSendEmailService() {
+		return sendEmailService;
+	}
+	public void setSendEmailService(SendEmailService sendEmailService) {
+		this.sendEmailService = sendEmailService;
+	}
 	public GetValueFromConfigService getGetValueFromConfigService() {
 		return getValueFromConfigService;
 	}
@@ -67,6 +83,8 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 			GetClientsStatusListService getClientsStatusListService) {
 		this.getClientsStatusListService = getClientsStatusListService;
 	}
+
+
 
 //	public ClientNodeNameCheck getClientNodeNameCheck() {
 //		return clientNodeNameCheck;
@@ -109,34 +127,42 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 
 			List<NodeClientStatusDTO> clients = getClientsStatusListService.retrieveClientsLateForCheckinList();
 
+			List<NodeClientStatusDTO> clientsThatAreLate = new ArrayList<NodeClientStatusDTO>( clients.size() );
+
 			if ( clients != null && ! clients.isEmpty() ) {
 
-				boolean anyClientsNeedToBeMailed = false;
+				Date nowDate = new Date();
 
 				for ( NodeClientStatusDTO client: clients ) {
 
-					if ( ! client.getNotificationSentThatClientLate() ) {
+					if ( client.getLateForNextCheckinTime().before( nowDate ) ) {
 
-						anyClientsNeedToBeMailed = true;
-						break;
+						if ( ! client.getNotificationSentThatClientLate() ) {
+
+							if ( log.isDebugEnabled() ) {
+
+								log.debug( "Client found to be late.  node name = " + client.getNode().getName()
+										+ ", client last checkin time = " + client.getLastCheckinTime()
+										+ ", client time considered late for next check in = " + client.getLateForNextCheckinTime()
+										+ ", now = " + nowDate );
+							}
+
+							clientsThatAreLate.add( client );
+						}
 					}
 				}
 
 
-				if ( anyClientsNeedToBeMailed ) {
+				if ( ! clientsThatAreLate.isEmpty() ) {
 
-					sendMail( clients, mailConfig );
+					sendMail( clientsThatAreLate, mailConfig );
 
 					//  update email sent indicator and write to db
-					for ( NodeClientStatusDTO client: clients ) {
+					for ( NodeClientStatusDTO client: clientsThatAreLate ) {
 
-						if ( ! client.getNotificationSentThatClientLate() ) {
+						client.setNotificationSentThatClientLate( true );
 
-							client.setNotificationSentThatClientLate( true );
-
-							nodeClientStatusDAO.saveOrUpdate( client );
-
-						}
+						nodeClientStatusDAO.saveOrUpdate( client );
 					}
 
 				} else {
@@ -265,34 +291,11 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 		// send email
 		try {
 
-			// set the SMTP host property value
-			Properties properties = System.getProperties();
-
-			properties.put("mail.smtp.host", mailConfig.getSmtpEmailHost());
-
-
-			// create a JavaMail session
-			javax.mail.Session mSession = javax.mail.Session.getInstance(properties, null);
-
-			// create a new MIME message
-			MimeMessage message = new MimeMessage(mSession);
-
-			// set the from address
-			Address fromAddress = new InternetAddress( mailConfig.getFromEmailAddress() );
-
-			message.setFrom(fromAddress);
-
-			// set the subject
-			message.setSubject("JobCenter clients are late for checkin");
-
-			// set the message body
+			// create the message body
 
 			StringBuilder text = new StringBuilder(1000);
 
 			text.append( "The JobCenter clients listed below are late for checkin and may have problems.\n\n" );
-
-
-
 
 			for ( NodeClientStatusDTO client : clients ) {
 
@@ -306,50 +309,40 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 
 					if ( client.getRunningJobs() != null && ! client.getRunningJobs().isEmpty() ) {
 
-						text.append(  "The following jobs are in \"Running\" status on this node: " );
+						text.append(  "     The following jobs are in \"Running\" status on this node: " );
+						text.append( "\n" );
 						text.append( "\n" );
 
 						for ( Job job : client.getRunningJobs() ) {
 
-							text.append(  "Job Id: " );
+							text.append(  "     Job Id: " );
 							text.append(  job.getId() );
 							text.append( "\n" );
 
-							text.append(  "Job Type Name: " );
+							text.append(  "     Job Type Name: " );
 							text.append(  job.getJobType().getName() );
 							text.append( "\n" );
-
 						}
+
+						text.append( "\n" );
 					}
-
 				}
-
 			}
 
 
-			String textStr = text.toString();
-
-			message.setText(textStr);
+			String emailBody = text.toString();
 
 
 			//  send to configured list of recipients in config table of the database
 
 			for ( String toEmailAddress : mailConfig.getToAddresses() ) {
 
-				if ( toEmailAddress != null && ! toEmailAddress.isEmpty() ) {
+				if ( ! StringUtils.isEmpty( toEmailAddress ) ) {
 
-					// set the "To" address
-					Address[]  toAddress = InternetAddress.parse( toEmailAddress );
-					message.setRecipients(Message.RecipientType.TO, toAddress);
-
-
-					// send the message
-					Transport.send(message);
+					sendEmailService.sendEmail( mailConfig.getSmtpEmailHost(),
+							mailConfig.getFromEmailAddress(), toEmailAddress, EMAIL_SUBJECT_LINE, emailBody );
 				}
 			}
-
-
-
 
 		} catch (Throwable e) {
 
@@ -365,6 +358,10 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 
 
 
+	/**
+	 * Holder for the Mail config
+	 *
+	 */
 	private class MailConfig {
 
 		String[] toAddresses;
