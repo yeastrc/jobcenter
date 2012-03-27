@@ -1,0 +1,25 @@
+
+The Job Center server is a Java web application packaged as a "war" designed to run in a Java application server like Tomcat.
+
+The application context name can be changed if necessary.
+The application context name is not used in the server code.
+The application context name will be needed when configuring the client.
+
+A database connection pool is required at the JNDI name "jdbc/jobcenter".
+The JNDI name can be changed in the Spring configuration, but only change it if you understand.
+
+Example for Tomcat6
+This resource needs to be added to the context.xml file in the conf directory of your tomcat installation.
+"jdbc/jobcenter" is the JDNI name in this example.
+
+	  <Resource		name="jdbc/jobcenter"
+	  					auth="Container"
+                        type="javax.sql.DataSource"
+                        factory="org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory"
+                        maxActive="100"
+                        maxIdle="30"
+                        maxWait="10000"
+                        username="jobcenter"
+                        password="jobcenter"
+                        driverClassName="com.mysql.jdbc.Driver"
+						url="jdbc:mysql://localhost:3306/jobcenter?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8"/>
