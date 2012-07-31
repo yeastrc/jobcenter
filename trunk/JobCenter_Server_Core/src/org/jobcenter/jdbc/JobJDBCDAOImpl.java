@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.jobcenter.constants.DBConstantsServerCore;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.ServerCoreConstants;
 import org.jobcenter.dto.Job;
@@ -834,8 +835,8 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 */
 	private static String
 	insertJobSqlString
-	= "INSERT INTO job ( request_id, job_type_id, submitter, priority,  status_id, submit_date )  "
-		+ "  VALUES ( ?, ?, ?, ?, ?, NOW() ) " ;
+	= "INSERT INTO job ( request_id, job_type_id, submitter, priority,  status_id, insert_complete, submit_date  )  "
+		+ "  VALUES ( ?, ?, ?, ?, ?, ?, NOW() ) " ;
 
 	/**
 	 * @param job
@@ -882,6 +883,8 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 			pstmt.setInt( 5, job.getStatusId() );
 
+			pstmt.setString( 6, job.getInsertComplete() );
+
 			rowsUpdated = pstmt.executeUpdate();
 
 			// set to 1 since DB default
@@ -925,6 +928,74 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 				}
 			}
 
+
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+					// ignore
+				}
+			}
+
+		}
+	}
+
+
+
+
+	/**
+	 *
+	 */
+	private static String
+	markJobInsertCompleteSqlString
+	= "UPDATE job SET insert_complete = '" + DBConstantsServerCore.JobTableInsertCompleteT + "' WHERE id = ?" ;
+
+	/**
+	 * @param job
+	 * @param newJobStatus
+	 * @throws Exception
+	 */
+	public  void markJobInsertComplete ( Job job )
+	{
+		final String method = "markJobInsertComplete( Job job )";
+
+		if ( job == null  ) {
+
+			throw new IllegalArgumentException( "in method method: " + method  + ", job == null " );
+		}
+
+		if ( log.isDebugEnabled() ) {
+			log.debug( "Entering " + method );
+		}
+
+		PreparedStatement pstmt = null;
+
+
+		int rowsUpdated = 0;
+
+		Connection connection = null;
+
+
+		try {
+
+			connection = getConnection( );
+
+			pstmt = connection.prepareStatement( markJobInsertCompleteSqlString );
+
+			pstmt.setInt( 1, job.getId() );
+
+			rowsUpdated = pstmt.executeUpdate();
+
+		} catch (Throwable sqlEx) {
+
+			log.error( method + ":Exception:  job.getJobTypeId() = " + job.getJobTypeId() + ", job.getSubmitter() = " + job.getSubmitter()
+					+ " \nSQL = '" + insertJobSqlString
+					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+			//  Wrap in RuntimeException for Spring Transactional rollback
+			throw new RuntimeException( sqlEx );
+
+		} finally {
 
 			if (pstmt != null) {
 				try {
@@ -1465,8 +1536,8 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 		+ "          LEFT OUTER JOIN request ON job.request_id = request.id  "
 		+ "          LEFT OUTER JOIN request_type AS rt ON request.type = rt.id  ";
 
-	
-	
+
+
 	@Override
 	public  int  getJobCount( ListJobsRequest listJobsRequest )
 	{
@@ -1497,7 +1568,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			pstmt = getJobListPreparedStmt( sqlSB, listJobsRequest, true /* getCount */, connection );
 
 			sql = sqlSB.toString();
-			
+
 			rs = pstmt.executeQuery();
 
 			while ( rs.next() ) {
@@ -1581,7 +1652,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			pstmt = getJobListPreparedStmt( sqlSB, listJobsRequest, false /* getCount */, connection );
 
 			sql = sqlSB.toString();
-			
+
 			rs = pstmt.executeQuery();
 
 			while ( rs.next() ) {
@@ -1680,18 +1751,18 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			} else {
 				sqlSB.append( " AND " );
 			}
-			
+
 
 			sqlSB.append( " ( " );
 
 			boolean firstJobTypeName = true;
-			
+
 			for ( String jobTypeName : jobTypeNames ) {
 
 				if ( StringUtils.isEmpty( jobTypeName ) ) {
 
 					String msg = "Illegal argument, a jobtypeName in jobTypeNames is empty";
-					
+
 					throw new IllegalArgumentException( msg );
 				}
 
@@ -1703,7 +1774,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 				}
 				sqlSB.append( " jt.name = ? " );
 			}
-			
+
 			sqlSB.append( " ) " );
 
 		}
@@ -1718,8 +1789,8 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			}
 			sqlSB.append( " job.request_id = ? " );
 		}
-		
-		
+
+
 		Set<String> requestTypeNames = listJobsRequest.getRequestTypeNames();
 
 		if ( requestTypeNames != null && ( ! requestTypeNames.isEmpty() ) ) {
@@ -1731,17 +1802,17 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			} else {
 				sqlSB.append( " AND " );
 			}
-			
+
 			sqlSB.append( " ( " );
 
 			boolean firstRequestTypeName = true;
-			
+
 			for ( String requestTypeName : requestTypeNames ) {
-				
+
 				if ( StringUtils.isEmpty( requestTypeName ) ) {
 
 					String msg = "Illegal argument, a requestTypeName in requestTypeNames is empty";
-					
+
 					throw new IllegalArgumentException( msg );
 				}
 
@@ -1753,16 +1824,16 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 				}
 				sqlSB.append( " rt.name = ? " );
 			}
-			
+
 			sqlSB.append( " ) " );
-			
+
 		}
 
 		if ( ! getCount ) {
-			
+
 			sqlSB.append( "ORDER BY  job.id DESC  LIMIT ?, ?" );
 		}
-		
+
 		String sql = sqlSB.toString();
 
 		pstmt = connection.prepareStatement( sql );
@@ -1795,10 +1866,10 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 				pstmt.setString( paramCounter,  requestTypeName  );
 			}
 		}
-		
+
 
 		if ( ! getCount ) {
-		
+
 		//  Limit params
 
 			if ( listJobsRequest.getIndexStart() != null ) {
@@ -1821,7 +1892,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			}
 
 		}
-		
+
 		return pstmt;
 	}
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="D:/JobCenter/JobCenter_Client/jobcenter_modules/sample_module/main_jar/sample_module.jar"/>
+    <jar path="D:/JobManager/JobManager_Client/jobcenter_modules/sample_module/main_jar/sample_module.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/JobCenter_Sample_Module/Export_to_sample_module.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -14,8 +14,8 @@
         <file path="/JobCenter_Sample_Module/.classpath"/>
         <file path="/JobCenter_Sample_Module/OnInstall.txt"/>
         <folder path="/JobCenter_Sample_Module/lib"/>
-        <file path="/JobCenter_Sample_Module/Required_Projects.txt"/>
         <file path="/JobCenter_Sample_Module/.project"/>
+        <file path="/JobCenter_Sample_Module/Required_Projects.txt"/>
         <javaElement handleIdentifier="=JobCenter_Sample_Module/resources"/>
         <javaElement handleIdentifier="=JobCenter_Sample_Module/src"/>
     </selectedElements>

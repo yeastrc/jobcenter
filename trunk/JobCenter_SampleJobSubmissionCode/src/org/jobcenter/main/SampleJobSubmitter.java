@@ -26,7 +26,7 @@ public class SampleJobSubmitter {
 
 			jobSubmissionClient.init( connectionURL );
 
-			int requestId = jobSubmissionClient.submitJob("Testing", null /* requestId */, "typename", "my submitter", 1, jobParameters );
+			int requestId = jobSubmissionClient.submitJob("Testing", null /* requestId */, "sampleModule", "my submitter", 1, jobParameters );
 
 
 			System.out.println( "requestId = " + requestId );
@@ -36,6 +36,8 @@ public class SampleJobSubmitter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		System.out.println( "Run complete" );
 
 	}
 

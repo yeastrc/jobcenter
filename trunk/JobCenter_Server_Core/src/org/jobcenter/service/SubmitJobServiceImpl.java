@@ -4,6 +4,7 @@ package org.jobcenter.service;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jobcenter.constants.DBConstantsServerCore;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.dao.JobTypeDAO;
 import org.jobcenter.dao.RequestTypeDAO;
@@ -210,6 +211,8 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 
 		Job job = new Job();
 
+		job.setInsertComplete( DBConstantsServerCore.JobTableInsertCompleteF );
+
 		job.setJobTypeId( jobType.getId() );
 		job.setJobParameters( submitJobRequest.getJobParameters() );
 		job.setSubmitter( submitJobRequest.getSubmitter() );
@@ -248,8 +251,13 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 				jobJDBCDAO.insertJobParameter( entry.getKey(), entry.getValue(), job.getId() );
 
 			}
-
 		}
+
+		//  set field "insert_complete" to "T" so that the job can be sent to the client
+
+		job.setInsertComplete( DBConstantsServerCore.JobTableInsertCompleteT );
+
+		jobJDBCDAO.markJobInsertComplete( job );
 
 		submitJobResponse.setRequestId( job.getRequestId() );
 

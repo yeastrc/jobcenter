@@ -27,7 +27,7 @@ public class Job {
 	private int requestId;
 
 	/**
-	 * associated jobType table record, populated by Hibernate 
+	 * associated jobType table record, populated by Hibernate
 	 */
 	private JobType jobType;
 
@@ -39,13 +39,15 @@ public class Job {
 
 	private int statusId;
 
+	private String insertComplete = "T";
+
 
 	/**
 	 * Current database record version number, for optimistic locking version tracking
 	 */
 	private Integer dbRecordVersionNumber;
 
-	//	populated by Hibernate 
+	//	populated by Hibernate
 	private StatusDTO status;
 
 
@@ -65,18 +67,18 @@ public class Job {
 
 
 	private Map<String, String> jobParameters;
-	
-	
+
+
 	public static class ReverseSortByIdComparator implements Comparator<Job> {
 
 		@Override
 		public int compare(Job o1, Job o2) {
-			
-			if ( o1 == null || o2 == null ) {			
+
+			if ( o1 == null || o2 == null ) {
 				return 0;
 			}
-			
-			// "-" in front since reverse 
+
+			// "-" in front since reverse
 			return  -  ( o1.getId() - o2.getId() );
 		}
 	}
@@ -89,7 +91,7 @@ public class Job {
 	 * @return
 	 */
 	public boolean isRequeueable() {
-		
+
 		return JobUtilities.isJobRequeueable( this );
 	}
 
@@ -99,7 +101,7 @@ public class Job {
 	 * @return
 	 */
 	public boolean isCancellable() {
-		
+
 		return JobUtilities.isJobCancellable( this );
 	}
 
@@ -200,7 +202,7 @@ public class Job {
 
 
 	public Date getSubmitDate() {
-		
+
 		return submitDate;
 	}
 
@@ -293,6 +295,16 @@ public class Job {
 
 	public void setRequestTypeDTO(RequestTypeDTO requestTypeDTO) {
 		this.requestTypeDTO = requestTypeDTO;
+	}
+
+
+	public String getInsertComplete() {
+		return insertComplete;
+	}
+
+
+	public void setInsertComplete(String insertComplete) {
+		this.insertComplete = insertComplete;
 	}
 
 
