@@ -1,9 +1,0 @@
-
-Required Projects:
-
-None
-
-
-The Class-Path in the manifest is:
-
-Class-Path: . mail.jar jobcenter_client_module_interface.jar
