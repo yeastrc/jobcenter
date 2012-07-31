@@ -114,6 +114,7 @@ CREATE  TABLE IF NOT EXISTS `job` (
   `submitter` VARCHAR(200) NULL ,
   `priority` INT NOT NULL ,
   `status_id` INT NOT NULL ,
+  `insert_complete` ENUM('T','F') NOT NULL DEFAULT 'T',
   `db_record_version_number` INT NOT NULL DEFAULT 1 ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `job_type_id_fk`

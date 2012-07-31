@@ -162,6 +162,9 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 
 						client.setNotificationSentThatClientLate( true );
 
+						//  TODO  need to handle exception here for concurrent update error on the database, similar to
+						//           class ClientStatusUpdateServiceImpl
+
 						nodeClientStatusDAO.saveOrUpdate( client );
 					}
 

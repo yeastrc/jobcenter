@@ -1,6 +1,5 @@
 package org.jobcenter.jdbc;
 
-import java.sql.Connection;
 import java.util.List;
 
 import org.jobcenter.dto.*;
@@ -25,10 +24,12 @@ public interface JobJDBCDAO {
 	public  void insertRunOutputParam ( String key, String value, RunDTO run );
 
 	public  void retrieveRunOutputParams( RunDTO run );
-	
+
 	public  int insertRequest( int requestType );
 
 	public  void insertJob ( Job job );
+
+	public  void markJobInsertComplete ( Job job );
 
 	public  void insertJobParameter ( String key, String value, int jobId );
 
@@ -40,5 +41,5 @@ public interface JobJDBCDAO {
 	public  int  getJobCount( ListJobsRequest listJobsRequest );
 
 	public  List<Integer>  getJobIdList( ListJobsRequest listJobsRequest );
-	
+
 }

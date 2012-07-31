@@ -147,7 +147,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 	 * @see org.jobcenter.job_module_interface.JobManagerInterface#processRequest()
 	 */
 	@Override
-	public void processRequest( ModuleInterfaceRequest jobManagerModuleRequest, ModuleInterfaceResponse jobManagerModuleResponse, ModuleInterfaceJobProgress jobManagerModuleJobProgress, ModuleInterfaceClientServices jobManagerClientServices ) throws Throwable {
+	public void processRequest( ModuleInterfaceRequest moduleRequest, ModuleInterfaceResponse moduleResponse, ModuleInterfaceJobProgress moduleJobProgress, ModuleInterfaceClientServices moduleInterfaceClientServices ) throws Throwable {
 
 //		log.error( "Logged to Error:  Called SampleMain.processRequest()" );
 
@@ -157,7 +157,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 
 
 
-		Map<String, String> firstRunOutputParams =  jobManagerClientServices.getFirstRunOutputParams();
+		Map<String, String> firstRunOutputParams =  moduleInterfaceClientServices.getFirstRunOutputParams();
 
 
 		if ( firstRunOutputParams == null ) {
@@ -179,7 +179,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 		log.info("Calling jobManagerClientServices.getRunCount()" );
 
 
-		int prevRunOutputParamsCount = jobManagerClientServices.getRunCount();
+		int prevRunOutputParamsCount = moduleInterfaceClientServices.getRunCount();
 
 		log.info("prevRunOutputParamsCount: " + prevRunOutputParamsCount );
 
@@ -187,7 +187,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 		log.info("Calling jobManagerClientServices.getRunOutputParamsUsingIndex( 1 );" );
 
 
-		Map<String, String> secondRunOutputParams =  jobManagerClientServices.getRunOutputParamsUsingIndex( 1 );
+		Map<String, String> secondRunOutputParams =  moduleInterfaceClientServices.getRunOutputParamsUsingIndex( 1 );
 
 
 		if ( secondRunOutputParams == null ) {
@@ -209,7 +209,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 		log.info("Calling jobManagerClientServices.getRunOutputParamsUsingIndex( 2 );" );
 
 
-		Map<String, String> thirdRunOutputParams =  jobManagerClientServices.getRunOutputParamsUsingIndex( 2 );
+		Map<String, String> thirdRunOutputParams =  moduleInterfaceClientServices.getRunOutputParamsUsingIndex( 2 );
 
 
 		if ( thirdRunOutputParams == null ) {
@@ -232,7 +232,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 
 		log.info("Calling jobManagerClientServices.getPreviousRunOutputParams();" );
 
-		Map<String, String> prevRunOutputParams =  jobManagerClientServices.getPreviousRunOutputParams();
+		Map<String, String> prevRunOutputParams =  moduleInterfaceClientServices.getPreviousRunOutputParams();
 
 
 		if ( prevRunOutputParams == null ) {
@@ -255,7 +255,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 		log.info("Calling jobManagerModuleRequest.getJobParameters()" );
 
 
-		Map<String, String> parameters = jobManagerModuleRequest.getJobParameters();
+		Map<String, String> parameters = moduleRequest.getJobParameters();
 
 
 
@@ -286,9 +286,9 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 //			while ( ! successfullySubmittedJob ) {
 //
 //				try {
-//					jobManagerClientServices.submitJob( "Testing" , null, "sampleModule", "submitter.test", 5, null);
+//					moduleInterfaceClientServices.submitJob( "Testing" , null, "sampleModule", "submitter.test", 5, null);
 //
-////					jobManagerClientServices.submitJob( requestTypeName, requestId, jobTypeName, submitter, priority, jobParameters)
+////					moduleInterfaceClientServices( requestTypeName, requestId, jobTypeName, submitter, priority, jobParameters)
 //
 //					successfullySubmittedJob = true;
 //
@@ -311,11 +311,11 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 
 				System.out.println( "SampleMain.processRequest(), next sleeping 65 seconds to simulate time to do work." );
 
-				jobManagerModuleJobProgress.progressPing();
+				moduleJobProgress.progressPing();
 
-				jobManagerModuleJobProgress.supportsPercentComplete();
+				moduleJobProgress.supportsPercentComplete();
 
-				jobManagerModuleJobProgress.updatePercentComplete( 5 );
+				moduleJobProgress.updatePercentComplete( 5 );
 
 				synchronized (this) {
 					wait( 65 * 1000);
@@ -329,9 +329,9 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 				System.out.println( "SampleMain.processRequest(), next sleeping 48 seconds to simulate time to do work." );
 
 
-				jobManagerModuleJobProgress.progressPing();
+				moduleJobProgress.progressPing();
 
-				jobManagerModuleJobProgress.updatePercentComplete( 30 );
+				moduleJobProgress.updatePercentComplete( 30 );
 
 				synchronized (this) {
 					wait( 48 * 1000 );
@@ -360,14 +360,14 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 
 //		jobStatus = JobStatusValuesConstants.JOB_STATUS_HARD_ERROR;
 
-		jobManagerModuleResponse.setStatusCode( jobStatus );
+		moduleResponse.setStatusCode( jobStatus );
 
-		jobManagerModuleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_MSG, "Successful Completion Sample Main" );
+		moduleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_MSG, "Successful Completion Sample Main" );
 
-		jobManagerModuleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_WARNING, "Second Message, warning" );
+		moduleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_WARNING, "Second Message, warning" );
 
 
-		jobManagerModuleResponse.addRunOutputParam( "SampleModKeyV2", "SampleModValueV2" );
+		moduleResponse.addRunOutputParam( "SampleModKeyV2", "SampleModValueV2" );
 
 
 	}

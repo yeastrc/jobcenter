@@ -3,7 +3,7 @@
   type="WEB"
   name="JobCenter_GUI_Web_App"
   id="myeclipse.1284076658673"
-  context-root="/jobmanager"
+  context-root="/jobcenter"
   j2ee-spec="1.4"
   archive="JobCenter_GUI_Web_App.war">
   <attributes>

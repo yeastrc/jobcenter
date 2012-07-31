@@ -18,8 +18,8 @@ import org.jobcenter.request.JobRequestModuleInfo;
 public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNextJobForClientJDBCDAO {
 
 	private static Logger log = Logger.getLogger(GetNextJobForClientJDBCDAOImpl.class);
-	
-	
+
+
 
 
 
@@ -32,7 +32,7 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 			+ " WHERE ( status_id = " + JobStatusValuesConstants.JOB_STATUS_SUBMITTED
 			+ "           OR  status_id = "  + JobStatusValuesConstants.JOB_STATUS_SOFT_ERROR
 			+ "           OR  status_id = "  + JobStatusValuesConstants.JOB_STATUS_REQUEUED + " )  "
-				+ " AND enabled = 1 AND ( ";
+				+ " AND insert_complete = 'T' AND enabled = 1 AND ( ";
 
 	private static String
 	getJobForJobRequestQuerySqlStringOrderBy
@@ -106,7 +106,7 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 		sql.append( getJobForJobRequestQuerySqlStringOrderBy );
 
 		String sqlString = sql.toString();
-		
+
 		Connection connection = null;
 
 
@@ -234,7 +234,7 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 					// ignore
 				}
 			}
-		
+
 		}
 
 		return job;
