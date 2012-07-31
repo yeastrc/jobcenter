@@ -1,7 +1,0 @@
-
-The client produces log files to help with tracking what is happening with the client and diagnosing problems.
-Modules can also produce log files.
-
-The client and the provided modules write log files in the "logs" directory under the root directory of the client installation.
-
-The files with "errors" in the filenames contain only errors which usually need to be addressed.
