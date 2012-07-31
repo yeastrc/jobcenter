@@ -1,11 +1,13 @@
 package org.jobcenter.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.JobStatusValuesConstants;
+import org.jobcenter.constants.RunMessageTypesConstants;
 import org.jobcenter.dao.JobDAO;
 import org.jobcenter.dao.RunDAO;
 import org.jobcenter.dao.StatusDAO;
@@ -134,16 +136,6 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 
 		RunDTO runFromRequest = jobFromRequest.getCurrentRun();
 
-		StatusDTO newStatus = statusDAO.findById(  jobFromRequest.getStatusId() );
-
-		if ( newStatus == null ) {
-
-			String msg = "New job status not found in status table so not valid, = " +  jobFromRequest.getStatusId();
-
-			log.error( msg );
-			throw new RuntimeException( msg );
-		}
-
 		//  update run
 
 		RunDTO run = runDAO.findById( runFromRequest.getId() );
@@ -184,6 +176,33 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 			}
 
 
+			List<RunMessageDTO> runMessages = runFromRequest.getRunMessages();
+
+
+			StatusDTO newStatus = statusDAO.findById(  jobFromRequest.getStatusId() );
+
+			if ( newStatus == null ) {
+
+				String msg = "New job status not found in status table so not valid, = " +  jobFromRequest.getStatusId();
+
+				log.error( msg );
+
+				//  Fail the job so the operator knows something bad happened.
+
+				newStatus = statusDAO.findById(  JobStatusValuesConstants.JOB_STATUS_HARD_ERROR );
+
+				runMessages = new ArrayList<RunMessageDTO>();
+
+				RunMessageDTO runMessageDTO = new RunMessageDTO();
+				runMessages.add( runMessageDTO );
+
+				runMessageDTO.setType( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR );
+
+				runMessageDTO.setMessage( "System error.  Status id value set by module is not a valid status value.  Status id value from module = " + jobFromRequest.getStatusId() );
+
+//				throw new RuntimeException( msg );
+			}
+
 			run.setStatus( newStatus );
 
 			if ( runFromRequest.getEndDate() != null ) {
@@ -215,8 +234,6 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 			jobDAO.saveOrUpdate( job );
 
 			// save run messages
-
-			List<RunMessageDTO> runMessages = runFromRequest.getRunMessages();
 
 			if ( runMessages != null && ! runMessages.isEmpty() ) {
 
