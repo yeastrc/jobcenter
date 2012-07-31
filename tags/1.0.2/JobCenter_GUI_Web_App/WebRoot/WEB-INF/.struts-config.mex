@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowViewLayout Version="1.2">
+  <StrutsActivity path="/listJobs.do" location="129,99" dimension="150,100" />
+  <StrutsActivity path="/listRequests.do" location="50,1250" dimension="271,96" />
+  <StrutsActivity path="/listNodes.do" location="60,255" dimension="282,96" />
+  <StrutsActivity path="/viewJob.do" location="60,390" dimension="273,96" />
+  <StrutsActivity path="/viewRun.do" location="60,540" dimension="276,96" />
+  <StrutsActivity path="/requeueJob.do" location="350,1050" dimension="326,96" />
+  <StrutsActivity path="/cancelJob.do" location="795,435" dimension="284,96" />
+  <StrutsActivity path="/updateJobPriority.do" location="950,1050" dimension="324,96" />
+  <StrutsActivity path="/listJobTypes.do" location="650,850" dimension="297,96" />
+  <StrutsActivity path="/listRequestTypes.do" location="50,850" dimension="321,96" />
+  <StrutsActivity path="/listClientsStatus.do" location="650,1250" dimension="160,96" />
+  <StrutsActivity path="/clientsConnectedList.do" location="50,1450" dimension="342,96" />
+  <StrutsActivity path="/clientsUsingSameNodeNameList.do" location="795,1365" dimension="404,96" />
+  <StrutsActivity path="def.template.listJobs" location="420,120" dimension="138,51" />
+  <StrutsActivity path="def.template.listRequests" location="950,250" dimension="162,51" />
+  <StrutsActivity path="def.template.listNodes" location="465,270" dimension="149,51" />
+  <StrutsActivity path="def.template.viewJob" location="435,420" dimension="142,51" />
+  <StrutsActivity path="def.template.viewRun" location="435,555" dimension="145,51" />
+  <StrutsActivity path="def.template.listJobTypes" location="650,650" dimension="164,51" />
+  <StrutsActivity path="def.template.listRequestTypes" location="50,1050" dimension="188,51" />
+  <StrutsActivity path="def.template.listClientsStatus" location="950,1250" dimension="183,51" />
+  <StrutsActivity path="def.template.clientsConnectedList" location="465,1455" dimension="210,51" />
+  <StrutsActivity path="def.template.clientsUsingSameNodeNameList" location="795,1545" dimension="272,51" />
+  <StrutsActivity path="def" location="435,675" dimension="47,51" />
+  <StrutsActivity path="def.template.listRequstTypesAction" location="950,650" dimension="217,51" />
+  <StrutsActivity path="def.template.ClientsUsingSameNodeNameList" location="810,1620" dimension="274,51" />
+  <StrutsActivity path="/clientsFailedToConnectList.do" location="60,1560" dimension="374,96" />
+  <StrutsActivity path="def.template.clientsFailedToConnectList" location="495,1590" dimension="242,51" />
+  <StrutsTransition id="/requeueJob.do,success,/viewJob.do,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="405,1050" />
+      <AbsolutePoint location="405,405" />
+      <AbsolutePoint location="333,405" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/listNodes.do,success,def.template.listNodes,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="342,295" />
+      <AbsolutePoint location="465,295" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/cancelJob.do,success,/viewJob.do,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="795,501" />
+      <AbsolutePoint location="196,501" />
+      <AbsolutePoint location="196,486" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/listRequests.do,success,def.template.listRequests,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="185,1298" />
+      <AbsolutePoint location="0,0" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/clientsConnectedList.do,success,def.template.clientsConnectedList,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="392,1480" />
+      <AbsolutePoint location="465,1480" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/listJobs.do,success,def.template.listJobs,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="279,145" />
+      <AbsolutePoint location="420,145" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/listRequestTypes.do,success,def.template.listRequestTypes,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="144,946" />
+      <AbsolutePoint location="144,1050" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/cancelJob.do,error,/viewJob.do,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="935,435" />
+      <AbsolutePoint location="935,-15" />
+      <AbsolutePoint location="-45,-15" />
+      <AbsolutePoint location="-45,438" />
+      <AbsolutePoint location="60,438" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/clientsFailedToConnectList.do,success,def.template.clientsFailedToConnectList,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="434,1615" />
+      <AbsolutePoint location="495,1615" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/clientsUsingSameNodeNameList.do,success,def.template.clientsUsingSameNodeNameList,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="931,1461" />
+      <AbsolutePoint location="931,1545" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/listClientsStatus.do,success,def.template.listClientsStatus,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="810,1275" />
+      <AbsolutePoint location="950,1275" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/viewJob.do,success,def.template.viewJob,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="333,445" />
+      <AbsolutePoint location="435,445" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/requeueJob.do,error,/viewJob.do,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="513,1098" />
+      <AbsolutePoint location="196,438" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/updateJobPriority.do,error,/viewJob.do,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="1112,1050" />
+      <AbsolutePoint location="1112,801" />
+      <AbsolutePoint location="15,801" />
+      <AbsolutePoint location="15,468" />
+      <AbsolutePoint location="60,468" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/viewRun.do,success,def.template.viewRun,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="336,580" />
+      <AbsolutePoint location="435,580" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/updateJobPriority.do,success,/viewJob.do,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="1182,1050" />
+      <AbsolutePoint location="1182,366" />
+      <AbsolutePoint location="196,366" />
+      <AbsolutePoint location="196,390" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/listJobTypes.do,success,def.template.listJobTypes,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="732,850" />
+      <AbsolutePoint location="732,701" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+</FlowViewLayout>
+

@@ -1,0 +1,65 @@
+
+
+  The client information will need to be configured in the database
+  to allow the client to connect to the server.
+
+  The server will return an error to the client if the client is not
+  in the configuration.
+
+  The easiest way to collect the information needed to configure the
+  client is to start the client from the command line while the
+  server is running.  The client will print out what IP address the
+  server sees the client as connecting from.  An example is:
+
+
+    The server returned an ERROR when the client made it's startup connection.
+     Error code = 2, error description = "node name invalid for network address".
+     The client's configured node name sent to the server = 'localNode'.
+     The client's IP address as seen by the server = 127.0.0.1
+
+
+   Using the IP address from the last line, "127.0.0.1" the database can
+   be configured for this database.
+
+     **  Note, if the client is connecting to the network using DHCP
+         ( The user did not assign an IP address ) the user may want
+         to configure the IP address using wild cards, as shown below.
+
+   First an entry in the table "node" needs to be made.
+   The "name" field needs to be populated with the value from the client
+   as printed in the message above in the next to last line, ie "localNode".
+   ( The quotes should not be placed in the field ).
+   The name value can also be retrieved from the client configuration in
+   the field "client.node.name" as described in the client installation document.
+
+   A SQL statement can look like:
+
+   INSERT INTO jobcenter.node (name, description) VALUES ('localNode' , 'localNode Description');
+
+   When that entry is created, a value is automatically populated in the field "id".
+
+   The "id" value is retrieved by doing a select from the table.
+
+   SELECT * FROM jobcenter.node
+
+   The row with the name you assigned has the value for the "id" you need for the next step.
+
+Table "node_access_rule"
+
+   The next step is to create an entry in the table "node_access_rule".
+
+   SQL
+
+   INSERT INTO jobcenter.node_access_rule ( node_id, network_address ) VALUES ( <node-id> , '<IP-Address>' );
+
+
+   Substitute the "id" from the node table for "<node-id>".
+
+   The value to substitute for "<IP-Address>" can either be the IP address returned from the client, or a
+   shortened version with an "*" on the end ( indicating to match everything from here to the end of the
+   IP address ).
+
+
+
+
+

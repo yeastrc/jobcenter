@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: org.jobcenter.client.program.JobCenterClientRoot
+Class-Path: . mail.jar jobcenter_client_module_interface.jar
+
