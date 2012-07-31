@@ -25,6 +25,8 @@
 	    </fileset>
 	    <fileset dir="." includes="schema/**">
 	    </fileset>
+	    <fileset dir="." includes="schema_upgrades/**">
+	    </fileset>
 	</zip>
 
   </target>
