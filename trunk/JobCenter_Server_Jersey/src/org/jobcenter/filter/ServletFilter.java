@@ -33,7 +33,7 @@ public class ServletFilter implements Filter {
 	//import com.sun.org.apache.commons.logging.Log;
 	//import com.sun.org.apache.commons.logging.LogFactory;
 
-//	private static final Log log = LogFactory.getLog(JobManagerFilter.class);
+//	private static final Log log = LogFactory.getLog(JobCenterFilter.class);
 
 
 	private static final Logger log = Logger.getLogger(ServletFilter.class);

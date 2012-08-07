@@ -73,20 +73,20 @@ public class JobCenterClientRoot {
 	public static void main(String[] args) throws Throwable {
 
 
-		System.out.println( "JobManagerClientRoot::main() Starting,  now(): " + new Date() );
+		System.out.println( "JobCenterClientRoot::main() Starting,  now(): " + new Date() );
 
 		try {
 
 
 
-			JobCenterClientRoot jobManagerClientRoot = new JobCenterClientRoot();
+			JobCenterClientRoot jobCenterClientRoot = new JobCenterClientRoot();
 
 
-			JobCenterClientRootShutdown jobManagerClientRootShutdown = new JobCenterClientRootShutdown();
+			JobCenterClientRootShutdown jobCenterClientRootShutdown = new JobCenterClientRootShutdown();
 
-			jobManagerClientRootShutdown.setMainThread( Thread.currentThread() );
+			jobCenterClientRootShutdown.setMainThread( Thread.currentThread() );
 
-			jobManagerClientRootShutdown.setJobManagerClientRootProgram( jobManagerClientRoot );
+			jobCenterClientRootShutdown.setJobCenterClientRootProgram( jobCenterClientRoot );
 
 
 
@@ -97,10 +97,10 @@ public class JobCenterClientRoot {
 			//  public void addShutdownHook(Thread hook)
 
 			Runtime runtime = Runtime.getRuntime();
-			runtime.addShutdownHook( jobManagerClientRootShutdown );
+			runtime.addShutdownHook( jobCenterClientRootShutdown );
 
 
-			jobManagerClientRoot.execute( );
+			jobCenterClientRoot.execute( );
 
 
 
@@ -108,7 +108,7 @@ public class JobCenterClientRoot {
 		} catch ( Throwable t ) {
 
 
-			String msg = "jobManagerClientRoot:main(...): Exception = " + t.toString();
+			String msg = "jobCenterClientRoot:main(...): Exception = " + t.toString();
 
 			System.out.println( msg );
 			t.printStackTrace();
@@ -158,13 +158,13 @@ public class JobCenterClientRoot {
 			this.mainThread = mainThread;
 		}
 
-		public JobCenterClientRoot getJobManagerClientRootProgram() {
+		public JobCenterClientRoot getJobCenterClientRootProgram() {
 			return jobCenterClientRootProgram;
 		}
 
-		public void setJobManagerClientRootProgram(
-				JobCenterClientRoot jobManagerClientRootProgram) {
-			this.jobCenterClientRootProgram = jobManagerClientRootProgram;
+		public void setJobCenterClientRootProgram(
+				JobCenterClientRoot jobCenterClientRootProgram) {
+			this.jobCenterClientRootProgram = jobCenterClientRootProgram;
 		}
 
 

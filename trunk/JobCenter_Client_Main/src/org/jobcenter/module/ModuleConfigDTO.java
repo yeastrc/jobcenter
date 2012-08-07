@@ -10,15 +10,42 @@ public class ModuleConfigDTO {
 	private String moduleSubDirectory;
 
 	/**
-	 * Max number of threads executing tasks for this module ( based on the subdirectory for this module )
+	 * Max number of concurrent jobs for this module ( based on the subdirectory for this module )
 	 */
-	private int maxNumberThreads;
+	private int maxNumberConcurrentJobs;
 
 
 	/**
-	 * is the max number of theads set?
+	 * is the max number of concurrent jobs set?
 	 */
-	private boolean maxNumberThreadsSet;
+	private boolean maxNumberConcurrentJobsSet;
+
+	/**
+	 * Max number of threads per jobs for this module ( based on the subdirectory for this module )
+	 */
+	private int maxNumberThreadsPerJob;
+
+	/**
+	 * is the Max number of threads per jobs set to unlimited?
+	 */
+	private boolean maxNumberThreadsPerJobUnlimited;
+
+	/**
+	 * is the Max number of threads per jobs set?
+	 */
+	private boolean maxNumberThreadsPerJobSet;
+
+	/**
+	 * min number of threads per jobs for this module ( based on the subdirectory for this module )
+	 */
+	private int minNumberThreadsPerJob;
+
+
+	/**
+	 * is the min number of threads per jobs set?
+	 */
+	private boolean minNumberThreadsPerJobSet;
+
 
 
 	/**
@@ -45,6 +72,24 @@ public class ModuleConfigDTO {
 
 
 
+	@Override
+	public String toString() {
+		return "ModuleConfigDTO [maxNumberConcurrentJobs="
+				+ maxNumberConcurrentJobs + ", maxNumberConcurrentJobsSet="
+				+ maxNumberConcurrentJobsSet + ", maxNumberThreadsPerJob="
+				+ maxNumberThreadsPerJob + ", maxNumberThreadsPerJobSet="
+				+ maxNumberThreadsPerJobSet
+				+ ", maxNumberThreadsPerJobUnlimited="
+				+ maxNumberThreadsPerJobUnlimited + ", minNumberThreadsPerJob="
+				+ minNumberThreadsPerJob + ", minNumberThreadsPerJobSet="
+				+ minNumberThreadsPerJobSet + ", moduleFailedToLoadOrInit="
+				+ moduleFailedToLoadOrInit + ", moduleInstanceCount="
+				+ moduleInstanceCount + ", moduleJavaClass=" + moduleJavaClass
+				+ ", moduleName=" + moduleName + ", moduleSubDirectory="
+				+ moduleSubDirectory + ", moduleVersion=" + moduleVersion + "]";
+	}
+
+
 	public String getModuleJavaClass() {
 		return moduleJavaClass;
 	}
@@ -59,14 +104,6 @@ public class ModuleConfigDTO {
 
 	public void setModuleSubDirectory(String moduleSubDirectory) {
 		this.moduleSubDirectory = moduleSubDirectory;
-	}
-
-	public int getMaxNumberThreads() {
-		return maxNumberThreads;
-	}
-
-	public void setMaxNumberThreads(int maxNumberThreads) {
-		this.maxNumberThreads = maxNumberThreads;
 	}
 
 	public String getModuleName() {
@@ -85,14 +122,6 @@ public class ModuleConfigDTO {
 		this.moduleVersion = moduleVersion;
 	}
 
-	public boolean isMaxNumberThreadsSet() {
-		return maxNumberThreadsSet;
-	}
-
-	public void setMaxNumberThreadsSet(boolean maxNumberThreadsSet) {
-		this.maxNumberThreadsSet = maxNumberThreadsSet;
-	}
-
 	public boolean isModuleFailedToLoadOrInit() {
 		return moduleFailedToLoadOrInit;
 	}
@@ -107,6 +136,63 @@ public class ModuleConfigDTO {
 
 	public void setModuleInstanceCount(int moduleInstanceCount) {
 		this.moduleInstanceCount = moduleInstanceCount;
+	}
+
+	public int getMaxNumberConcurrentJobs() {
+		return maxNumberConcurrentJobs;
+	}
+
+	public void setMaxNumberConcurrentJobs(int maxNumberConcurrentJobs) {
+		this.maxNumberConcurrentJobs = maxNumberConcurrentJobs;
+	}
+
+	public boolean isMaxNumberConcurrentJobsSet() {
+		return maxNumberConcurrentJobsSet;
+	}
+
+	public void setMaxNumberConcurrentJobsSet(boolean maxNumberConcurrentJobsSet) {
+		this.maxNumberConcurrentJobsSet = maxNumberConcurrentJobsSet;
+	}
+
+	public int getMaxNumberThreadsPerJob() {
+		return maxNumberThreadsPerJob;
+	}
+
+	public void setMaxNumberThreadsPerJob(int maxNumberThreadsPerJob) {
+		this.maxNumberThreadsPerJob = maxNumberThreadsPerJob;
+	}
+
+	public int getMinNumberThreadsPerJob() {
+		return minNumberThreadsPerJob;
+	}
+
+	public void setMinNumberThreadsPerJob(int minNumberThreadsPerJob) {
+		this.minNumberThreadsPerJob = minNumberThreadsPerJob;
+	}
+
+	public boolean isMaxNumberThreadsPerJobSet() {
+		return maxNumberThreadsPerJobSet;
+	}
+
+	public void setMaxNumberThreadsPerJobSet(boolean maxNumberThreadsPerJobSet) {
+		this.maxNumberThreadsPerJobSet = maxNumberThreadsPerJobSet;
+	}
+
+	public boolean isMinNumberThreadsPerJobSet() {
+		return minNumberThreadsPerJobSet;
+	}
+
+	public void setMinNumberThreadsPerJobSet(boolean minNumberThreadsPerJobSet) {
+		this.minNumberThreadsPerJobSet = minNumberThreadsPerJobSet;
+	}
+
+	public boolean isMaxNumberThreadsPerJobUnlimited() {
+		return maxNumberThreadsPerJobUnlimited;
+	}
+
+	public void setMaxNumberThreadsPerJobUnlimited(
+			boolean maxNumberThreadsPerJobUnlimited) {
+		this.maxNumberThreadsPerJobUnlimited = maxNumberThreadsPerJobUnlimited;
 	}
 
 

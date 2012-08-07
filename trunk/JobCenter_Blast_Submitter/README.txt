@@ -1,5 +1,5 @@
 
-!!!!!! Dont Forget to Install the JobManager_Blast_Module. This submitter is useless without it. !!!!!!
+!!!!!! Dont Forget to Install the JobCenter_Blast_Module. This submitter is useless without it. !!!!!!
 
 Assuming that you followed the directions for installing the server (mysql, apache, tomcat), simply export a project .war file
 and drop it in the webapps directory.

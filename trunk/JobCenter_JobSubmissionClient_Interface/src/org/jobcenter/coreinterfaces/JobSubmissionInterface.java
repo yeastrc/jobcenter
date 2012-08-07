@@ -17,7 +17,7 @@ public interface JobSubmissionInterface {
 
 	/**
 	 * Set the name in the node table to be used for this submit job,
-	 *   or use the default specified in project JobManager_Base class org.jobcenter.constants.Constants.SUBMISSION_CLIENT_NODE_NAME_DEFAULT
+	 *   or use the default specified in project JobCenter_Base class org.jobcenter.constants.Constants.SUBMISSION_CLIENT_NODE_NAME_DEFAULT
 	 *
 	 * @param nodeName
 	 */

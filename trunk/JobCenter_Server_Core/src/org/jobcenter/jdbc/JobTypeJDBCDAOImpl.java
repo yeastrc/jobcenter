@@ -47,7 +47,7 @@ public class JobTypeJDBCDAOImpl extends JDBCBaseDAO implements JobTypeJDBCDAO {
 
 			connection = getConnection( );
 
-			//			connection = JobManagerDBConnectionFactory.getConnection( );
+			//			connection = JobCenterDBConnectionFactory.getConnection( );
 
 
 

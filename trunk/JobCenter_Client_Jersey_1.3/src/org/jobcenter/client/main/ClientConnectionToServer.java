@@ -38,7 +38,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 	private static final int RETRY_SLEEP_TIME = 1000; // 1 second
 
-	private static final int RETRY_COUNT_MAX = 2; // max retries before rethrow exception
+	private static final int RETRY_COUNT_MAX = 5; // max retries before rethrow exception
 
 
 	private static Logger log = Logger.getLogger(ClientConnectionToServer.class);
@@ -54,7 +54,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 	@Override
 	public void init() throws Throwable {
 
-		log.info( "Entered init() in project JobManager_Client_Jersey_1.3" );
+		log.debug( "Entered init() in project JobCenter_Client_Jersey_1.3" );
 
 		try {
 
@@ -64,7 +64,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 			if ( props == null ) {
 
-				String msg = "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:    Properties file '" + PROPERTIES_FILE_NAME + "' not found.";
+				String msg = "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:    Properties file '" + PROPERTIES_FILE_NAME + "' not found.";
 
 				log.error( msg );
 
@@ -76,7 +76,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 				configProps.load(props);
 
-//				log.info( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  config.location = " + configProps.getProperty("config.location") );
+//				log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  config.location = " + configProps.getProperty("config.location") );
 
 				connectionURL = configProps.getProperty("server.url") + "/" + WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT;
 			}
@@ -85,7 +85,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		} catch ( RuntimeException e ) {
 
-			log.info( "In init(),   Properties file '" + PROPERTIES_FILE_NAME + "', exception: " + e.toString(), e );
+			log.error( "In init(),   Properties file '" + PROPERTIES_FILE_NAME + "', exception: " + e.toString(), e );
 
 			throw e;
 		}
@@ -105,7 +105,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		} catch ( RuntimeException e ) {
 
-			log.info( "In destroy(), exception: " + e.toString(), e );
+			log.error( "In destroy(), exception: " + e.toString(), e );
 
 			throw e;
 		}
@@ -140,9 +140,9 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobManager_Client_Jersey_1.3" );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobCenter_Client_Jersey_1.3" );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
 		}
 
 		/////////////////////////////
@@ -169,15 +169,19 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 			} catch ( Throwable t ) {
 
-				log.info( "Call to server from clientStartup() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
+				log.warn( "Call to server from clientStartup() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
 
 
 				retryCount++;
 
 				if ( retryCount >= RETRY_COUNT_MAX ) {
 
-					throw new Exception( "\n\n!!!!!!!!!!!   Exception connecting to the server for the first time.  \n\n"
-							+ "Trying to connect using the URL:  " + fullConnectionURL + "\n\n", t );
+					String msg = "\n\n!!!!!!!!!!!   Exception connecting to the server for the first time.  \n\n"
+						+ "Trying to connect using the URL:  " + fullConnectionURL + "\n\n";
+
+					log.error( msg, t );
+
+					throw new Exception( msg, t );
 
 				}
 
@@ -186,7 +190,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 				} catch (InterruptedException e) {
 
-					log.info( "Sleep waiting for retry interrupted with InterruptedException", e );
+					log.warn( "Sleep waiting for retry interrupted with InterruptedException", e );
 				}
 			}
 		}
@@ -194,7 +198,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  clientStartupResponse.isErrorResponse() = " + clientStartupResponse.isErrorResponse()
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  clientStartupResponse.isErrorResponse() = " + clientStartupResponse.isErrorResponse()
 						+ ", clientStartupResponse.getErrorCode() = " + clientStartupResponse.getErrorCode()
 //						+ ",  clientStartupResponse.getNodeIndentifier() = " + clientStartupResponse.getNodeIndentifier()
 						);
@@ -233,9 +237,9 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobManager_Client_Jersey_1.3" );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobCenter_Client_Jersey_1.3" );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
 		}
 
 		/////////////////////////////
@@ -262,15 +266,19 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 			} catch ( Throwable t ) {
 
-				log.info( "Call to server from clientStatusUpdate() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
+				log.warn( "Call to server from clientStatusUpdate() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
 
 
 				retryCount++;
 
 				if ( retryCount >= RETRY_COUNT_MAX ) {
 
-					throw new Exception( "!!!!!!!!!!!   Exception connecting to the server.  "
-							+ "In clientStatusUpdate(), trying to connect using the URL:  " + fullConnectionURL, t );
+					String msg = "!!!!!!!!!!!   Exception connecting to the server.  "
+						+ "In clientStatusUpdate(), trying to connect using the URL:  " + fullConnectionURL;
+
+					log.error( msg, t );
+
+					throw new Exception( msg, t );
 
 //					throw t; //////   exit by rethrowing the exception if the retry count has been exceeded
 				}
@@ -280,7 +288,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 				} catch (InterruptedException e) {
 
-					log.info( "Sleep waiting for retry interrupted with InterruptedException", e );
+					log.warn( "Sleep waiting for retry interrupted with InterruptedException", e );
 				}
 			}
 		}
@@ -288,7 +296,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer: clientStatusUpdate(...):  response.isErrorResponse() = " + response.isErrorResponse()
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer: clientStatusUpdate(...):  response.isErrorResponse() = " + response.isErrorResponse()
 						+ ", response.getErrorCode() = " + response.getErrorCode()
 //						+ ",  clientHeartbeatResponse.getNodeIndentifier() = " + clientHeartbeatResponse.getNodeIndentifier()
 						);
@@ -331,9 +339,9 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobManager_Client_Jersey_1.3" );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobCenter_Client_Jersey_1.3" );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
 		}
 
 		/////////////////////////////
@@ -360,14 +368,18 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 			} catch ( Throwable t ) {
 
-				log.info( "Call to server with jobRequest threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
+				log.warn( "Call to server with jobRequest threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
 
 				retryCount++;
 
 				if ( retryCount >= RETRY_COUNT_MAX ) {
 
-					throw new Exception( "!!!!!!!!!!!   Exception connecting to the server.  "
-							+ "In getNextJobToProcess(), trying to connect using the URL:  " + fullConnectionURL, t );
+					String msg =  "!!!!!!!!!!!   Exception connecting to the server.  "
+						+ "In getNextJobToProcess(), trying to connect using the URL:  " + fullConnectionURL;
+
+					log.error( msg, t );
+
+					throw new Exception( msg, t );
 
 //					throw t;
 				}
@@ -377,7 +389,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 				} catch (InterruptedException e) {
 
-					log.info( "Sleep waiting for retry interrupted with InterruptedException", e );
+					log.warn( "Sleep waiting for retry interrupted with InterruptedException", e );
 				}
 			}
 		}
@@ -387,7 +399,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 		if ( log.isDebugEnabled() ) {
 
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  jobResponse.isErrorResponse() = " + jobResponse.isErrorResponse()
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  jobResponse.isErrorResponse() = " + jobResponse.isErrorResponse()
 						+ ", jobResponse.getErrorCode() = " + jobResponse.getErrorCode()
 						+ ",  jobResponse.isJobFound() = " + jobResponse.isJobFound() );
 
@@ -402,27 +414,30 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 			if ( job != null ) {
 
-				log.info( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
+				if ( log.isDebugEnabled() ) {
 
-				log.info( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  jobResponse.getJob().getId() =  " + job.getId()
-					+ ", getJobTypeId() =  " + job.getJobTypeId()
-					+ ", getPriority() =  " + job.getPriority()
-					+ ", getJob().getgetStatusId() =  " + job.getStatusId()
-					+ ", jobResponse.getJob().getSubmitter() =  " + job.getSubmitter()
-					+ ", jobResponse.getJob().getSubmitDate() =  " + job.getSubmitDate() );
+					log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
 
-				if ( job.getJobParameters() == null ) {
+					log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  jobResponse.getJob().getId() =  " + job.getId()
+							+ ", getJobTypeId() =  " + job.getJobTypeId()
+							+ ", getPriority() =  " + job.getPriority()
+							+ ", getJob().getgetStatusId() =  " + job.getStatusId()
+							+ ", jobResponse.getJob().getSubmitter() =  " + job.getSubmitter()
+							+ ", jobResponse.getJob().getSubmitDate() =  " + job.getSubmitDate() );
 
-					log.info( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  jobResponse.getJobParameters() == null " );
+					if ( job.getJobParameters() == null ) {
 
-				} else {
+						log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  jobResponse.getJobParameters() == null " );
 
-					for ( Map.Entry<String, String> entry : job.getJobParameters().entrySet() ) {
+					} else {
 
-						log.info( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  jobResponse.getJob().getJobParameters() entry.getKey() =  |"
-								+ entry.getKey()
-								+ "|, entry.getValue() =  |" + entry.getValue() + "|." );
+						for ( Map.Entry<String, String> entry : job.getJobParameters().entrySet() ) {
 
+							log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  jobResponse.getJob().getJobParameters() entry.getKey() =  |"
+									+ entry.getKey()
+									+ "|, entry.getValue() =  |" + entry.getValue() + "|." );
+
+						}
 					}
 				}
 			}
@@ -461,9 +476,9 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobManager_Client_Jersey_1.3" );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobCenter_Client_Jersey_1.3" );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
 		}
 
 		/////////////////////////////
@@ -491,7 +506,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 			} catch ( Throwable t ) {
 
 
-				log.info( "Call to server from updateServerFromJobRunOnClient() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
+				log.warn( "Call to server from updateServerFromJobRunOnClient() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
 
 				retryCount++;
 
@@ -508,7 +523,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 				} catch (InterruptedException e) {
 
-					log.info( "Sleep waiting for retry interrupted with InterruptedException", e );
+					log.warn( "Sleep waiting for retry interrupted with InterruptedException", e );
 				}
 			}
 		}
@@ -516,9 +531,9 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  updateServerFromJobRunOnClientResponse.isErrorResponse() = " + updateServerFromJobRunOnClientResponse.isErrorResponse() );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  updateServerFromJobRunOnClientResponse.isErrorResponse() = " + updateServerFromJobRunOnClientResponse.isErrorResponse() );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  updateServerFromJobRunOnClientResponse.getErrorCode() = " + updateServerFromJobRunOnClientResponse.getErrorCode() );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  updateServerFromJobRunOnClientResponse.getErrorCode() = " + updateServerFromJobRunOnClientResponse.getErrorCode() );
 		}
 
 		return updateServerFromJobRunOnClientResponse;
@@ -559,11 +574,11 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobManager_Client_Jersey_1.3" );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobCenter_Client_Jersey_1.3" );
 
 			log.debug( "Entered getRunRequest( GetRunRequest getRunRequest ). Job id = " + getRunRequest.getJobId() + ", Run id = " + getRunRequest.getCurrentRunId() );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
 		}
 
 		/////////////////////////////
@@ -590,7 +605,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 			} catch ( Throwable t ) {
 
-				log.info( "Call to server from getRunRequest() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
+				log.warn( "Call to server from getRunRequest() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
 
 				retryCount++;
 
@@ -607,16 +622,16 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 				} catch (InterruptedException e) {
 
-					log.info( "Sleep waiting for retry interrupted with InterruptedException", e );
+					log.warn( "Sleep waiting for retry interrupted with InterruptedException", e );
 				}
 			}
 		}
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:   getRunRequest( GetRunRequest getRunRequest ):  getRunResponse.isErrorResponse() = " + getRunResponse.isErrorResponse() );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:   getRunRequest( GetRunRequest getRunRequest ):  getRunResponse.isErrorResponse() = " + getRunResponse.isErrorResponse() );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:   getRunRequest( GetRunRequest getRunRequest ):  getRunResponse.getErrorCode() = " + getRunResponse.getErrorCode() );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:   getRunRequest( GetRunRequest getRunRequest ):  getRunResponse.getErrorCode() = " + getRunResponse.getErrorCode() );
 		}
 
 		return getRunResponse;
@@ -661,11 +676,11 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobManager_Client_Jersey_1.3" );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  ClientConnectionToServer in project JobCenter_Client_Jersey_1.3" );
 
 			log.debug( "Entered getRunIdListRequest( GetRunRequest getRunIdListRequest ). Job id = " + getRunIdListRequest.getJobId() );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  fullConnectionURL = " + fullConnectionURL );
 		}
 
 		/////////////////////////////
@@ -692,7 +707,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 			} catch ( Throwable t ) {
 
-				log.info( "Call to server from getRunIdListRequest() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
+				log.warn( "Call to server from getRunIdListRequest() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
 
 				retryCount++;
 
@@ -709,7 +724,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 				} catch (InterruptedException e) {
 
-					log.info( "Sleep waiting for retry interrupted with InterruptedException", e );
+					log.warn( "Sleep waiting for retry interrupted with InterruptedException", e );
 				}
 			}
 		}
@@ -717,9 +732,9 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:   getRunIdListRequest( GetRunIdListRequest getRunIdListRequest ):  getRunIdListResponse.isErrorResponse() = " + getRunIdListResponse.isErrorResponse() );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:   getRunIdListRequest( GetRunIdListRequest getRunIdListRequest ):  getRunIdListResponse.isErrorResponse() = " + getRunIdListResponse.isErrorResponse() );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:   getRunIdListRequest( GetRunIdListRequest getRunIdListRequest ):  getRunIdListResponse.getErrorCode() = " + getRunIdListResponse.getErrorCode() );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:   getRunIdListRequest( GetRunIdListRequest getRunIdListRequest ):  getRunIdListResponse.getErrorCode() = " + getRunIdListResponse.getErrorCode() );
 		}
 
 		return getRunIdListResponse;
@@ -779,7 +794,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 			} catch ( Throwable t ) {
 
-				log.info( "Call to server from submitJob() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
+				log.warn( "Call to server from submitJob() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
 
 				retryCount++;
 
@@ -796,7 +811,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 				} catch (InterruptedException e) {
 
-					log.info( "Sleep waiting for retry interrupted with InterruptedException", e );
+					log.warn( "Sleep waiting for retry interrupted with InterruptedException", e );
 				}
 			}
 		}
@@ -805,9 +820,9 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:   submitJob( SubmitJobRequest submitJobRequest )):  submitJobResponse.isErrorResponse() = " + submitJobResponse.isErrorResponse() );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:   submitJob( SubmitJobRequest submitJobRequest )):  submitJobResponse.isErrorResponse() = " + submitJobResponse.isErrorResponse() );
 
-			log.debug( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:   submitJob( SubmitJobRequest submitJobRequest ):  submitJobResponse.getErrorCode() = " + submitJobResponse.getErrorCode() );
+			log.debug( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:   submitJob( SubmitJobRequest submitJobRequest ):  submitJobResponse.getErrorCode() = " + submitJobResponse.getErrorCode() );
 		}
 
 

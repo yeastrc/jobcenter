@@ -18,6 +18,11 @@ public class ClientConfigDTO {
 	private String clientNodeName;
 
 	/**
+	 * Max number of concurrent jobs running on modules
+	 */
+	private int maxConcurrentJobs;
+
+	/**
 	 * Max number of threads running tasks on modules
 	 */
 	private int maxThreadsForModules;
@@ -126,5 +131,13 @@ public class ClientConfigDTO {
 
 	public void setClientNodeName(String clientNodeName) {
 		this.clientNodeName = clientNodeName;
+	}
+
+	public int getMaxConcurrentJobs() {
+		return maxConcurrentJobs;
+	}
+
+	public void setMaxConcurrentJobs(int maxConcurrentJobs) {
+		this.maxConcurrentJobs = maxConcurrentJobs;
 	}
 }

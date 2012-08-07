@@ -46,16 +46,13 @@ public class GetJob {
 
 
 
-
-
 	/**
 	 * @return
 	 * @throws Throwable
 	 */
-	public JobResponse getNextJob( )  throws Throwable {
+	public JobResponse getNextJob( int availableThreadCount )  throws Throwable {
 
-
-		log.info( "getNextJob( ) called." );
+		log.debug( "getNextJob( ) called." );
 
 		//   TODO    !!!!!!!!!!  for now code for one version per module, fix later
 
@@ -74,7 +71,7 @@ public class GetJob {
 
 			moduleTracker.setModuleConfigDTO( configDTOModuleInList );
 
-			moduleTracker.setThreadsAvailableCount( configDTOModuleInList.getMaxNumberThreads() );
+			moduleTracker.setConcurrentJobsAvailableCount( configDTOModuleInList.getMaxNumberConcurrentJobs() );
 
 			modulesInUse.put( moduleSubDirectory, moduleTracker );
 		}
@@ -83,7 +80,6 @@ public class GetJob {
 
 
 		List<JobRunnerThread> jobRunnerThreads = ThreadsHolderSingleton.getInstance().getJobRunnerThreads();
-
 
 
 		//  get info on modules currently assigned to worker threads
@@ -109,15 +105,27 @@ public class GetJob {
 
 				} else {
 
-					if ( moduleConfigDTO.isMaxNumberThreadsSet() ) {
+					if ( moduleConfigDTO.isMaxNumberConcurrentJobsSet() ) {
 
-						moduleTracker.setThreadsAvailableCount( moduleTracker.getThreadsAvailableCount() - 1 );
+						moduleTracker.setConcurrentJobsAvailableCount( moduleTracker.getConcurrentJobsAvailableCount() - 1 );
 					}
 				}
 			}
 
 		}
 
+
+		return getNextJobInternal( modulesInUse, availableThreadCount );
+	}
+
+	/**
+	 * @param modulesInUse
+	 * @param availableThreadCount
+	 * @return
+	 * @throws Throwable
+	 */
+	private JobResponse getNextJobInternal( Map<String, ModuleTracker> modulesInUse, int availableThreadCount )
+	throws Throwable {
 
 
 		JobRequest jobRequest = new JobRequest();
@@ -134,17 +142,25 @@ public class GetJob {
 		//        available to process jobs
 
 
-		for ( Map.Entry< String, ModuleTracker > entry : modulesInUse.entrySet() ) {
+		for ( Map.Entry<String, ModuleTracker> entry : modulesInUse.entrySet() ) {
 
 			ModuleTracker moduleTracker = entry.getValue();
 
 			ModuleConfigDTO moduleConfigDTO =  moduleTracker.getModuleConfigDTO();
 
 			if ( ( ! moduleConfigDTO.isModuleFailedToLoadOrInit() ) // bypass modules that failed to load or init()
-					&& ( ( ! moduleConfigDTO.isMaxNumberThreadsSet() )
-							|| moduleTracker.threadsAvailableCount > 0
+					//              if the max number of concurrent jobs is set on the module, the available count must be > zero
+					&& ( ( ! moduleConfigDTO.isMaxNumberConcurrentJobsSet() )
+							|| moduleTracker.concurrentJobsAvailableCount > 0
 						)
-				) {
+						//  If the minimumThreads per Job is set for a given module,
+						//  only accept it where the minimumThreads per Job is <= the available threads
+					&& ( moduleConfigDTO.isMinNumberThreadsPerJobSet()
+							&& moduleConfigDTO.getMinNumberThreadsPerJob() <= availableThreadCount
+						)
+
+				)
+			{
 
 				jobRequestModuleInfo = new JobRequestModuleInfo();
 
@@ -161,14 +177,14 @@ public class GetJob {
 		//  Skip call to server if no modules found that can run on another thread
 
 		if ( ! clientModules.isEmpty() ) {
-			
+
 			logModules( clientModules );
 
 			jobResponse = ServerConnection.getInstance().getNextJob( jobRequest );
 
 		} else {
-			
-			log.info( "Skipping calling the server since no modules are available to run the next job.  Possibly all modules are at max threads." );
+
+			log.debug( "Skipping calling the server since no modules are available to run the next job.  Possibly all modules are at max threads." );
 
 			jobResponse = new JobResponse();
 
@@ -181,22 +197,23 @@ public class GetJob {
 
 		return jobResponse;
 	}
-	
-	
+
+
 
 	/**
-	 * logs the configuration loaded from the modules: 
-	 * 
+	 * logs the configuration loaded from the modules:
+	 *
 	 * @param configAllModules
 	 */
 	private void logModules( List<JobRequestModuleInfo> clientModules ) throws Throwable {
-		
-		if( log.isInfoEnabled() ) {
-			log.info( "Calling the server to get the next job using the following modules:" );
+
+		if( log.isDebugEnabled() ) {
+			
+			log.debug( "Calling the server to get the next job using the following modules:" );
 
 			for ( JobRequestModuleInfo clientModule : clientModules  ) {
 
-				log.info( "Module name: '" + clientModule.getModuleName() 
+				log.debug( "Module name: '" + clientModule.getModuleName()
 						+ "', Module Version: '" + clientModule.getModuleVersion() );
 			}
 		}
@@ -210,7 +227,7 @@ public class GetJob {
 	 */
 	public void destroy() {
 
-		log.info( "destroy() called." );
+		log.debug( "destroy() called." );
 
 	}
 
@@ -223,7 +240,7 @@ public class GetJob {
 
 		ModuleConfigDTO moduleConfigDTO;
 
-		int threadsAvailableCount;
+		int concurrentJobsAvailableCount;
 
 		public ModuleConfigDTO getModuleConfigDTO() {
 			return moduleConfigDTO;
@@ -233,13 +250,14 @@ public class GetJob {
 			this.moduleConfigDTO = moduleConfigDTO;
 		}
 
-		public int getThreadsAvailableCount() {
-			return threadsAvailableCount;
+		public int getConcurrentJobsAvailableCount() {
+			return concurrentJobsAvailableCount;
 		}
 
-		public void setThreadsAvailableCount(int threadsAvailableCount) {
-			this.threadsAvailableCount = threadsAvailableCount;
+		public void setConcurrentJobsAvailableCount(int concurrentJobsAvailableCount) {
+			this.concurrentJobsAvailableCount = concurrentJobsAvailableCount;
 		}
+
 
 	}
 }

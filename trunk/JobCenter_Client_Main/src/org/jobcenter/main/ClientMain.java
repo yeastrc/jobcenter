@@ -1,7 +1,5 @@
 package org.jobcenter.main;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
 
 
@@ -34,7 +32,7 @@ public class ClientMain implements ClientMainIF {
 	@Override
 	public void runClientMain( ClassLoader rootClassLoader ) {
 
-		log.info( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!runClientMain( ClassLoader rootClassLoader ) start" );
+		log.warn( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!runClientMain( ClassLoader rootClassLoader ) start" );
 
 //		createFile();
 
@@ -85,7 +83,7 @@ public class ClientMain implements ClientMainIF {
 
 					} catch (InterruptedException e) {
 
-						log.info("wait() interrupted with InterruptedException");
+						log.warn("wait() interrupted with InterruptedException");
 
 					}
 				}
@@ -123,7 +121,7 @@ public class ClientMain implements ClientMainIF {
 	@Override
 	public void shutdown() {
 
-		log.info( "shutdown() Called" );
+		log.debug( "shutdown() Called" );
 
 
 		try {
@@ -141,7 +139,7 @@ public class ClientMain implements ClientMainIF {
 
 				} catch (InterruptedException e) {
 
-					log.info( "In shutdown(): call to managerThread.join() threw InterruptedException " + e.toString(), e );
+					log.warn( "In shutdown(): call to managerThread.join() threw InterruptedException " + e.toString(), e );
 				}
 			}
 

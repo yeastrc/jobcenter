@@ -42,11 +42,11 @@ public class JobRunnerThread extends Thread  {
 
 	//  Put here so can be updated when stopRunningAfterProcessingJob() is called
 
-	private volatile ModuleInterfaceClientServicesImpl jobManagerClientServicesImpl = null;
+	private volatile ModuleInterfaceClientServicesImpl moduleInterfaceClientServicesImpl = null;
 
 
 	//  put here so can be accessed when updating status on the server
-	private volatile ModuleInterfaceModuleJobProgressImpl jobManagerModuleJobProgressImpl = null;
+	private volatile ModuleInterfaceModuleJobProgressImpl moduleInterfaceModuleJobProgressImpl = null;
 
 
 	private SendJobStatusToServer sendJobStatusToServer = new SendJobStatusToServer();
@@ -75,6 +75,11 @@ public class JobRunnerThread extends Thread  {
 	 */
 	private volatile ModuleHolder moduleHolder;
 
+
+	/**
+	 * The max number of threads to use to process this job, reset to zero when job is done processing.
+	 */
+	private volatile int maxNumberThreadsToUseToProcessJob;
 
 
 
@@ -110,8 +115,9 @@ public class JobRunnerThread extends Thread  {
 	 */
 	private void init() {
 
-		log.debug( "init() called" );
-
+		if ( log.isDebugEnabled() ) {
+			log.debug( "init() called, thread name = " + this.getName() );
+		}
 
 
 //		ClassLoader thisClassLoader = this.getClass().getClassLoader();
@@ -142,9 +148,14 @@ public class JobRunnerThread extends Thread  {
 
 	/**
 	 * Called on a different thread.
-	 * The ManagerThread instance has detected that the user has requested that the Jobmanager client stop retrieving jobs.
+	 * The ManagerThread instance has detected that the user has requested that the JobCenter client stop retrieving jobs.
 	 */
 	public void stopRunningAfterProcessingJob() {
+
+		if ( log.isInfoEnabled() ) {
+
+			log.info("stopRunningAfterProcessingJob() called:  jobRunnerThread.getId() = " + this.getId() + ", jobRunnerThread.getName() = " + this.getName() );
+		}
 
 		synchronized (this) {
 
@@ -154,7 +165,7 @@ public class JobRunnerThread extends Thread  {
 
 		try {
 
-			if ( jobManagerClientServicesImpl != null ) {
+			if ( moduleInterfaceClientServicesImpl != null ) {
 
 
 			}
@@ -164,7 +175,7 @@ public class JobRunnerThread extends Thread  {
 		} catch ( Throwable t ) {
 
 
-			log.error( "Exception calling jobManagerClientServicesImpl = null;");
+			log.error( "Exception calling jobCenterClientServicesImpl = null;");
 		}
 
 		try {
@@ -199,11 +210,13 @@ public class JobRunnerThread extends Thread  {
 					try {
 						//  Set context class loader to class loader for module
 
+						if ( log.isInfoEnabled() ) {
 
-						log.info( "Setting current thread context class loader to class loader for module. moduleToRun.getClass().getClassLoader() = " + module.getClass().getClassLoader() );
+							log.info( "Setting current thread context class loader to class loader for module. moduleToRun.getClass().getClassLoader() = " + module.getClass().getClassLoader() );
 
-						log.info( "Setting current thread context class loader to class loader for module.  module sub directory " + moduleHolder.getModuleConfigDTO().getModuleSubDirectory() );
-
+							log.info( "Setting current thread context class loader to class loader for module.  module sub directory " + moduleHolder.getModuleConfigDTO().getModuleSubDirectory() );
+						}
+						
 				        Thread.currentThread().setContextClassLoader( module.getClass().getClassLoader() );
 
 						//  pass shutdown request to the module.  Then can only wait for the module to return to process the results and exit the loop.
@@ -229,7 +242,7 @@ public class JobRunnerThread extends Thread  {
 
 		} catch (Throwable e) {
 
-			log.info( "In stopRunningAfterProcessingJob(): call to module.stopRunningAfterProcessingJob() threw Throwable " + e.toString(), e );
+			log.warn( "In stopRunningAfterProcessingJob(): call to module.stopRunningAfterProcessingJob() threw Throwable " + e.toString(), e );
 		}
 
 		//  awaken this thread if it is in 'wait' state ( not currently processing a job )
@@ -431,7 +444,7 @@ public class JobRunnerThread extends Thread  {
 
 					runMessageDTO.setType( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR );
 
-					runMessageDTO.setMessage( "Module is not loaded" );
+					runMessageDTO.setMessage( "JobCenter Client Module is not loaded" );
 
 					runMessages.add( runMessageDTO );
 
@@ -503,7 +516,14 @@ public class JobRunnerThread extends Thread  {
 
 				} catch ( Throwable t ) {
 
-					log.error( "Exception from call to deleteJobFromJobsInProgressDirectory(job): ", t );
+					String jobId = "unknown";
+
+					if ( job != null ) {
+
+						jobId = Integer.toString( job.getId() );
+					}
+
+					log.error( "Exception from call to deleteJobFromJobsInProgressDirectory(job): job.id = " + jobId, t );
 				}
 
 				job = null;
@@ -529,6 +549,10 @@ public class JobRunnerThread extends Thread  {
 
 						if ( keepRunning ) {
 
+							// reset to zero
+
+							maxNumberThreadsToUseToProcessJob = 0;
+
 							//  Add self to inactive thread pool to wait for next job
 
 							JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().add( this );
@@ -549,7 +573,7 @@ public class JobRunnerThread extends Thread  {
 
 					} catch (InterruptedException e) {
 
-						log.info("wait() interrupted with InterruptedException");
+						log.info("wait() interrupted with InterruptedException", e);
 
 					}
 				}
@@ -582,28 +606,30 @@ public class JobRunnerThread extends Thread  {
 
 		Map<String, String> parameters = job.getJobParameters();
 
-		ModuleInterfaceRequestImpl jobManagerModuleRequestImpl = new ModuleInterfaceRequestImpl();
+		ModuleInterfaceRequestImpl moduleInterfaceRequestImpl = new ModuleInterfaceRequestImpl();
 
-		ModuleInterfaceModuleResponseImpl jobManagerModuleResponseImpl = new ModuleInterfaceModuleResponseImpl();
+		ModuleInterfaceModuleResponseImpl moduleInterfaceModuleResponseImpl = new ModuleInterfaceModuleResponseImpl();
 
-		jobManagerClientServicesImpl = new ModuleInterfaceClientServicesImpl();
+		moduleInterfaceClientServicesImpl = new ModuleInterfaceClientServicesImpl();
 
 		try {
 
-			jobManagerClientServicesImpl.init();
+			moduleInterfaceClientServicesImpl.init();
 
-			jobManagerModuleRequestImpl.setJobParameters( parameters );
+			moduleInterfaceRequestImpl.setNumberOfThreadsForRunningJob( maxNumberThreadsToUseToProcessJob );
 
-			jobManagerModuleRequestImpl.setRequestId( job.getRequestId() );
+			moduleInterfaceRequestImpl.setJobParameters( parameters );
 
-			jobManagerModuleResponseImpl.setRunOutputParams( runOutputParams );
-			jobManagerModuleResponseImpl.setRunMessages( runMessages );
+			moduleInterfaceRequestImpl.setRequestId( job.getRequestId() );
 
-			jobManagerClientServicesImpl.setCurrentJob( job );
+			moduleInterfaceModuleResponseImpl.setRunOutputParams( runOutputParams );
+			moduleInterfaceModuleResponseImpl.setRunMessages( runMessages );
+
+			moduleInterfaceClientServicesImpl.setCurrentJob( job );
 
 			RunDTO run = job.getCurrentRun();
 
-			jobManagerClientServicesImpl.setCurrentRun( run );
+			moduleInterfaceClientServicesImpl.setCurrentRun( run );
 
 			if ( log.isDebugEnabled() ) {
 
@@ -618,7 +644,7 @@ public class JobRunnerThread extends Thread  {
 				//  Set context class loader to class loader for module
 
 
-				jobManagerModuleJobProgressImpl = new ModuleInterfaceModuleJobProgressImpl();
+				moduleInterfaceModuleJobProgressImpl = new ModuleInterfaceModuleJobProgressImpl();
 
 
 				log.info( "Setting current thread context class loader to class loader for module. moduleToRun.getClass().getClassLoader() = " + moduleToRun.getClass().getClassLoader() );
@@ -631,7 +657,7 @@ public class JobRunnerThread extends Thread  {
 						+ this.getClass().getClassLoader()
 						+ "; this.getContextClassLoader(): " + this.getContextClassLoader() );
 
-				moduleToRun.processRequest( jobManagerModuleRequestImpl, jobManagerModuleResponseImpl, jobManagerModuleJobProgressImpl, jobManagerClientServicesImpl );
+				moduleToRun.processRequest( moduleInterfaceRequestImpl, moduleInterfaceModuleResponseImpl, moduleInterfaceModuleJobProgressImpl, moduleInterfaceClientServicesImpl );
 
 			} finally {
 
@@ -642,11 +668,11 @@ public class JobRunnerThread extends Thread  {
 		        Thread.currentThread().setContextClassLoader( threadCurrentContextClassLoader );
 
 		        //  clear the In progress tracking
-		        jobManagerModuleJobProgressImpl = null;
+		        moduleInterfaceModuleJobProgressImpl = null;
 			}
 
 
-			moduleRunStatus = jobManagerModuleResponseImpl.getStatusCode();
+			moduleRunStatus = moduleInterfaceModuleResponseImpl.getStatusCode();
 
 		} catch ( Throwable t ) {
 
@@ -670,16 +696,16 @@ public class JobRunnerThread extends Thread  {
 
 			try {
 
-				jobManagerClientServicesImpl.destroy();
+				moduleInterfaceClientServicesImpl.destroy();
 
 			} catch ( Throwable t ) {
 
-				log.error( "Exception in call to jobManagerClientServicesImpl.destroy()"
+				log.error( "Exception in call to jobCenterClientServicesImpl.destroy()"
 						+ ", Exception:" +  t.toString(), t );
 			}
 
 			//  Must do since doesn't go out of scope
-			jobManagerClientServicesImpl = null;
+			moduleInterfaceClientServicesImpl = null;
 		}
 
 
@@ -793,6 +819,15 @@ public class JobRunnerThread extends Thread  {
 		this.job = job;
 	}
 
+	public int getMaxNumberThreadsToUseToProcessJob() {
+		return maxNumberThreadsToUseToProcessJob;
+	}
+
+	public void setMaxNumberThreadsToUseToProcessJob(
+			int maxNumberThreadsToUseToProcessJob) {
+		this.maxNumberThreadsToUseToProcessJob = maxNumberThreadsToUseToProcessJob;
+	}
+
 
 	public ManagerThread getManagerThread() {
 		return managerThread;
@@ -818,8 +853,8 @@ public class JobRunnerThread extends Thread  {
 	}
 
 
-	public ModuleInterfaceModuleJobProgressImpl getJobManagerModuleJobProgressImpl() {
-		return jobManagerModuleJobProgressImpl;
+	public ModuleInterfaceModuleJobProgressImpl getModuleInterfaceModuleJobProgressImpl() {
+		return moduleInterfaceModuleJobProgressImpl;
 	}
 
 

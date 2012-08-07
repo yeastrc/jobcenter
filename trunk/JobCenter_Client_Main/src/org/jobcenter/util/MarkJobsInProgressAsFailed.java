@@ -19,8 +19,8 @@ public class MarkJobsInProgressAsFailed {
 
 	private static Logger log = Logger.getLogger(MarkJobsInProgressAsFailed.class);
 
-	
-	private static final String ERROR_MSG = "This job was being processed when the client was previously running.  " 
+
+	private static final String ERROR_MSG = "This job was being processed when the client was previously running.  "
 											+ "The client has been restarted so the job is in an unknown state and needs to be researched.";
 
 	private volatile boolean keepRunning = true;
@@ -28,13 +28,13 @@ public class MarkJobsInProgressAsFailed {
 
 	private SendJobStatusToServer sendJobStatusToServer = new SendJobStatusToServer();
 
-	
+
 
 
 
 	/**
 	 * Called on a different thread.
-	 * The ManagerThread instance has detected that the user has requested that the Jobmanager client stop retrieving jobs.
+	 * The ManagerThread instance has detected that the user has requested that the JobCenter client stop retrieving jobs.
 	 */
 	public void stopRunningAfterProcessingJob() {
 
@@ -78,43 +78,43 @@ public class MarkJobsInProgressAsFailed {
 
 	/**
 	 * mark all jobs in the "Jobs In progress as failed and send that to the server.
-	 * 
+	 *
 	 * This method must log and not rethrow all exceptions
 	 */
 	public boolean markJobsInProgressAsFailed()  {
-		
+
 		boolean completedTask = false;
-		
+
 		try {
-			
+
 			List<Job> jobsInDirectory = null;
-			
+
 			try {
-			
+
 				jobsInDirectory = JobToFile.listJobsInJobsInProgressDirectory();
-				
+
 				int z = 0;
 
 			} catch ( Throwable t ) {
 
 				log.error( "Exception from call to listJobsInJobsInProgressDirectory(): ", t );
-				
+
 				throw t;
 			}
-			
+
 			List<RunMessageDTO> runMessages = new ArrayList<RunMessageDTO>();
-			
+
 			RunMessageDTO runMessageDTO = new RunMessageDTO();
-			
+
 			runMessageDTO.setType( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR );
-			
+
 			runMessageDTO.setMessage( ERROR_MSG );
-			
+
 			runMessages.add( runMessageDTO );
 
-			
+
 			for ( Job job : jobsInDirectory ) {
-				
+
 
 				job.setStatusId( JobStatusValuesConstants.JOB_STATUS_HARD_ERROR );
 
@@ -130,9 +130,9 @@ public class MarkJobsInProgressAsFailed {
 
 
 				sendJobStatusToServer.sendJobStatusToServer( job );
-				
+
 				if ( ! keepRunning ) {
-					
+
 					break;
 				}
 			}
@@ -140,22 +140,22 @@ public class MarkJobsInProgressAsFailed {
 			if ( keepRunning ) {
 
 				//  clean out directory
-				
+
 				JobToFile.cleanJobsInProgressDirectoryOfAllJobsFiles();
-				
+
 				completedTask = true;
 			}
 
-			
+
 		} catch ( Throwable t ) {
-			
-			
+
+
 			log.error( "ERROR sending to the server all the jobs that were in progress when the client was previously running.", t );
 		}
-		
+
 		return completedTask;
-		
+
 	}
-	
+
 
 }

@@ -27,8 +27,8 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	private static Logger log = Logger.getLogger(SubmissionClientConnectionToServer.class);
 
 
-	private static final String CONNECTION_URL_EXTENSION 
-	
+	private static final String CONNECTION_URL_EXTENSION
+
 			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.SUBMIT_JOB;
 
 
@@ -50,7 +50,7 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	@Override
 	public void init( String connectionURL ) throws Throwable {
 
-		log.info( "Entered org.jobcenter.client.main.SubmissionClientConnectionToServer.init() in project JobManager_JobSubmissionClient" );
+		log.info( "Entered org.jobcenter.client.main.SubmissionClientConnectionToServer.init() in project JobCenter_JobSubmissionClient" );
 
 		if ( connectionURL == null || connectionURL.isEmpty() ) {
 
@@ -87,7 +87,7 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	}
 
 
-//	  @see org.jobcenter.coreinterfaces.JobManagerJobSubmissionInterface#submitJob(java.lang.String, java.lang.String, int, java.util.Map)
+//	  @see org.jobcenter.coreinterfaces.JobCenterJobSubmissionInterface#submitJob(java.lang.String, java.lang.String, int, java.util.Map)
 
 	/**
 	 * @param requestTypeName - the name of the request type
@@ -96,11 +96,11 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	 * @param submitter
 	 * @param priority
 	 * @param jobParameters
-	 * @return requestId - the next assigned id related to the particular requestTypeName.  Will return the passed in requestId if one is provided ( not null ) 
+	 * @return requestId - the next assigned id related to the particular requestTypeName.  Will return the passed in requestId if one is provided ( not null )
 	 * @throws Throwable - throws an error if any errors related to submitting the job
 	 */
 	@Override
-	
+
 	public int submitJob( String requestTypeName, Integer requestId, String jobTypeName, String submitter, Integer priority, Map<String, String> jobParameters ) throws Throwable {
 
 		if ( connectionURL == null ) {
@@ -130,7 +130,7 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 		submitJobRequest.setRequestId( requestId );
 
 		submitJobRequest.setJobTypeName( jobTypeName );
-		
+
 		submitJobRequest.setPriority (priority );
 		submitJobRequest.setSubmitter( submitter );
 		submitJobRequest.setJobParameters( jobParameters );
@@ -144,19 +144,19 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 		if ( log.isInfoEnabled() ) {
 
 
-			log.info( "JobManager_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobResponse.isErrorResponse() = " + submitJobResponse.isErrorResponse() );
+			log.info( "JobCenter_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobResponse.isErrorResponse() = " + submitJobResponse.isErrorResponse() );
 
-			log.info( "JobManager_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobResponse.getErrorCode() = " + submitJobResponse.getErrorCode() );
+			log.info( "JobCenter_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobResponse.getErrorCode() = " + submitJobResponse.getErrorCode() );
 		}
 
 		if ( submitJobResponse.isErrorResponse() ) {
 
-			String msg = "Submission of job failed.  Error code = " + submitJobResponse.getErrorCode() + ", error code desc = " + submitJobResponse.getErrorCodeDescription() 
+			String msg = "Submission of job failed.  Error code = " + submitJobResponse.getErrorCode() + ", error code desc = " + submitJobResponse.getErrorCodeDescription()
 				+ ", the client's IP address as seen by the server = " + submitJobResponse.getClientIPAddressAtServer()
 				+ "\n  requestTypeName = |" + requestTypeName + "|, requestId = " + requestId + ", jobTypeName = |" + jobTypeName + "|.";
-			
+
 			log.error( msg );
-			
+
 			throw new Exception( msg );
 		}
 

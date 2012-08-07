@@ -20,7 +20,7 @@ public class BuildURLClassLoader {
 
 
 	/**
-	 * The class loader for JobManager_Root
+	 * The class loader for JobCenter_Root
 	 */
 	private static ClassLoader rootClassLoader;
 
@@ -88,17 +88,17 @@ public class BuildURLClassLoader {
 		if ( ! configDirFileObj.exists() ) {
 
 			String msg =  "Configdir directory '" + configDirFileObj.getAbsolutePath() + "' does not exist" ;
-			
+
 			System.out.println( msg );
-			
+
 			log.error( msg );
 
 		} else if ( ! baseDirectoryFileObject.isDirectory() ) {
 
 			String msg = "Configdir directory '" + configDirFileObj.getAbsolutePath() + "' is not a directory";
-			
+
 			System.out.println( msg );
-			
+
 			log.error( msg );
 
 		} else {
@@ -115,7 +115,7 @@ public class BuildURLClassLoader {
 
 			throw new IllegalArgumentException( "No jar files found in directory " + baseDirectory + "/main_jar" );
 		}
-		
+
 
 		@SuppressWarnings("unused")
 		int foundLibJarsCount = addJarsForPath( pathElements, baseDirectory, "lib" );

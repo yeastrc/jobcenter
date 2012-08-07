@@ -57,7 +57,7 @@ public class Job {
 	private int currentRunId;
 
 
-	//   Populated for getJob ( next job to run returned to JobManager_Client
+	//   Populated for getJob ( next job to run returned to JobCenter_Client
 	private RunDTO currentRun;
 
 	//   Populated for listJob

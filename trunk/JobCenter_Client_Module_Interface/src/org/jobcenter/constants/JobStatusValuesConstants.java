@@ -2,11 +2,11 @@ package org.jobcenter.constants;
 
 /**
  * These are the valid values to be returned in the method getStatus() in the
- * interface org.jobcenter.job_module_interface.JobManagerInterface
+ * interface org.jobcenter.job_module_interface.ModuleInterfaceClientMainInterface
  *
  * These values must be kept in sync with the values in the table "status"
  *
- * These values must be kept in sync with the values in the interface JobStatusValuesConstantsCopy in the project JobManager_base
+ * These values must be kept in sync with the values in the interface JobStatusValuesConstantsCopy in the project JobCenter_base
  */
 public interface JobStatusValuesConstants {
 

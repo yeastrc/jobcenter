@@ -55,11 +55,11 @@ public class EmailSendUtil {
 			message.setRecipients(Message.RecipientType.TO, toAddress);
 
 			// set the subject
-			message.setSubject("Test email from JobManager_Sample_Module." + msg );
+			message.setSubject("Test email from JobCenter_Sample_Module." + msg );
 
 			// set the message body
 
-			String textStr = "This is a test email from the JobManager_Sample_Module." + msg ;
+			String textStr = "This is a test email from the JobCenter_Sample_Module." + msg ;
 
 			message.setText(textStr);
 
@@ -83,7 +83,7 @@ public class EmailSendUtil {
 	 */
 	public static void main( String[] args ) throws Exception {
 
-		log.error("Test Error Log from JobManager_Sample_Module::main.");
+		log.error("Test Error Log from JobCenter_Sample_Module::main.");
 
 		sendTestMail( "  Called from main()." ) ;
 	}
