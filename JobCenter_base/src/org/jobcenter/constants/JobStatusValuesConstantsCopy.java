@@ -1,7 +1,7 @@
 package org.jobcenter.constants;
 
 /**
- * This is a copy of the values in "JobManager_Client_Module_Interface" interface "JobStatusValuesConstants"
+ * This is a copy of the values in "JobCenter_Client_Module_Interface" interface "JobStatusValuesConstants"
  *
  */
 public interface JobStatusValuesConstantsCopy {

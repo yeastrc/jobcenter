@@ -12,7 +12,7 @@
         <appender name="ROLL" class="org.apache.log4j.rolling.RollingFileAppender">
                 <!-- The active file to log to -->
                 <!--  Have to comment this out so the filename is controlled by the class specified by < rollingPolicy
-                <param name="file" value="logs/jobManagerMain.log" />
+                <param name="file" value="logs/Main.log" />
                  -->
 
                 <param name="append" value="true" />

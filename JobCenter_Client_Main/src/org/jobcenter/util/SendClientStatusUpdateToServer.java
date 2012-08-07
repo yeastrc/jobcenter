@@ -60,7 +60,7 @@ public class SendClientStatusUpdateToServer {
 			for ( JobRunnerThread jobRunnerThreadInList: jobRunnerThreads) {
 
 				Job jobInProgress = jobRunnerThreadInList.getJob();
-				ModuleInterfaceModuleJobProgressImpl jobProgress = jobRunnerThreadInList.getJobManagerModuleJobProgressImpl();
+				ModuleInterfaceModuleJobProgressImpl jobProgress = jobRunnerThreadInList.getModuleInterfaceModuleJobProgressImpl();
 
 				if ( jobInProgress != null && jobInProgress.getCurrentRun() != null && jobProgress != null ) {
 

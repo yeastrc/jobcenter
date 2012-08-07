@@ -87,7 +87,7 @@ public class ClientStatusUpdateThread extends Thread {
 	public void run() {
 
 
-		log.info( "run() called " );
+		log.debug( "run() called " );
 
 		//		ClassLoader thisClassLoader = this.getClass().getClassLoader();
 
@@ -111,7 +111,7 @@ public class ClientStatusUpdateThread extends Thread {
 
 					} catch (InterruptedException e) {
 
-						log.info( "wait( ) was interrupted." );
+						log.warn( "wait( ) was interrupted." );
 					}
 				}
 
@@ -149,7 +149,7 @@ public class ClientStatusUpdateThread extends Thread {
 
 			} catch (Throwable t) {
 
-				log.info( "In run(); call to SendClientStatusUpdateToServer.sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum.CLIENT_ABOUT_TO_EXIT ) threw Throwable " + t.toString(), t );
+				log.warn( "In run(); call to SendClientStatusUpdateToServer.sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum.CLIENT_ABOUT_TO_EXIT ) threw Throwable " + t.toString(), t );
 			}
 
 		} else {
@@ -159,13 +159,11 @@ public class ClientStatusUpdateThread extends Thread {
 
 			} catch (Throwable t) {
 
-				log.info( "In shutdown(): call to SendClientStatusUpdateToServer.sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum.CLIENT_ABOUT_TO_EXIT ) threw Throwable " + t.toString(), t );
+				log.warn( "In shutdown(): call to SendClientStatusUpdateToServer.sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum.CLIENT_ABOUT_TO_EXIT ) threw Throwable " + t.toString(), t );
 			}
 		}
 
-		log.info( "About to exit run()" );
-
-		log.info( "exitting run()" );
+		log.debug( "exitting run()" );
 	}
 
 
@@ -202,7 +200,7 @@ public class ClientStatusUpdateThread extends Thread {
 
 						} catch (InterruptedException e) {
 
-							log.info( "wait( waitTime ) was interrupted." );
+							log.warn( "wait( waitTime ) was interrupted." );
 
 						}
 					}
@@ -247,13 +245,13 @@ public class ClientStatusUpdateThread extends Thread {
 	public void shutdown() {
 
 
-		log.info( "shutdown() called, setting keepRunning = false, calling awaken() " );
+		log.debug( "shutdown() called, setting keepRunning = false, calling awaken() " );
 
 		keepRunning = false;
 
 		awaken();
 
-		log.info( "Exiting shutdown()" );
+		log.debug( "Exiting shutdown()" );
 	}
 
 

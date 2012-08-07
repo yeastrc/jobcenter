@@ -296,7 +296,8 @@ public class Main implements ModuleInterfaceClientMainInterface {
 	 * Process the request
 	 */
 	@Override
-	public void processRequest( ModuleInterfaceRequest jobManagerModuleRequest, ModuleInterfaceResponse jobManagerModuleResponse, ModuleInterfaceJobProgress jobManagerModuleJobProgress, ModuleInterfaceClientServices jobManagerClientServices ) throws Throwable {
+	public void processRequest( ModuleInterfaceRequest moduleInterfaceRequest, ModuleInterfaceResponse moduleInterfaceResponse,
+			ModuleInterfaceJobProgress moduleInterfaceJobProgress, ModuleInterfaceClientServices moduleInterfaceClientServices ) throws Throwable {
 
 
 		final String methodName = "processRequest()";
@@ -304,7 +305,7 @@ public class Main implements ModuleInterfaceClientMainInterface {
 		log.info( methodName + " called " );
 
 
-		Map<String, String> jobParameters = jobManagerModuleRequest.getJobParameters();
+		Map<String, String> jobParameters = moduleInterfaceRequest.getJobParameters();
 
 
 		if ( ! initialized ) {
@@ -378,16 +379,16 @@ public class Main implements ModuleInterfaceClientMainInterface {
 
 			}
 
-			jobManagerModuleResponse.setStatusCode( jobStatus );
+			moduleInterfaceResponse.setStatusCode( jobStatus );
 
-			jobManagerModuleResponse.addRunMessage( msgType, message );
+			moduleInterfaceResponse.addRunMessage( msgType, message );
 
 		} catch ( Throwable ex ) {
 
 			log.error("General Exception while running the shell command.  This error may have already been logged and emailed.  Exception = " + ex.toString(), ex );
 
 
-			jobManagerModuleResponse.setStatusCode( JobStatusValuesConstants.JOB_STATUS_HARD_ERROR );
+			moduleInterfaceResponse.setStatusCode( JobStatusValuesConstants.JOB_STATUS_HARD_ERROR );
 
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream( 1000 );
@@ -405,7 +406,7 @@ public class Main implements ModuleInterfaceClientMainInterface {
 			String message = "Failed Completion. Exception type = " + ex.getClass().getName() + ", Exception string = " + ex.toString()
 					+ "\n" + exStackTrace;
 
-			jobManagerModuleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR, message );
+			moduleInterfaceResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR, message );
 
 
 		} finally {

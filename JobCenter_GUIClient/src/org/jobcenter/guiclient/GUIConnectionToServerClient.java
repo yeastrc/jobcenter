@@ -64,21 +64,21 @@ public class GUIConnectionToServerClient {
 			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.GUI_LIST_CLIENTS_STATUS;
 
 	private static final String URL_EXTENSION_GUI_LIST_CLIENTS_CONNECTED
-	
+
 			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.GUI_LIST_CLIENTS_CONNECTED;
-	
-	
+
+
 	private static final String URL_EXTENSION_GUI_LIST_CLIENTS_USING_SAME_NODE_NAME
-	
+
 			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.GUI_LIST_CLIENTS_USING_SAME_NODE_NAME;
 
 	private static final String URL_EXTENSION_GUI_LIST_CLIENTS_FAILED_TO_CONNECT
-	
+
 			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.GUI_LIST_CLIENTS_FAILED_TO_CONNECT;
-	
-	
-	
-	
+
+
+
+
 	private String connectionURL = null;
 
 
@@ -102,7 +102,7 @@ public class GUIConnectionToServerClient {
 	 */
 	public void init( String connectionURL ) throws Throwable {
 
-		log.info( "Entered init() in project JobManager_GUIClient" );
+		log.info( "Entered init() in project JobCenter_GUIClient" );
 
 		if ( connectionURL == null || connectionURL.isEmpty() ) {
 
@@ -120,7 +120,7 @@ public class GUIConnectionToServerClient {
 //
 //		if ( props == null ) {
 //
-//			String msg = "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:    Properties file '" + PROPERTIES_FILE_NAME + "' not found.";
+//			String msg = "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:    Properties file '" + PROPERTIES_FILE_NAME + "' not found.";
 //
 //			log.error( msg );
 //
@@ -132,7 +132,7 @@ public class GUIConnectionToServerClient {
 //
 //			configProps.load(props);
 //
-//			log.info( "JobManager_Client_Jersey_1.3:  ClientConnectionToServer:  config.location = " + configProps.getProperty("config.location") );
+//			log.info( "JobCenter_Client_Jersey_1.3:  ClientConnectionToServer:  config.location = " + configProps.getProperty("config.location") );
 //
 //			connectionURL = configProps.getProperty("server.url") + "/services/";
 //
@@ -236,7 +236,7 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "JobManager_GUIClient:  GUIConnectionToServerClient:  listJobsResponse.isErrorResponse() = " + listJobsResponse.isErrorResponse()
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  listJobsResponse.isErrorResponse() = " + listJobsResponse.isErrorResponse()
 					+ ", listJobsResponse.getErrorCode() = " + listJobsResponse.getErrorCode() );
 		}
 
@@ -365,7 +365,7 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "JobManager_GUIClient:  GUIConnectionToServerClient:  listRequestsResponse.isErrorResponse() = " + listRequestsResponse.isErrorResponse()
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  listRequestsResponse.isErrorResponse() = " + listRequestsResponse.isErrorResponse()
 					+ ", listRequestsResponse.getErrorCode() = " + listRequestsResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + listRequestsResponse.getClientIPAddressAtServer() );
 		}
@@ -430,7 +430,7 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "JobManager_GUIClient:  GUIConnectionToServerClient:  viewJobResponse.isErrorResponse() = " + viewJobResponse.isErrorResponse()
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  viewJobResponse.isErrorResponse() = " + viewJobResponse.isErrorResponse()
 					+ ", viewJobResponse.getErrorCode() = " + viewJobResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + viewJobResponse.getClientIPAddressAtServer() );
 		}
@@ -503,7 +503,7 @@ public class GUIConnectionToServerClient {
 //
 //		if ( log.isInfoEnabled() ) {
 //
-//			log.info( "JobManager_GUIClient:  GUIConnectionToServerClient:  updateJobStatusResponse.isErrorResponse() = " + updateJobStatusResponse.isErrorResponse()
+//			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  updateJobStatusResponse.isErrorResponse() = " + updateJobStatusResponse.isErrorResponse()
 //					+ ", updateJobStatusResponse.getErrorCode() = " + updateJobStatusResponse.getErrorCode()
 //					+ ", the client's IP address as seen by the server = " + updateJobStatusResponse.getClientIPAddressAtServer() );
 //		}
@@ -576,7 +576,7 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "JobManager_GUIClient:  GUIConnectionToServerClient:  requeueJobResponse.isErrorResponse() = " + requeueJobResponse.isErrorResponse()
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  requeueJobResponse.isErrorResponse() = " + requeueJobResponse.isErrorResponse()
 					+ ", requeueJobResponse.getErrorCode() = " + requeueJobResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + requeueJobResponse.getClientIPAddressAtServer() );
 		}
@@ -666,7 +666,7 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "JobManager_GUIClient:  GUIConnectionToServerClient:  cancelJobResponse.isErrorResponse() = " + cancelJobResponse.isErrorResponse()
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  cancelJobResponse.isErrorResponse() = " + cancelJobResponse.isErrorResponse()
 					+ ", cancelJobResponse.getErrorCode() = " + cancelJobResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + cancelJobResponse.getClientIPAddressAtServer() );
 		}
@@ -759,7 +759,7 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "JobManager_GUIClient:  GUIConnectionToServerClient:  JobChangePriorityResponse.isErrorResponse() = " + JobChangePriorityResponse.isErrorResponse()
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  JobChangePriorityResponse.isErrorResponse() = " + JobChangePriorityResponse.isErrorResponse()
 					+ ", JobChangePriorityResponse.getErrorCode() = " + JobChangePriorityResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + JobChangePriorityResponse.getClientIPAddressAtServer() );
 		}
@@ -830,7 +830,7 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "JobManager_GUIClient:  GUIConnectionToServerClient:  listJobTypesResponse.isErrorResponse() = " + listJobTypesResponse.isErrorResponse()
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  listJobTypesResponse.isErrorResponse() = " + listJobTypesResponse.isErrorResponse()
 					+ ", listJobTypesResponse.getErrorCode() = " + listJobTypesResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + listJobTypesResponse.getClientIPAddressAtServer() );
 		}
@@ -892,7 +892,7 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "RequestManager_GUIClient:  GUIConnectionToServerClient:  listRequestTypesResponse.isErrorResponse() = " + listRequestTypesResponse.isErrorResponse()
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  listRequestTypesResponse.isErrorResponse() = " + listRequestTypesResponse.isErrorResponse()
 					+ ", listRequestTypesResponse.getErrorCode() = " + listRequestTypesResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + listRequestTypesResponse.getClientIPAddressAtServer() );
 		}
@@ -954,8 +954,8 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "RequestManager_GUIClient:  GUIConnectionToServerClient:  listClientsStatusResponse.isErrorResponse() = " + listClientsStatusResponse.isErrorResponse()
-					+ ", listClientsStatusResponse.getErrorCode() = " + listClientsStatusResponse.getErrorCode() 
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  listClientsStatusResponse.isErrorResponse() = " + listClientsStatusResponse.isErrorResponse()
+					+ ", listClientsStatusResponse.getErrorCode() = " + listClientsStatusResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + listClientsStatusResponse.getClientIPAddressAtServer() );
 		}
 
@@ -1016,8 +1016,8 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "RequestManager_GUIClient:  GUIConnectionToServerClient:  getClientsConnectedListResponse.isErrorResponse() = " + getClientsConnectedListResponse.isErrorResponse()
-					+ ", getClientsConnectedListResponse.getErrorCode() = " + getClientsConnectedListResponse.getErrorCode() 
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient:  getClientsConnectedListResponse.isErrorResponse() = " + getClientsConnectedListResponse.isErrorResponse()
+					+ ", getClientsConnectedListResponse.getErrorCode() = " + getClientsConnectedListResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + getClientsConnectedListResponse.getClientIPAddressAtServer() );
 		}
 
@@ -1076,8 +1076,8 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "RequestManager_GUIClient:  GUIConnectionToServerClient: retrieveClientsUsingSameNodeNameList():  getClientsConnectedListResponse.isErrorResponse() = " + getClientsConnectedListResponse.isErrorResponse()
-					+ ", getClientsConnectedListResponse.getErrorCode() = " + getClientsConnectedListResponse.getErrorCode() 
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient: retrieveClientsUsingSameNodeNameList():  getClientsConnectedListResponse.isErrorResponse() = " + getClientsConnectedListResponse.isErrorResponse()
+					+ ", getClientsConnectedListResponse.getErrorCode() = " + getClientsConnectedListResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + getClientsConnectedListResponse.getClientIPAddressAtServer() );
 		}
 
@@ -1095,8 +1095,8 @@ public class GUIConnectionToServerClient {
 
 		return clientConnectedDTOList;
 	}
-	
-	
+
+
 
 	/**
 	 * @return
@@ -1138,8 +1138,8 @@ public class GUIConnectionToServerClient {
 
 		if ( log.isInfoEnabled() ) {
 
-			log.info( "RequestManager_GUIClient:  GUIConnectionToServerClient: retrieveClientsFailedToConnectTrackingList():  getClientsConnectedListResponse.isErrorResponse() = " + getClientsConnectedListResponse.isErrorResponse()
-					+ ", getClientsConnectedListResponse.getErrorCode() = " + getClientsConnectedListResponse.getErrorCode() 
+			log.info( "JobCenter_GUIClient:  GUIConnectionToServerClient: retrieveClientsFailedToConnectTrackingList():  getClientsConnectedListResponse.isErrorResponse() = " + getClientsConnectedListResponse.isErrorResponse()
+					+ ", getClientsConnectedListResponse.getErrorCode() = " + getClientsConnectedListResponse.getErrorCode()
 					+ ", the client's IP address as seen by the server = " + getClientsConnectedListResponse.getClientIPAddressAtServer() );
 		}
 
@@ -1157,11 +1157,11 @@ public class GUIConnectionToServerClient {
 
 		return clientConnectedDTOList;
 	}
-	
-	
-			
-	
-	
-		
+
+
+
+
+
+
 
 }

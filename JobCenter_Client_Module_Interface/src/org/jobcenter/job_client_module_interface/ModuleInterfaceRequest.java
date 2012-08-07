@@ -17,4 +17,11 @@ public interface ModuleInterfaceRequest {
 	 */
 	public int getRequestId(  );
 
+	/**
+	 * @return  the number of threads for running this job.
+	 *
+	 * The module is allowed to use up to this number of threads.
+	 */
+	public int getNumberOfThreadsForRunningJob(  );
+
 }

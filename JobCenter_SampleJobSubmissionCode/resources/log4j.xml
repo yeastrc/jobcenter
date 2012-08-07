@@ -12,7 +12,7 @@
         <appender name="ROLL" class="org.apache.log4j.rolling.RollingFileAppender">
                 <!-- The active file to log to -->
                 <!--  Have to comment this out so the filename is controlled by the class specified by < rollingPolicy
-                <param name="file" value="logs/jobManagerMain.log" />
+                <param name="file" value="logs/jobCenterMain.log" />
                  -->
 
                 <param name="append" value="true" />
@@ -24,7 +24,7 @@
                         default is yyyy-MM-dd, (rolls at midnight)
                         See: http://logging.apache.org/log4j/companions/extras/apidocs/org/apache/log4j/rolling/TimeBasedRollingPolicy.html -->
                         <!--  <param name="FileNamePattern" value="/applogs/myportal/portal.%d.log.gz" /> -->
-                        <param name="FileNamePattern" value="logs/jobManagerSampleSubmitter.%d.log" />
+                        <param name="FileNamePattern" value="logs/jobCenterSampleSubmitter.%d.log" />
                 </rollingPolicy>
 
                 <layout class="org.apache.log4j.PatternLayout">
@@ -53,7 +53,7 @@
                         default is yyyy-MM-dd, (rolls at midnight)
                         See: http://logging.apache.org/log4j/companions/extras/apidocs/org/apache/log4j/rolling/TimeBasedRollingPolicy.html -->
                         <!--  <param name="FileNamePattern" value="/applogs/myportal/portal.%d.log.gz" /> -->
-                        <param name="FileNamePattern" value="logs/jobManagerSampleSubmitter.errors.%d.log" />
+                        <param name="FileNamePattern" value="logs/jobCenterSampleSubmitter.errors.%d.log" />
                 </rollingPolicy>
 
                 <layout class="org.apache.log4j.PatternLayout">

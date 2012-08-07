@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.ClientConstants;
 import org.jobcenter.module.ModuleConfigDTO;
@@ -28,6 +29,8 @@ public class RetrieveClientConfiguration {
 	private static final String CONFIG_CLIENT_NODE_NAME  = "client.node.name";
 
 	private static final String CONFIG_MAX_NUMBER_CONCURRENT_JOBS  = "max.number.concurrent.jobs";
+
+	private static final String CONFIG_MAX_NUMBER_JOB_THREADS  = "max.number.job.threads";
 
 	private static final String CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS  = "sleep.time.checking.for.new.jobs";
 
@@ -101,18 +104,18 @@ public class RetrieveClientConfiguration {
 
 			clientConfigDTO.setClientNodeName( clientNodeName );
 
+/////////////////////////////
 
-
-			String maxThreadsForModulesString = "";
+			String maxConcurrentJobsForModulesString = "";
 
 			try {
 
-				maxThreadsForModulesString = configProps.getProperty( CONFIG_MAX_NUMBER_CONCURRENT_JOBS );
+				maxConcurrentJobsForModulesString = configProps.getProperty( CONFIG_MAX_NUMBER_CONCURRENT_JOBS );
 
 
 			} catch ( Exception ex ) {
 
-				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxThreadsForModulesString;
+				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxConcurrentJobsForModulesString;
 
 				log.error( msg, ex );
 
@@ -122,9 +125,31 @@ public class RetrieveClientConfiguration {
 
 			}
 
-			if ( maxThreadsForModulesString == null || maxThreadsForModulesString.isEmpty() ) {
+			String maxThreadsForModulesString = "";
 
-				String msg = "This property needs a value:\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\"";
+			try {
+
+				maxThreadsForModulesString = configProps.getProperty( CONFIG_MAX_NUMBER_JOB_THREADS );
+
+
+			} catch ( Exception ex ) {
+
+				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_JOB_THREADS + "\") = " + maxThreadsForModulesString;
+
+				log.error( msg, ex );
+
+				System.out.println( msg );
+
+				throw new Exception( msg, ex );
+
+			}
+
+
+
+			if ( StringUtils.isEmpty( maxConcurrentJobsForModulesString ) && StringUtils.isEmpty( maxThreadsForModulesString ) ) {
+
+				String msg = "One of these two properties needs a value:\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+				+ "\" or  \"" + CONFIG_MAX_NUMBER_JOB_THREADS + "\"" + ".  Both properties can be set.";
 
 				log.error( msg );
 
@@ -134,23 +159,97 @@ public class RetrieveClientConfiguration {
 
 			}
 
-			try {
-				int maxThreadsForModules = Integer.parseInt( maxThreadsForModulesString );
 
-				clientConfigDTO.setMaxThreadsForModules( maxThreadsForModules );
+			if ( ! StringUtils.isEmpty( maxThreadsForModulesString ) ) {
 
-			} catch ( Exception ex ) {
+				try {
+					int maxThreadsForModules = Integer.parseInt( maxThreadsForModulesString );
 
-				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxThreadsForModulesString;
+					clientConfigDTO.setMaxThreadsForModules( maxThreadsForModules );
 
-				log.error( msg, ex );
+
+				} catch ( Exception ex ) {
+
+					String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_JOB_THREADS + "\") = " + maxThreadsForModulesString;
+
+					log.error( msg, ex );
+
+					System.out.println( msg );
+
+					throw new Exception( msg, ex );
+
+				}
+			}
+
+
+
+			if ( ! StringUtils.isEmpty( maxConcurrentJobsForModulesString ) ) {
+
+				try {
+					int maxConcurrentJobsForModules = Integer.parseInt( maxConcurrentJobsForModulesString );
+
+					clientConfigDTO.setMaxConcurrentJobs( maxConcurrentJobsForModules );
+
+				} catch ( Exception ex ) {
+
+					String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxConcurrentJobsForModulesString;
+
+					log.error( msg, ex );
+
+					System.out.println( msg );
+
+					throw new Exception( msg, ex );
+				}
+			}
+
+
+
+			if ( StringUtils.isEmpty( maxConcurrentJobsForModulesString ) ) {
+
+				log.warn( "Using the value of \"" + clientConfigDTO.getMaxThreadsForModules()
+						+ "\"  in \"" + CONFIG_MAX_NUMBER_JOB_THREADS
+						+ "\" for the value for \"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+						+ "\" since the config param \"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+						+ "\" was not set in the configuration file." );
+
+				//  copy the value to here since maxConcurrentJobsForModules is not set in the configuration
+				clientConfigDTO.setMaxConcurrentJobs( clientConfigDTO.getMaxThreadsForModules() );
+			}
+
+			if ( StringUtils.isEmpty( maxThreadsForModulesString ) ) {
+
+				log.warn( "Using the value of \"" + clientConfigDTO.getMaxConcurrentJobs()
+						+ "\" in \"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+						+ "\" for the value for \"" + CONFIG_MAX_NUMBER_JOB_THREADS
+						+ "\" since the config param \"" + CONFIG_MAX_NUMBER_JOB_THREADS
+						+ "\" was not set in the configuration file." );
+
+
+				//  copy the value to here since maxThreadsForModules is not set in the configuration
+				clientConfigDTO.setMaxThreadsForModules( clientConfigDTO.getMaxConcurrentJobs() );
+			}
+
+
+
+
+			if ( clientConfigDTO.getMaxConcurrentJobs() > clientConfigDTO.getMaxThreadsForModules() ) {
+
+				String msg = "ERROR:  The value of \"" + clientConfigDTO.getMaxConcurrentJobs()
+						+ "\"  in \"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+						+ "\" is larger than the value of \"" + clientConfigDTO.getMaxThreadsForModules()
+						+ "\" in \"" + CONFIG_MAX_NUMBER_JOB_THREADS
+						+ "\".";
+
+				log.error( msg );
 
 				System.out.println( msg );
 
-				throw new Exception( msg, ex );
-
+				throw new Exception( msg );
 			}
 
+
+
+//////////////////////////////////////////////////
 
 			String sleepTimeCheckingForNewJobsString = configProps.getProperty( CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS );
 

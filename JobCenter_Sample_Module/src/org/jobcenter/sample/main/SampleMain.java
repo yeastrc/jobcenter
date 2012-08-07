@@ -25,7 +25,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 	private volatile boolean stopRunningAfterProcessingJob = false;
 
 	/* (non-Javadoc)
-	 * @see org.jobcenter.job_module_interface.JobManagerInterface#destroy()
+	 * @see org.jobcenter.job_module_interface.ModuleInterfaceClientMainInterface#destroy()
 	 */
 	@Override
 	public void destroy() {
@@ -144,7 +144,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.jobcenter.job_module_interface.JobManagerInterface#processRequest()
+	 * @see org.jobcenter.job_module_interface.ModuleInterfaceClientMainInterface#processRequest()
 	 */
 	@Override
 	public void processRequest( ModuleInterfaceRequest moduleRequest, ModuleInterfaceResponse moduleResponse, ModuleInterfaceJobProgress moduleJobProgress, ModuleInterfaceClientServices moduleInterfaceClientServices ) throws Throwable {
@@ -156,103 +156,12 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 		System.out.println("\nCalled SampleMain.processRequest()");
 
 
+		int numberOfThreadsForRunningJob = moduleRequest.getNumberOfThreadsForRunningJob();
 
-		Map<String, String> firstRunOutputParams =  moduleInterfaceClientServices.getFirstRunOutputParams();
-
-
-		if ( firstRunOutputParams == null ) {
-
-			log.info( "SampleMain.processRequest(), firstRunOutputParams == null " );
-
-		} else if ( firstRunOutputParams.isEmpty() ) {
-
-				log.info( "SampleMain.processRequest(), firstRunOutputParams is emtpy " );
-
-		} else {
-
-			for ( Map.Entry<String, String> entry : firstRunOutputParams.entrySet() ) {
-
-				log.info("firstRunOutputParams: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
-			}
-		}
-
-		log.info("Calling jobManagerClientServices.getRunCount()" );
+		log.info("numberOfThreadsForRunningJob = " + numberOfThreadsForRunningJob );
 
 
-		int prevRunOutputParamsCount = moduleInterfaceClientServices.getRunCount();
-
-		log.info("prevRunOutputParamsCount: " + prevRunOutputParamsCount );
-
-
-		log.info("Calling jobManagerClientServices.getRunOutputParamsUsingIndex( 1 );" );
-
-
-		Map<String, String> secondRunOutputParams =  moduleInterfaceClientServices.getRunOutputParamsUsingIndex( 1 );
-
-
-		if ( secondRunOutputParams == null ) {
-
-			log.info( "SampleMain.processRequest(), secondRunOutputParams == null " );
-
-		} else if ( secondRunOutputParams.isEmpty() ) {
-
-				log.info( "SampleMain.processRequest(), secondRunOutputParams is emtpy " );
-
-		} else {
-
-			for ( Map.Entry<String, String> entry : secondRunOutputParams.entrySet() ) {
-
-				log.info("secondRunOutputParams: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
-			}
-		}
-
-		log.info("Calling jobManagerClientServices.getRunOutputParamsUsingIndex( 2 );" );
-
-
-		Map<String, String> thirdRunOutputParams =  moduleInterfaceClientServices.getRunOutputParamsUsingIndex( 2 );
-
-
-		if ( thirdRunOutputParams == null ) {
-
-			log.info( "SampleMain.processRequest(), thirdRunOutputParams == null " );
-
-		} else if ( thirdRunOutputParams.isEmpty() ) {
-
-				log.info( "SampleMain.processRequest(), thirdRunOutputParams is emtpy " );
-
-		} else {
-
-			for ( Map.Entry<String, String> entry : thirdRunOutputParams.entrySet() ) {
-
-				log.info("thirdRunOutputParams: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
-			}
-		}
-
-
-
-		log.info("Calling jobManagerClientServices.getPreviousRunOutputParams();" );
-
-		Map<String, String> prevRunOutputParams =  moduleInterfaceClientServices.getPreviousRunOutputParams();
-
-
-		if ( prevRunOutputParams == null ) {
-
-			log.info( "SampleMain.processRequest(), prevRunOutputParams == null " );
-
-		} else if ( prevRunOutputParams.isEmpty() ) {
-
-				log.info( "SampleMain.processRequest(), prevRunOutputParams is empty " );
-
-
-		} else {
-
-			for ( Map.Entry<String, String> entry : prevRunOutputParams.entrySet() ) {
-
-				log.info("prevRunOutputParam: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
-			}
-		}
-
-		log.info("Calling jobManagerModuleRequest.getJobParameters()" );
+		log.info("Calling moduleRequest.getJobParameters()" );
 
 
 		Map<String, String> parameters = moduleRequest.getJobParameters();
@@ -270,6 +179,103 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 				log.info("parameter: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
 			}
 		}
+
+//
+//
+//		Map<String, String> firstRunOutputParams =  moduleInterfaceClientServices.getFirstRunOutputParams();
+//
+//
+//		if ( firstRunOutputParams == null ) {
+//
+//			log.info( "SampleMain.processRequest(), firstRunOutputParams == null " );
+//
+//		} else if ( firstRunOutputParams.isEmpty() ) {
+//
+//				log.info( "SampleMain.processRequest(), firstRunOutputParams is emtpy " );
+//
+//		} else {
+//
+//			for ( Map.Entry<String, String> entry : firstRunOutputParams.entrySet() ) {
+//
+//				log.info("firstRunOutputParams: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
+//			}
+//		}
+//
+//		log.info("Calling moduleInterfaceClientServices.getRunCount()" );
+//
+//
+//		int prevRunOutputParamsCount = moduleInterfaceClientServices.getRunCount();
+//
+//		log.info("prevRunOutputParamsCount: " + prevRunOutputParamsCount );
+//
+//
+//		log.info("Calling moduleInterfaceClientServices.getRunOutputParamsUsingIndex( 1 );" );
+//
+//
+//		Map<String, String> secondRunOutputParams =  moduleInterfaceClientServices.getRunOutputParamsUsingIndex( 1 );
+//
+//
+//		if ( secondRunOutputParams == null ) {
+//
+//			log.info( "SampleMain.processRequest(), secondRunOutputParams == null " );
+//
+//		} else if ( secondRunOutputParams.isEmpty() ) {
+//
+//				log.info( "SampleMain.processRequest(), secondRunOutputParams is emtpy " );
+//
+//		} else {
+//
+//			for ( Map.Entry<String, String> entry : secondRunOutputParams.entrySet() ) {
+//
+//				log.info("secondRunOutputParams: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
+//			}
+//		}
+//
+//		log.info("Calling moduleInterfaceClientServices.getRunOutputParamsUsingIndex( 2 );" );
+//
+//
+//		Map<String, String> thirdRunOutputParams =  moduleInterfaceClientServices.getRunOutputParamsUsingIndex( 2 );
+//
+//
+//		if ( thirdRunOutputParams == null ) {
+//
+//			log.info( "SampleMain.processRequest(), thirdRunOutputParams == null " );
+//
+//		} else if ( thirdRunOutputParams.isEmpty() ) {
+//
+//				log.info( "SampleMain.processRequest(), thirdRunOutputParams is emtpy " );
+//
+//		} else {
+//
+//			for ( Map.Entry<String, String> entry : thirdRunOutputParams.entrySet() ) {
+//
+//				log.info("thirdRunOutputParams: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
+//			}
+//		}
+//
+//
+//
+//		log.info("Calling moduleInterfaceClientServices.getPreviousRunOutputParams();" );
+//
+//		Map<String, String> prevRunOutputParams =  moduleInterfaceClientServices.getPreviousRunOutputParams();
+//
+//
+//		if ( prevRunOutputParams == null ) {
+//
+//			log.info( "SampleMain.processRequest(), prevRunOutputParams == null " );
+//
+//		} else if ( prevRunOutputParams.isEmpty() ) {
+//
+//				log.info( "SampleMain.processRequest(), prevRunOutputParams is empty " );
+//
+//
+//		} else {
+//
+//			for ( Map.Entry<String, String> entry : prevRunOutputParams.entrySet() ) {
+//
+//				log.info("prevRunOutputParam: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
+//			}
+//		}
 
 		int jobStatus = JobStatusValuesConstants.JOB_STATUS_RUNNING;
 
@@ -305,22 +311,22 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 				wait( 5 * 1000 );
 			}
 
-			if ( keepRunning ) {
-
-				log.info( "SampleMain.processRequest(), next sleeping 65 seconds to simulate time to do work." );
-
-				System.out.println( "SampleMain.processRequest(), next sleeping 65 seconds to simulate time to do work." );
-
-				moduleJobProgress.progressPing();
-
-				moduleJobProgress.supportsPercentComplete();
-
-				moduleJobProgress.updatePercentComplete( 5 );
-
-				synchronized (this) {
-					wait( 65 * 1000);
-				}
-			}
+//			if ( keepRunning ) {
+//
+//				log.info( "SampleMain.processRequest(), next sleeping 65 seconds to simulate time to do work." );
+//
+//				System.out.println( "SampleMain.processRequest(), next sleeping 65 seconds to simulate time to do work." );
+//
+//				moduleJobProgress.progressPing();
+//
+//				moduleJobProgress.supportsPercentComplete();
+//
+//				moduleJobProgress.updatePercentComplete( 5 );
+//
+//				synchronized (this) {
+//					wait( 65 * 1000);
+//				}
+//			}
 
 			if ( keepRunning ) {
 
@@ -360,6 +366,11 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 
 //		jobStatus = JobStatusValuesConstants.JOB_STATUS_HARD_ERROR;
 
+
+		//  Non-valid status value
+//		jobStatus = 99;
+
+
 		moduleResponse.setStatusCode( jobStatus );
 
 		moduleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_MSG, "Successful Completion Sample Main" );
@@ -370,10 +381,12 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 		moduleResponse.addRunOutputParam( "SampleModKeyV2", "SampleModValueV2" );
 
 
+		log.info( "Exiting: SampleMain.processRequest()" );
+
 	}
 
 	/* (non-Javadoc)
-	 * @see org.jobcenter.job_module_interface.JobManagerInterface#reset()
+	 * @see org.jobcenter.job_module_interface.ModuleInterfaceClientMainInterface#reset()
 	 */
 	@Override
 	public void reset()  throws Throwable {

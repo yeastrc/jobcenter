@@ -2,9 +2,11 @@ package org.jobcenter.managerthread;
 
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.Writer;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -34,18 +36,18 @@ public class ManagerThread extends Thread {
 
 	private static Logger log = Logger.getLogger(ManagerThread.class);
 
-	
-	
+
+
 	private static final int WAIT_TIME_FOR_MANAGER_THREAD_TO_EXIT_IN_SECONDS = 10;
-	
+
 	private static final int WAIT_TIME_FOR_CLIENT_STATUS_UPDATE_THREAD_TO_EXIT_IN_SECONDS = 10;
-	
+
 	private static final int WAIT_TIME_FOR_GET_JOB_THREAD_TO_EXIT_IN_SECONDS = 10;
-	
+
 	private static final int WAIT_TIME_FOR_GET_JOB_RUNNER_THREAD_TO_EXIT_IN_SECONDS = 10;
 
-	
-	
+
+
 	private static final String GET_JOB_THREAD_NAME = "GetJobThread";
 
 	private volatile boolean keepRunning = true;
@@ -54,7 +56,7 @@ public class ManagerThread extends Thread {
 	private volatile boolean stopRetrievingJobs = false;
 
 
-	private volatile boolean stopJobManagerClientProgram = false;;
+	private volatile boolean stopJobCenterClientProgram = false;;
 
 
 	private ClientMain jobCenterClientMain;
@@ -131,7 +133,7 @@ public class ManagerThread extends Thread {
 	public void run() {
 
 
-		log.info( "run() called " );
+		log.debug( "run() called " );
 
 		//		ClassLoader thisClassLoader = this.getClass().getClassLoader();
 
@@ -150,12 +152,13 @@ public class ManagerThread extends Thread {
 
 			ClientConfigDTO clientConfigDTO = ClientConfigDTO.getSingletonInstance();  //  retrieve singleton
 
-			log.info( "Starting " + clientConfigDTO.getMaxThreadsForModules() + " JobRunnerThread instances." );
+
+			log.info( "Starting " + clientConfigDTO.getMaxConcurrentJobs() + " JobRunnerThread instances." );
 
 
 			List<JobRunnerThread> jobRunnerThreads = ThreadsHolderSingleton.getInstance().getJobRunnerThreads();
 
-			for ( int count = 0; count < clientConfigDTO.getMaxThreadsForModules(); count++ ) {
+			for ( int count = 0; count < clientConfigDTO.getMaxConcurrentJobs(); count++ ) {
 
 				JobRunnerThread jobRunnerThread = new JobRunnerThread();
 
@@ -193,7 +196,7 @@ public class ManagerThread extends Thread {
 
 					clientControlFileWriter = new FileWriter( clientControlFile );
 
-					if ( stopJobManagerClientProgram ) {
+					if ( stopJobCenterClientProgram ) {
 
 						log.info( "ClientControlFile: Changing file contents to: \n" + Constants.CLIENT_RUN_CONTROL_ALL_JOBS_COMPLETE_SHUTDOWN_PROCEEDING );
 
@@ -225,7 +228,7 @@ public class ManagerThread extends Thread {
 					}
 				}
 
-				if ( stopJobManagerClientProgram ) {
+				if ( stopJobCenterClientProgram ) {
 
 					jobCenterClientMain.stopMainThread();
 				}
@@ -239,7 +242,7 @@ public class ManagerThread extends Thread {
 		}
 
 
-		log.info( "About to exit run()" );
+		log.debug( "About to exit run()" );
 
 		LogOpenFiles.logOpenFiles( LogOpenFiles.LIST_FILES_TRUE );
 
@@ -286,7 +289,7 @@ public class ManagerThread extends Thread {
 
 						} catch (InterruptedException e) {
 
-							log.info( "wait( waitTime ) was interrupted." );
+							log.warn( "wait( waitTime ) was interrupted." );
 
 						}
 					}
@@ -326,7 +329,7 @@ public class ManagerThread extends Thread {
 
 				clientStatusUpdateThreadCounter++;
 
-				log.info( "HeartbeatThread thread '" + oldHeartbeatThread.getName() + "' is dead.  Replacing it with HeartbeatThread thread '" + clientStatusUpdateThread.getName() + "'."  );
+				log.error( "HeartbeatThread thread '" + oldHeartbeatThread.getName() + "' is dead.  Replacing it with HeartbeatThread thread '" + clientStatusUpdateThread.getName() + "'."  );
 
 				clientStatusUpdateThread.start();
 			}
@@ -345,7 +348,7 @@ public class ManagerThread extends Thread {
 
 				ThreadsHolderSingleton.getInstance().setGetJobThread( getJobThread );
 
-				log.info( "GetJobThread thread '" + oldGetJobThread.getName() + "' is dead.  Replacing it with GetJobThread thread '" + getJobThread.getName() + "'."  );
+				log.error( "GetJobThread thread '" + oldGetJobThread.getName() + "' is dead.  Replacing it with GetJobThread thread '" + getJobThread.getName() + "'."  );
 
 				getJobThread.start();
 			}
@@ -369,7 +372,7 @@ public class ManagerThread extends Thread {
 
 					jobRunnerThreads.set( index, newJobRunnerThread );
 
-					log.info( "Jobrunner thread '" + jobRunnerThreadInList.getName() + "' is dead.  Replacing it with Jobrunner thread '" + newJobRunnerThread.getName() + "'."  );
+					log.error( "Jobrunner thread '" + jobRunnerThreadInList.getName() + "' is dead.  Replacing it with Jobrunner thread '" + newJobRunnerThread.getName() + "'."  );
 
 					newJobRunnerThread.start();
 
@@ -384,8 +387,8 @@ public class ManagerThread extends Thread {
 				getJobThread.awaken();
 			}
 
-			
-			
+
+
 		}
 	}
 
@@ -397,7 +400,7 @@ public class ManagerThread extends Thread {
 
 		File clientControlFile = null;
 
-		FileWriter clientControlFileWriter = null;
+		BufferedWriter clientControlFileWriter = null;
 
 		try {
 
@@ -406,11 +409,29 @@ public class ManagerThread extends Thread {
 
 			log.info( "ClientControlFile: filename = '" + Constants.CLIENT_RUN_CONTROL_FILENAME + "' filepath is = '" + clientControlFile.getAbsolutePath() + "'." );
 
-			clientControlFileWriter = new FileWriter( clientControlFile );
+			clientControlFileWriter = new BufferedWriter( new FileWriter( clientControlFile ) );
+			
+			if ( log.isDebugEnabled() ) {
+				
+				StringBuilder contentsSB = new StringBuilder( 2000);
+				
+				for ( String line : Constants.CLIENT_RUN_CONTROL_INITIAL_CONTENTS ) {
 
-			log.info( "ClientControlFile: Changing file contents to: \n" + Constants.CLIENT_RUN_CONTROL_INITIAL_CONTENTS );
+					contentsSB.append( line  );
 
-			clientControlFileWriter.write( Constants.CLIENT_RUN_CONTROL_INITIAL_CONTENTS );
+					contentsSB.append( "\n" );
+				}
+
+
+				log.debug( "ClientControlFile: Changing file contents to: \n" + contentsSB );
+			}
+
+			for ( String line : Constants.CLIENT_RUN_CONTROL_INITIAL_CONTENTS ) {
+
+				clientControlFileWriter.append( line  );
+
+				clientControlFileWriter.newLine();
+			}
 
 		} catch (Throwable e) {
 
@@ -432,7 +453,7 @@ public class ManagerThread extends Thread {
 		}
 
 	}
-	
+
 
 	/**
 	 * Check if the control file has been updated to indicate that a "stop" has been requested
@@ -444,7 +465,7 @@ public class ManagerThread extends Thread {
 
 		BufferedReader clientControlFileReader = null;
 
-		FileWriter clientControlFileWriter = null;
+		BufferedWriter clientControlFileWriter = null;
 
 		try {
 
@@ -457,13 +478,13 @@ public class ManagerThread extends Thread {
 			if ( inputLine != null ) {
 
 				boolean stopRequestedLocal = false;
-				
+
 				String stopRequestType = null;
 
 				if ( inputLine.startsWith(  Constants.CLIENT_RUN_CONTROL_STOP_JOBS_TEXT ) ) {
 
 					stopRequestedLocal = true;
-					
+
 					stopRequestType = Constants.CLIENT_RUN_CONTROL_STOP_JOBS_TEXT;
 
 					log.info(  "File '" + Constants.CLIENT_RUN_CONTROL_FILENAME
@@ -472,12 +493,12 @@ public class ManagerThread extends Thread {
 
 				} else if ( inputLine.startsWith(  Constants.CLIENT_RUN_CONTROL_STOP_RUN_TEXT ) ) {
 
-					stopJobManagerClientProgram = true;
+					stopJobCenterClientProgram = true;
 					stopRequestedLocal = true;
 
 					stopRequestType = Constants.CLIENT_RUN_CONTROL_STOP_RUN_TEXT;
 
-					
+
 					log.info(  "File '" + Constants.CLIENT_RUN_CONTROL_FILENAME
 							+ "' has been changed to specify to stop retrieving new jobs and exit when all jobs are complete." );
 				}
@@ -493,9 +514,15 @@ public class ManagerThread extends Thread {
 
 					log.info( "ClientControlFile: filename = '" + Constants.CLIENT_RUN_CONTROL_FILENAME + "' filepath is = '" + clientControlFile.getAbsolutePath() + "'." );
 
-					clientControlFileWriter = new FileWriter( clientControlFile, true /* append */ );
+					clientControlFileWriter = new BufferedWriter( new FileWriter( clientControlFile, true /* append */ ) );
 
-					clientControlFileWriter.write( Constants.CLIENT_RUN_CONTROL_STOP_REQUEST_ACCEPTED );
+					for ( String line : Constants.CLIENT_RUN_CONTROL_STOP_REQUEST_ACCEPTED ) {
+
+						clientControlFileWriter.append( line  );
+
+						clientControlFileWriter.newLine();
+					}
+
 				}
 
 			}
@@ -541,19 +568,19 @@ public class ManagerThread extends Thread {
 
 		keepRunning = false;  // Set thread of the current object to exit main processing loop.
 
-		
+
 		//  call clientStatusUpdateThread
 
 
 		if ( clientStatusUpdateThread != null ) {
 
 			clientStatusUpdateThread.setStopRequestType( stopRequestType );
-			
+
 			clientStatusUpdateThread.shutdown();
 		}
 
-		
-		
+
+
 		//  call getJobThread.shutdown();
 
 		if ( getJobThread != null ) {
@@ -562,7 +589,7 @@ public class ManagerThread extends Thread {
 				getJobThread.shutdown();
 			} catch (Throwable e) {
 
-				log.info( "In processStopRetrievingJobsRequest(): call to getJobThread.shutdown() threw Throwable " + e.toString(), e );
+				log.error( "In processStopRetrievingJobsRequest(): call to getJobThread.shutdown() threw Throwable " + e.toString(), e );
 			}
 
 		} else {
@@ -594,14 +621,14 @@ public class ManagerThread extends Thread {
 
 		waitForWorkerThreadsToComplete();
 
-		
+
 
 		waitForClientStatusUpdateThreadToComplete();
 
 
-		
+
 		//  notify server attempting to shut down
-		
+
 		ClientStatusUpdateTypeEnum updateType = ClientStatusUpdateTypeEnum.CLIENT_STOP_RETRIEVING_JOBS_AND_PAUSE_REQUESTED;
 
 		if ( Constants.CLIENT_RUN_CONTROL_STOP_JOBS_TEXT.equals( stopRequestType ) ) {
@@ -633,19 +660,19 @@ public class ManagerThread extends Thread {
 	public void shutdown() {
 
 
-		log.info( "shutdown() called " );
+		log.debug( "shutdown() called " );
 
 		keepRunning = false;  // Set thread of the current object to exit main processing loop.
 
-		
+
 		//  Call to server that client has received shut down request.
-		
-		
+
+
 		if ( clientStatusUpdateThread != null ) {
-		
+
 			clientStatusUpdateThread.shutdown();
 		}
-		
+
 		awaken();  // send notify() to to the thread of the current object to start it so it will exit.
 
 
@@ -656,15 +683,15 @@ public class ManagerThread extends Thread {
 
 			try {  // wait for thread of the current object to die, so it won't start any threads to replace the threads that will be setup to die next.
 				this.join( WAIT_TIME_FOR_MANAGER_THREAD_TO_EXIT_IN_SECONDS * 1000 );
-				
+
 			} catch (Throwable e) {
 
-				log.info( "In processStopRetrievingJobsRequest(): call to this.shutdown() threw Throwable " + e.toString(), e );
+				log.error( "In processStopRetrievingJobsRequest(): call to this.shutdown() threw Throwable " + e.toString(), e );
 			}
 
 			if ( this.isAlive() ) {
 
-				log.info( "The thread 'managerThread' has not exited in the allocated time of " 
+				log.warn( "The thread 'managerThread' has not exited in the allocated time of "
 						+ WAIT_TIME_FOR_MANAGER_THREAD_TO_EXIT_IN_SECONDS
 						+ " seconds.  The wait for 'managerThread' to exit will be repeated with the same wait time." );
 
@@ -677,26 +704,26 @@ public class ManagerThread extends Thread {
 
 
 		shutdownWorkerTheads();  // call shutdown() on worker threads
-		
-		
-		
+
+
+
 
 		waitForClientStatusUpdateThreadToComplete();
 
-		
+
 		//  Call to server that client is shutting down.
-		
+
 		try {
-			
+
 			SendClientStatusUpdateToServer.sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum.CLIENT_ABOUT_TO_EXIT, PassJobsToServer.PASS_JOBS_TO_SERVER_NO );
-			
+
 		} catch (Throwable t) {
 
-			log.info( "In shutdown(): call to SendClientStatusUpdateToServer.sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum.CLIENT_ABOUT_TO_EXIT ) threw Throwable " + t.toString(), t );
+			log.error( "In shutdown(): call to SendClientStatusUpdateToServer.sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum.CLIENT_ABOUT_TO_EXIT ) threw Throwable " + t.toString(), t );
 		}
 
-		
-		
+
+
 
 		//  Destroy GetJob and ServerConnection
 
@@ -706,7 +733,7 @@ public class ManagerThread extends Thread {
 			getJob = GetJob.getInstance();
 		} catch (Throwable e) {
 
-			log.info( "In shutdown(): call to GetJob.getInstance() threw Throwable " + e.toString(), e );
+			log.error( "In shutdown(): call to GetJob.getInstance() threw Throwable " + e.toString(), e );
 		}
 
 		log.info( "shutdown():  call to getJob.destroy() " );
@@ -716,7 +743,7 @@ public class ManagerThread extends Thread {
 				getJob.destroy();
 			} catch (Throwable e) {
 
-				log.info( "In shutdown(): call to getJob.destroy() threw Throwable " + e.toString(), e );
+				log.error( "In shutdown(): call to getJob.destroy() threw Throwable " + e.toString(), e );
 			}
 		}
 
@@ -727,7 +754,7 @@ public class ManagerThread extends Thread {
 			ServerConnection.getInstance().destroy();
 		} catch (Throwable e) {
 
-			log.info( "In shutdown(): call to ServerConnection.getInstance().destroy() threw Throwable " + e.toString(), e );
+			log.error( "In shutdown(): call to ServerConnection.getInstance().destroy() threw Throwable " + e.toString(), e );
 		}
 
 
@@ -849,11 +876,11 @@ public class ManagerThread extends Thread {
 
 					if ( jobRunnerThread.isAlive() ) {
 
-						log.warn( "The thread 'jobRunnerThread' named '" 
+						log.warn( "The thread 'jobRunnerThread' named '"
 								+ jobRunnerThread.getName()
-								+ "' has not exited in the allocated time of " 
+								+ "' has not exited in the allocated time of "
 								+ WAIT_TIME_FOR_GET_JOB_RUNNER_THREAD_TO_EXIT_IN_SECONDS
-								+ " seconds.  The module probably hasn't exited the call to 'processRequest(...)' yet.  " 
+								+ " seconds.  The module probably hasn't exited the call to 'processRequest(...)' yet.  "
 								+ "The wait for 'jobRunnerThread' to exit will be repeated with the same wait time." );
 
 					} else {
@@ -862,7 +889,7 @@ public class ManagerThread extends Thread {
 					}
 
 				}
-				
+
 			} else {
 
 				log.info( "In waitForWorkerThreadsToComplete(): jobRunnerThread == null" );
@@ -885,7 +912,7 @@ public class ManagerThread extends Thread {
 		// wait for getJobThread to complete
 
 		if ( getJobThread != null ) {
-			
+
 			boolean getJobThreadExited = false;
 
 			while ( ! getJobThreadExited ) {
@@ -895,19 +922,19 @@ public class ManagerThread extends Thread {
 
 					log.info( "In waitForGetJobThreadToComplete(): call to getJobThread.join() threw InterruptedException " + e.toString(), e );
 				}
-				
+
 				if ( getJobThread.isAlive() ) {
 
-					log.error( "The thread 'getJobThread' has not exited in the allocated time of " 
+					log.error( "The thread 'getJobThread' has not exited in the allocated time of "
 							+ WAIT_TIME_FOR_GET_JOB_THREAD_TO_EXIT_IN_SECONDS
 							+ " seconds.  The wait for 'getJobThread' to exit will be repeated with the same wait time." );
-					
+
 				} else {
-					
+
 					getJobThreadExited = true;
 				}
 			}
-			
+
 		} else {
 
 			log.info( "In waitForGetJobThreadToComplete(): getJobThread == null" );
@@ -945,7 +972,7 @@ public class ManagerThread extends Thread {
 
 				if ( clientStatusUpdateThread.isAlive() ) {
 
-					log.info( "The thread 'clientStatusUpdateThread' has not exited in the allocated time of " 
+					log.info( "The thread 'clientStatusUpdateThread' has not exited in the allocated time of "
 							+ WAIT_TIME_FOR_CLIENT_STATUS_UPDATE_THREAD_TO_EXIT_IN_SECONDS
 							+ " seconds.  The wait for 'clientStatusUpdateThread' to exit will be repeated with the same wait time." );
 
@@ -971,8 +998,8 @@ public class ManagerThread extends Thread {
 	}
 
 
-	public void setJobCenterClientMain(ClientMain jobManagerClientMain) {
-		this.jobCenterClientMain = jobManagerClientMain;
+	public void setJobCenterClientMain(ClientMain jobCenterClientMain) {
+		this.jobCenterClientMain = jobCenterClientMain;
 	}
 
 

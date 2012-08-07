@@ -14,6 +14,11 @@ public class ModuleInterfaceRequestImpl implements ModuleInterfaceRequest {
 
 	private Map<String, String> jobParameters;
 
+	private int numberOfThreadsForRunningJob;
+
+
+	//  get methods visible to the module through interface ModuleInterfaceRequest
+
 	@Override
 	public int getRequestId() {
 
@@ -26,12 +31,27 @@ public class ModuleInterfaceRequestImpl implements ModuleInterfaceRequest {
 		return jobParameters;
 	}
 
+
+	@Override
+	public int getNumberOfThreadsForRunningJob() {
+
+		return numberOfThreadsForRunningJob;
+	}
+
+
+
+	//  setter methods not visible to the module
+
 	public void setRequestId(int requestId) {
 		this.requestId = requestId;
 	}
 
 	public void setJobParameters(Map<String, String> jobParameters) {
 		this.jobParameters = jobParameters;
+	}
+
+	public void setNumberOfThreadsForRunningJob(int numberOfThreadsForRunningJob) {
+		this.numberOfThreadsForRunningJob = numberOfThreadsForRunningJob;
 	}
 
 }

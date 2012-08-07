@@ -1,5 +1,5 @@
 
-!!!!!! Dont Forget to Install the JobManager_Blast_Submitter. This Module is useless without it. !!!!!!
+!!!!!! Dont Forget to Install the JobCenter_Blast_Submitter. This Module is useless without it. !!!!!!
 
 This readme assumes that you already installed and setup the sql server. If you did not, then follow the instructions in "create_database.txt" before you begin.
 
@@ -77,9 +77,9 @@ Building the Module
 1. Checkout the code.
 
 	# Non-members may check out a read-only working copy anonymously over HTTP.
-	svn checkout http://job-center.googlecode.com/svn/trunk/ job-center-read-only
+	svn checkout http://jobcenter.googlecode.com/svn/trunk/ jobcenter-read-only
 
-2.	Compile the Client and Module by executing the "build_all_JobManager.xml" ant script.
+2.	Compile the Client and Module by executing the "ant_build_all_JobCenter.xml" ant script.
 
 3.	If you don't know how to do this, but can export the project to a jar file, do that. But keep in mind that you will need a specific directory structure,
 	and some other files from the project. If you export the project jar, copy and pase/ create appropriate directories as seen below.
@@ -114,7 +114,7 @@ Building the Module
 
 Installing the Module
 
-1.	First, you must build the module. If you checked out the trunk via SVN, run the "build_all_JobManager.xml" ant script, then navigate to the
+1.	First, you must build the module. If you checked out the trunk via SVN, run the "ant_build_all_JobCenter.xml" ant script, then navigate to the
 	installables directory and copy the directory according to step 2. If not, check out the trunk first. The Blast_Module depends on some other projects.
 
 2.	For the Blast_Module, simply place the blast_module directory inside the path "jobcenter_client_installation/jobcenter_modules".

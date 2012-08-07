@@ -41,7 +41,7 @@ public class SendJobStatusToServer {
 
 	/**
 	 * Called on a different thread.
-	 * The ManagerThread instance has detected that the user has requested that the Jobmanager client stop retrieving jobs.
+	 * The ManagerThread instance has detected that the user has requested that the JobCenter client stop retrieving jobs.
 	 */
 	public void stopRunningAfterProcessingJob() {
 
@@ -89,7 +89,7 @@ public class SendJobStatusToServer {
 	 */
 	public void sendJobStatusToServer( Job job )
 	throws Throwable {
-		
+
 		UpdateServerFromJobRunOnClientRequest updateServerFromJobRunOnClientRequest = new UpdateServerFromJobRunOnClientRequest();
 
 		updateServerFromJobRunOnClientRequest.setJob( job );

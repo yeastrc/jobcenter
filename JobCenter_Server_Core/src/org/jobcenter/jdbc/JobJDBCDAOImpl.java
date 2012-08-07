@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -274,7 +275,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 			connection = getConnection( );
 
-			pstmt = connection.prepareStatement( addRunRecordSqlString );
+			pstmt = connection.prepareStatement( addRunRecordSqlString, Statement.RETURN_GENERATED_KEYS );
 
 			pstmt.setInt( 1, nodeId);
 
@@ -478,7 +479,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 			connection = getConnection( );
 
-			pstmt = connection.prepareStatement( addRunMessageRecordSqlString );
+			pstmt = connection.prepareStatement( addRunMessageRecordSqlString, Statement.RETURN_GENERATED_KEYS );
 
 			pstmt.setInt( 1, run.getId() );
 
@@ -767,7 +768,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 			connection = getConnection( );
 
-			pstmt = connection.prepareStatement( insertRequestSqlString );
+			pstmt = connection.prepareStatement( insertRequestSqlString, Statement.RETURN_GENERATED_KEYS );
 
 			pstmt.setInt( 1, requestType);
 
@@ -871,7 +872,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 			connection = getConnection( );
 
-			pstmt = connection.prepareStatement( insertJobSqlString );
+			pstmt = connection.prepareStatement( insertJobSqlString, Statement.RETURN_GENERATED_KEYS );
 
 			pstmt.setInt( 1, job.getRequestId() );
 

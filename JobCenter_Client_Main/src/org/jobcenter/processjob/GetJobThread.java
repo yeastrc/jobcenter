@@ -14,6 +14,7 @@ import org.jobcenter.dto.Job;
 import org.jobcenter.dto.RunDTO;
 import org.jobcenter.dto.RunMessageDTO;
 import org.jobcenter.managerthread.ManagerThread;
+import org.jobcenter.module.ModuleConfigDTO;
 import org.jobcenter.module.ModuleFactory;
 import org.jobcenter.module.ModuleHolder;
 import org.jobcenter.request.UpdateServerFromJobRunOnClientRequest;
@@ -56,6 +57,17 @@ public class GetJobThread extends Thread  {
 
 
 	private volatile boolean exittedWaitDueToAwakenNotify = false;
+
+
+	/**
+	 * This is the size of the inactiveThreadPool at the time the client
+	 * last looked for jobs to run.
+	 *
+	 * If this gets larger before the get job thread goes to sleep,
+	 * the get job thread should not sleep but immediately check if it
+	 * can get a job to run.
+	 */
+	private int inactiveJobRunnersCountAtGetJobSearchTime = 0;
 
 
 
@@ -148,21 +160,40 @@ public class GetJobThread extends Thread  {
 
 			try {
 
-				JobRunnerThread jobRunnerThread  = JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().poll();
+				inactiveJobRunnersCountAtGetJobSearchTime = JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().size();
 
-				if ( jobRunnerThread == null ) {
-
+				if ( JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().isEmpty() ) {
 
 					//  If no worker threads available
 
-					log.info( "no worker threads available, jobRunnerThread == null so sleeping, loopCounter = " + loopCounter );
+					if ( log.isInfoEnabled() ) {
+
+						log.info( "no worker threads available so sleeping, loopCounter = " + loopCounter );
+					}
 
 					waitForSleepTime( WAIT_BECAUSE_NO_WORKER_THREADS_TRUE );
 
 
 				} else  {
 
-					getJob( jobRunnerThread );
+					int availableThreadCount = getAvailableThreadCount( );
+
+					if ( availableThreadCount <= 0 ) {
+
+						//  If no worker threads available
+
+						if ( log.isInfoEnabled() ) {
+
+							log.info( "availableThreadCount <= 0 so sleeping , loopCounter = " + loopCounter );
+						}
+
+						waitForSleepTime( WAIT_BECAUSE_NO_WORKER_THREADS_TRUE );
+
+
+					} else {
+
+						getJob( availableThreadCount );
+					}
 				}
 
 
@@ -182,12 +213,37 @@ public class GetJobThread extends Thread  {
 	}
 
 
+	/**
+	 * @return
+	 */
+	private int getAvailableThreadCount( ) {
+
+		int threadInUseCount = 0;
+
+		List<JobRunnerThread> jobRunnerThreads = ThreadsHolderSingleton.getInstance().getJobRunnerThreads();
+
+		for ( JobRunnerThread jobRunnerThread : jobRunnerThreads ) {
+
+			int jobRunnerThreadMaxNumberThreadsToUseToProcessJob = jobRunnerThread.getMaxNumberThreadsToUseToProcessJob();
+
+			threadInUseCount += jobRunnerThreadMaxNumberThreadsToUseToProcessJob;
+		}
+
+		ClientConfigDTO clientConfigDTO = ClientConfigDTO.getSingletonInstance();  //  retrieve singleton
+
+		int maxThreadsForModules = clientConfigDTO.getMaxThreadsForModules();
+
+		int availableThreadCount = maxThreadsForModules - threadInUseCount;
+
+		return availableThreadCount;
+	}
+
 
 
 	/**
 	 *
 	 */
-	private void getJob( JobRunnerThread jobRunnerThread ) throws Throwable {
+	private void getJob( int availableThreadCount ) throws Throwable {
 
 		log.info( "getJob(): getting a job" );
 
@@ -197,7 +253,7 @@ public class GetJobThread extends Thread  {
 		JobResponse jobResponse = null;
 
 		try {
-			jobResponse = GetJob.getInstance().getNextJob( );
+			jobResponse = GetJob.getInstance().getNextJob( availableThreadCount );
 
 		} catch ( Throwable t ) {
 
@@ -208,23 +264,11 @@ public class GetJobThread extends Thread  {
 
 		if ( jobResponse == null ) {
 
-
-			//    Problem getting a job
-			//            put worker thread back on inactive queue
-
-			JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().add( jobRunnerThread );
-
 			log.error( "GetJobThread : run() Error:  'jobResponse == null'." );
 
 			waitForSleepTime( WAIT_BECAUSE_NO_WORKER_THREADS_FALSE );
 
 		} else if ( jobResponse.isErrorResponse() || jobResponse.getErrorCode() != BaseResponse.ERROR_CODE_NO_ERRORS ) {
-
-
-			//    Problem getting a job
-			//            put worker thread back on inactive queue
-
-			JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().add( jobRunnerThread );
 
 			log.error( "GetJobThread : run() Error:  'jobResponse.isErrorResponse() || jobResponse.getErrorCode() != BaseResponse.ERROR_CODE_NO_ERRORS':  Error code = " + jobResponse.getErrorCode()
 					+  " Error description = " + jobResponse.getErrorCodeDescription() + "." );
@@ -233,21 +277,15 @@ public class GetJobThread extends Thread  {
 
 		} else if ( ! jobResponse.isJobFound() ) {
 
-			log.info( "getJob(): no job found, put worker thread back on inactive queue and go to sleep" );
-
-			//    if no job found
-			//            put worker thread back on inactive queue
-
-			JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().add( jobRunnerThread );
+			log.info( "getJob(): no job found go to sleep" );
 
 			waitForSleepTime( WAIT_BECAUSE_NO_WORKER_THREADS_FALSE );
 
 		} else {
 
-			processJobResponse( jobResponse, jobRunnerThread );
+			processJobResponse( jobResponse, availableThreadCount );
 		}
 	}
-
 
 
 	/**
@@ -255,16 +293,11 @@ public class GetJobThread extends Thread  {
 	 * @param jobRunnerThread
 	 * @throws Throwable
 	 */
-	private void processJobResponse( JobResponse jobResponse, JobRunnerThread jobRunnerThread ) throws Throwable {
+	private void processJobResponse( JobResponse jobResponse, int availableThreadCount ) throws Throwable {
 
 		Job job = jobResponse.getJob();
 
 		if ( job == null ) {
-
-			//    Problem getting a job
-			//            put worker thread back on inactive queue
-
-			JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().add( jobRunnerThread );
 
 			waitForSleepTime( WAIT_BECAUSE_NO_WORKER_THREADS_FALSE );
 
@@ -283,38 +316,43 @@ public class GetJobThread extends Thread  {
 			}
 
 
-			try {
+			ModuleHolder moduleHolder = null;
 
-				 processJob( job, moduleName, jobRunnerThread );
+			try {
+				moduleHolder = ModuleFactory.getInstance().getModuleForJob( job );
 
 			} catch ( Throwable t ) {
 
 
-				log.error( "Exception in processJobResponse(), trying to get moduleHolder: moduleName on job = " + moduleName, t );
+				log.error( "Exception in loading module error: " + t.toString(), t );
+
+				sendJobResponseOnError( job, moduleName, t );
+			}
+
+			if ( moduleHolder != null ) {
+
+				try {
+
+					processJob( job, moduleHolder, availableThreadCount );
+
+				} catch ( Throwable t ) {
 
 
-				//			ModuleHolder moduleHolder = jobRunnerThread.getModuleHolder();
-				//
-				//			if ( moduleHolder == null ) {
-
-				jobRunnerThread.setModuleHolder( null );
-
-				jobRunnerThread.setJob( null );
-
-				JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().add( jobRunnerThread );
-				//			}
-
-				//			throw t;
-
-			} finally {
-
+					log.error( "Exception in processJobResponse(), trying to get moduleHolder: moduleName on job = " + moduleName, t );
 
 
 
+					//			throw t;
+
+				} finally {
+
+
+
+
+				}
 			}
 		}
 	}
-
 
 
 
@@ -324,47 +362,58 @@ public class GetJobThread extends Thread  {
 	 * @param jobRunnerThread
 	 * @throws Throwable
 	 */
-	private void processJob( Job job, String moduleName, JobRunnerThread jobRunnerThread ) throws Throwable {
-
-		jobRunnerThread.setModuleHolder( null ); // clear out moduleHolder
-
-		ModuleHolder moduleHolder = null;
-
-		try {
-			moduleHolder = ModuleFactory.getInstance().getModuleForJob( job );
-
-			jobRunnerThread.setModuleHolder( moduleHolder );
+	private void processJob( Job job, ModuleHolder moduleHolder, int availableThreadCount  ) throws Throwable {
 
 
-		} catch ( Throwable t ) {
+		JobRunnerThread jobRunnerThread = JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().poll();
 
+		if ( jobRunnerThread == null ) {
 
-			log.error( "Exception in loading module error: " + t.toString(), t );
+			String msg = "processJob( ... ):  jobRunnerThread == null, should not have gotten here if there were no entries in JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance()";
 
-			sendJobResponseOnError( job, moduleName, t );
+			log.error( msg );
 
-
-			jobRunnerThread.setModuleHolder( null );
-
-			jobRunnerThread.setJob( null );
-
-			JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().add( jobRunnerThread );
+			throw new Exception( msg );
 		}
 
+		ModuleConfigDTO moduleConfigDTO = moduleHolder.getModuleConfigDTO();
+
+		boolean moduleMaxNumberThreadsPerJobSet = moduleConfigDTO.isMaxNumberThreadsPerJobSet();
+
+		int moduleMaxNumberThreadsPerJob = moduleConfigDTO.getMaxNumberThreadsPerJob();
+
+		int maxNumberThreadsToUseToProcessJob = availableThreadCount;
+
+		if ( moduleMaxNumberThreadsPerJobSet && moduleMaxNumberThreadsPerJob < maxNumberThreadsToUseToProcessJob ) {
+
+			maxNumberThreadsToUseToProcessJob = moduleMaxNumberThreadsPerJob;
+
+			if ( log.isDebugEnabled() ) {
+
+				log.debug( "Using max number of threads per job from the module, = " + moduleMaxNumberThreadsPerJob );
+			}
+		}
+
+		if ( log.isDebugEnabled() ) {
+
+			log.debug( "maxNumberThreadsToUseToProcessJob = " + maxNumberThreadsToUseToProcessJob );
+		}
+
+		jobRunnerThread.setMaxNumberThreadsToUseToProcessJob( maxNumberThreadsToUseToProcessJob );
+
+		jobRunnerThread.setModuleHolder( moduleHolder );
+
 		try {
 
-			if ( moduleHolder != null ) {
+			jobRunnerThread.setJob( job );
 
-				if ( log.isDebugEnabled() ) {
+			if ( log.isDebugEnabled() ) {
 
-					log.debug("Calling jobRunnerThread.awaken():  jobRunnerThread.getId() = " + jobRunnerThread.getId()
-							+ ", jobRunnerThread.getName() = " + jobRunnerThread.getName() );
-				}
-
-				jobRunnerThread.setJob( job );
-
-				jobRunnerThread.awaken();
+				log.debug("Calling jobRunnerThread.awaken():  jobRunnerThread.getId() = " + jobRunnerThread.getId()
+						+ ", jobRunnerThread.getName() = " + jobRunnerThread.getName() );
 			}
+
+			jobRunnerThread.awaken();
 
 		} catch ( IllegalMonitorStateException ex ) {
 
@@ -373,6 +422,7 @@ public class GetJobThread extends Thread  {
 
 			log.error( "Exception in processJob(), trying to call jobRunnerThread.awaken(), which calls notify() : ", ex );
 
+			throw ex;
 
 			//  TODO  properly handle this
 		}
@@ -478,7 +528,9 @@ public class GetJobThread extends Thread  {
 	 */
 	private void waitForSleepTime( boolean waitBecauseNoWorkerThreads ) {
 
-		log.debug( "waitForSleepTime() entered, waitBecauseNoWorkerThreads " + waitBecauseNoWorkerThreads );
+		if ( log.isDebugEnabled() ) {
+			log.debug( "waitForSleepTime() entered, waitBecauseNoWorkerThreads " + waitBecauseNoWorkerThreads );
+		}
 
 //		int waitTimeInSeconds = ClientConfigDTO.getSingletonInstance().getSleepTimeCheckingForNewJobs();
 
@@ -498,13 +550,17 @@ public class GetJobThread extends Thread  {
 
 				try {
 
-					//  If waiting due to no worker threads, make one last check here for worker threads before waiting
+					//  If waiting due to no worker threads or no available thread count,
+					//  make one last check here for worker threads before waiting
 
-					if ( inATimeWhenCanRetrieveJobs && waitBecauseNoWorkerThreads && ( ! JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().isEmpty() ) ) {
+					if ( inATimeWhenCanRetrieveJobs
+							&& waitBecauseNoWorkerThreads
+							&& ( JobRunnerThreadPool.getInactiveJobRunnerThreadsInstance().size() > inactiveJobRunnersCountAtGetJobSearchTime ) )
+					{
 
-						//  A worker thread is now found so don't wait but rather loop around and go get it
+						//  The number of inactive threads went up so loop around and check for a job
 
-						log.info( "waitForSleepTime(): waitBecauseNoWorkerThreads == true and now there is a thread available so not waiting. " );
+						log.info( "waitForSleepTime(): waitBecauseNoWorkerThreads == true and The number of inactive threads went up so loop around and check for a job. " );
 
 					} else {
 
@@ -519,7 +575,11 @@ public class GetJobThread extends Thread  {
 
 						}
 
-						log.info( "waitForSleepTime():  Get Job waiting ( calling wait(...) ) for " + waitTimeInSeconds + " seconds." );
+						if ( log.isInfoEnabled() ) {
+							log.info( "waitForSleepTime():  Get Job waiting ( calling wait(...) ) for " + waitTimeInSeconds + " seconds." );
+						}
+
+						exittedWaitDueToAwakenNotify = false;
 
 						wait( ( (long) waitTimeInSeconds ) * 1000 ); //  wait for notify() call or timeout, in milliseconds
 
@@ -555,8 +615,9 @@ public class GetJobThread extends Thread  {
 				}
 			}
 
-
-			log.info( "waitForSleepTime():  wait() call exited, was:  waitBecauseNoWorkerThreads = " + waitBecauseNoWorkerThreads + ", waitTimeInSeconds = " + waitTimeInSeconds + ", keepRunning = " + keepRunning );
+			if ( log.isInfoEnabled() ) {
+				log.info( "waitForSleepTime():  wait() call exited, was:  waitBecauseNoWorkerThreads = " + waitBecauseNoWorkerThreads + ", waitTimeInSeconds = " + waitTimeInSeconds + ", keepRunning = " + keepRunning );
+			}
 
 			if ( ! keepRunning ) {
 
@@ -574,7 +635,9 @@ public class GetJobThread extends Thread  {
 			}
 		}
 
-		log.info( "waitForSleepTime() exitted, waitBecauseNoWorkerThreads = " + waitBecauseNoWorkerThreads + ", waitTimeInSeconds = " + waitTimeInSeconds + ", keepRunning = " + keepRunning );
+		if ( log.isInfoEnabled() ) {
+			log.info( "waitForSleepTime() exitted, waitBecauseNoWorkerThreads = " + waitBecauseNoWorkerThreads + ", waitTimeInSeconds = " + waitTimeInSeconds + ", keepRunning = " + keepRunning );
+		}
 
 	}
 
@@ -604,7 +667,7 @@ public class GetJobThread extends Thread  {
 	public void shutdown() {
 
 
-		log.info( "shutdown() called, setting keepRunning = false, calling awaken() " );
+		log.warn( "shutdown() called, setting keepRunning = false, calling awaken() " );
 
 		keepRunning = false;
 
@@ -618,7 +681,7 @@ public class GetJobThread extends Thread  {
 
 		awaken();
 
-		log.info( "Exiting shutdown()" );
+		log.warn( "Exiting shutdown()" );
 	}
 
 

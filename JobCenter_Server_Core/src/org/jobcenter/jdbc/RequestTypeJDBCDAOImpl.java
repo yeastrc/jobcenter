@@ -48,7 +48,7 @@ public class RequestTypeJDBCDAOImpl extends JDBCBaseDAO implements RequestTypeJD
 
 			connection = getConnection( );
 
-//			connection = JobManagerDBConnectionFactory.getConnection( );
+//			connection = JobCenterDBConnectionFactory.getConnection( );
 
 			pstmt = connection.prepareStatement( getRequestTypesQuerySqlString );
 

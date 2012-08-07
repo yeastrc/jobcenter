@@ -131,6 +131,10 @@ public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService 
 		clientStatusUpdateRequest.getTimeUntilNextClientStatusUpdate();
 
 
+		//  TODO  Update to update the DB to indicate that the client has shut down so that a client late email is not generated
+		//            after the client has shut down.
+
+
 
 		//  TODO    Need to actually do something with the provided info
 
@@ -237,6 +241,17 @@ public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService 
 						updatedEntry = true;
 
 					} catch ( Throwable t ) {
+
+						//  TODO   This retry process does not work.
+						//             There is NO exception thrown at this point.
+
+						//         The update is not committed to the database until the
+						//           call to the method "clientStatusUpdate(...)" on this class completes
+						//           and that is when the exception is thrown.
+
+						//   Can try to add a "flush()" after the save or saveOrUpdate call.
+
+						//   Can try setting the class to "readOnly = true" and this method to "readOnly = false"
 
 
 						retryCount++;
