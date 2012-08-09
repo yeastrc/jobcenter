@@ -30,6 +30,7 @@ public class ClientStatusUpdateRequest extends BaseRequest {
 	private List<RunInProgressDTO> runsInProgress;
 
 
+	private boolean clientAcceptsServerValueForTimeUntilNextClientStatusUpdate = false;
 
 	/**
 	 * Not currently used
@@ -38,16 +39,20 @@ public class ClientStatusUpdateRequest extends BaseRequest {
 
 
 
+
 	@Override
 	public String toString() {
-		return "ClientStatusUpdateRequest [clientCurrentTime="
-				+ clientCurrentTime + ", runsInProgress=" + runsInProgress
+		return "ClientStatusUpdateRequest [clientAcceptsServerValueForTimeUntilNextClientStatusUpdate="
+				+ clientAcceptsServerValueForTimeUntilNextClientStatusUpdate
+				+ ", clientCurrentTime="
+				+ clientCurrentTime
+				+ ", runsInProgress="
+				+ runsInProgress
 				+ ", timeUntilNextClientStatusUpdate="
-				+ timeUntilNextClientStatusUpdate + ", updateType="
+				+ timeUntilNextClientStatusUpdate
+				+ ", updateType="
 				+ updateType + "]";
 	}
-
-
 
 
 
@@ -76,6 +81,25 @@ public class ClientStatusUpdateRequest extends BaseRequest {
 	public void setTimeUntilNextClientStatusUpdate(
 			int timeUntilNextClientStatusUpdate) {
 		this.timeUntilNextClientStatusUpdate = timeUntilNextClientStatusUpdate;
+	}
+
+
+
+
+
+
+	public boolean isClientAcceptsServerValueForTimeUntilNextClientStatusUpdate() {
+		return clientAcceptsServerValueForTimeUntilNextClientStatusUpdate;
+	}
+
+
+
+
+
+
+	public void setClientAcceptsServerValueForTimeUntilNextClientStatusUpdate(
+			boolean clientAcceptsServerValueForTimeUntilNextClientStatusUpdate) {
+		this.clientAcceptsServerValueForTimeUntilNextClientStatusUpdate = clientAcceptsServerValueForTimeUntilNextClientStatusUpdate;
 	}
 
 }

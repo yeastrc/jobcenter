@@ -77,7 +77,7 @@ public class Main implements ModuleInterfaceClientMainInterface {
 
 
 
-	//   Constructor:    must be public so job manager client can instantiate it
+	//   Constructor:    must be public so JobCenter client can instantiate it
 	public Main() {
 	}
 
@@ -93,7 +93,7 @@ public class Main implements ModuleInterfaceClientMainInterface {
 	//////////////////////////////////////////////////////////////////////////
 
 
-//	Job Manager lifecycle methods
+//	JobCenter lifecycle methods
 
 
 	/**
@@ -130,7 +130,7 @@ public class Main implements ModuleInterfaceClientMainInterface {
 		log.info( "log4j file '" + LOG4J_CONFIG_FILENAME + "' load path = " + log4jFile.getFile() );
 
 
-		//  these files are used by the job manager program
+		//  these files are used by the JobCenter program
 
 //		InputStream propsPerModule = thisClassLoader.getResourceAsStream( ModuleConfigPropertyFileNames.MODULE_CONFIG_PER_MODULE );
 //		Properties configPropsPerModule = new Properties();

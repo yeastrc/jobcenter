@@ -11,6 +11,7 @@ import org.jobcenter.nondbdto.RunInProgressDTO;
 import org.jobcenter.processjob.JobRunnerThread;
 import org.jobcenter.processjob.ThreadsHolderSingleton;
 import org.jobcenter.request.ClientStatusUpdateRequest;
+import org.jobcenter.response.ClientStatusUpdateResponse;
 import org.jobcenter.serverinterface.ServerConnection;
 
 public class SendClientStatusUpdateToServer {
@@ -26,7 +27,7 @@ public class SendClientStatusUpdateToServer {
 	/**
 	 *
 	 */
-	public static void sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum clientStatus, PassJobsToServer passJobsToServer ) throws Throwable {
+	public static Integer sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum clientStatus, PassJobsToServer passJobsToServer ) throws Throwable {
 
 		ServerConnection serverConnection = ServerConnection.getInstance();
 
@@ -47,6 +48,7 @@ public class SendClientStatusUpdateToServer {
 		
 		clientStatusUpdateRequest.setTimeUntilNextClientStatusUpdate( timeUntilNextClientStatusUpdate );
 		
+		clientStatusUpdateRequest.setClientAcceptsServerValueForTimeUntilNextClientStatusUpdate( true );
 		
 
 		if ( passJobsToServer == PassJobsToServer.PASS_JOBS_TO_SERVER_YES ) {
@@ -84,10 +86,16 @@ public class SendClientStatusUpdateToServer {
 
 		clientStatusUpdateRequest.setClientCurrentTime( System.currentTimeMillis() );
 
+		Integer waitTimeForNextClientCheckinFromLastServerResponse = null; 
 
-		serverConnection.clientStatusUpdate( clientStatusUpdateRequest );
+		ClientStatusUpdateResponse clientStatusUpdateResponse = serverConnection.clientStatusUpdate( clientStatusUpdateRequest );
+		
+		if ( clientStatusUpdateResponse != null && ! clientStatusUpdateResponse.isErrorResponse() ) {
+			
+			waitTimeForNextClientCheckinFromLastServerResponse = clientStatusUpdateResponse.getWaitTimeForNextClientCheckinSpecifiedByServer(); 
+		}
 
-
+		return waitTimeForNextClientCheckinFromLastServerResponse;
 	}
 
 }

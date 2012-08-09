@@ -35,7 +35,7 @@ public interface ModuleInterfaceClientMainInterface {
 
 	/**
 	 * Called on a separate thread when a request comes from the user via updating the control file.
-	 * The user has indicated that they want the job manager client to to stop processing new jobs
+	 * The user has indicated that they want the JobCenter client to to stop processing new jobs
 	 * and complete the jobs that are running.
 	 *
 	 * The module needs this information since if it is in an endless retry mode to submit the next job or

@@ -180,6 +180,11 @@
 
 	<bean id="ClientStatusUpdateService" class="org.jobcenter.service.ClientStatusUpdateServiceImpl">
 
+
+
+		<property name="getValueFromConfigService">
+			<ref bean="getValueFromConfigService" />
+		</property>
 		<property name="clientStatusDBUpdateService">
 			<ref bean="clientStatusDBUpdateService" />
 		</property>

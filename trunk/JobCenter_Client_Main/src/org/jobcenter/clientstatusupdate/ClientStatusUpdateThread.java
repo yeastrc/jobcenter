@@ -28,6 +28,10 @@ public class ClientStatusUpdateThread extends Thread {
 
 	private int waitTimeForNextClientCheckin;
 
+	
+
+	private Integer waitTimeForNextClientCheckinFromLastServerResponse;
+
 
 	/**
 	 * default Constructor
@@ -190,11 +194,32 @@ public class ClientStatusUpdateThread extends Thread {
 
 				if ( keepRunning ) {
 
+
+					int waitTimeInSeconds = waitTimeForNextClientCheckin;
+					
+					if ( waitTimeForNextClientCheckinFromLastServerResponse != null ) {
+						
+						if ( log.isDebugEnabled() ) {
+							
+							log.debug( "waitTimeForNextClientCheckinFromLastServerResponse != null so using it, is = " 
+									+ waitTimeForNextClientCheckinFromLastServerResponse );
+						}
+						
+						waitTimeInSeconds = waitTimeForNextClientCheckinFromLastServerResponse;
+					
+					} else {
+						
+						if ( log.isDebugEnabled() ) {
+							
+							log.debug( "waitTimeForNextClientCheckinFromLastServerResponse == null so using waitTimeForNextClientCheckin from client startup, is = " 
+									+ waitTimeForNextClientCheckin );
+						}
+					}
+
+
 					synchronized (this) {
 
 						try {
-
-							int waitTimeInSeconds = waitTimeForNextClientCheckin;
 
 							wait( waitTimeInSeconds * 1000 ); //  wait for notify() call or timeout, in milliseconds
 
@@ -233,7 +258,7 @@ public class ClientStatusUpdateThread extends Thread {
 	 */
 	private void sendClientStatusUpdateClientUp() throws Throwable {
 
-		SendClientStatusUpdateToServer.sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum.CLIENT_UP, PassJobsToServer.PASS_JOBS_TO_SERVER_YES );
+		waitTimeForNextClientCheckinFromLastServerResponse = SendClientStatusUpdateToServer.sendClientStatusUpdateToServer( ClientStatusUpdateTypeEnum.CLIENT_UP, PassJobsToServer.PASS_JOBS_TO_SERVER_YES );
 	}
 
 
