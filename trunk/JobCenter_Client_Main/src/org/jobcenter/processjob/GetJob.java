@@ -147,7 +147,21 @@ public class GetJob {
 			ModuleTracker moduleTracker = entry.getValue();
 
 			ModuleConfigDTO moduleConfigDTO =  moduleTracker.getModuleConfigDTO();
+			
+			boolean notIsModuleFailedToLoadOrInit = ! moduleConfigDTO.isModuleFailedToLoadOrInit();
+			
+			boolean notIsMaxNumberConcurrentJobsSet = ! moduleConfigDTO.isMaxNumberConcurrentJobsSet();
 
+			boolean concurrentJobsAvailableCountGTZero = moduleTracker.concurrentJobsAvailableCount > 0;
+
+			boolean conCurrTest = ( ( ! moduleConfigDTO.isMaxNumberConcurrentJobsSet() ) || moduleTracker.concurrentJobsAvailableCount > 0 );
+			
+			boolean isMinNumberThreadsPerJobSet = moduleConfigDTO.isMinNumberThreadsPerJobSet();
+			
+			boolean MinNumberThreadsPerJobLEAvTC = moduleConfigDTO.getMinNumberThreadsPerJob() <= availableThreadCount;
+			
+			boolean MinTtoAvTCtest = ! moduleConfigDTO.isMinNumberThreadsPerJobSet() || moduleConfigDTO.getMinNumberThreadsPerJob() <= availableThreadCount;
+			
 			if ( ( ! moduleConfigDTO.isModuleFailedToLoadOrInit() ) // bypass modules that failed to load or init()
 					//              if the max number of concurrent jobs is set on the module, the available count must be > zero
 					&& ( ( ! moduleConfigDTO.isMaxNumberConcurrentJobsSet() )
@@ -155,8 +169,8 @@ public class GetJob {
 						)
 						//  If the minimumThreads per Job is set for a given module,
 						//  only accept it where the minimumThreads per Job is <= the available threads
-					&& ( moduleConfigDTO.isMinNumberThreadsPerJobSet()
-							&& moduleConfigDTO.getMinNumberThreadsPerJob() <= availableThreadCount
+					&& ( ( ! moduleConfigDTO.isMinNumberThreadsPerJobSet() )
+							|| moduleConfigDTO.getMinNumberThreadsPerJob() <= availableThreadCount
 						)
 
 				)
