@@ -58,7 +58,7 @@ public class ClientStatusUpdateWebService {
 
 
 		try {
-			ClientStatusUpdateResponse response = clientStatusUpdateService.clientStatusUpdate( clientStatusUpdateRequest, remoteHost );
+			ClientStatusUpdateResponse response = clientStatusUpdateService.clientStatusUpdateFromClient( clientStatusUpdateRequest, remoteHost );
 
 			return response;
 

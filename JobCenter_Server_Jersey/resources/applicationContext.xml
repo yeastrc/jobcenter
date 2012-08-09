@@ -129,8 +129,8 @@
 
 
 	<bean id="SendClientsCheckinLateNotificationServiceForWebInitiation" class="org.jobcenter.service.SendClientsCheckinLateNotificationServiceForWebInitiationImpl">
-		<property name="sendClientsCheckinLateNotificationService">
-			<ref bean="sendClientsCheckinLateNotificationService" />
+		<property name="processClientsStatusForLateCheckinsService">
+			<ref bean="processClientsStatusForLateCheckinsService" />
 		</property>
 	</bean>
 
@@ -180,19 +180,17 @@
 
 	<bean id="ClientStatusUpdateService" class="org.jobcenter.service.ClientStatusUpdateServiceImpl">
 
+		<property name="clientStatusDBUpdateService">
+			<ref bean="clientStatusDBUpdateService" />
+		</property>
+
 		<property name="clientNodeNameCheck">
 			<ref bean="clientNodeNameCheck" />
-		</property>
-		<property name="getValueFromConfigService">
-			<ref bean="getValueFromConfigService" />
 		</property>
 		<property name="clientsConnectedTrackingService">
 			<ref bean="clientsConnectedTrackingService" />
 		</property>
 
-		<property name="nodeClientStatusDAO">
-			<ref bean="nodeClientStatusDAO" />
-		</property>
 	</bean>
 
 
@@ -458,8 +456,8 @@
 
 
 	<bean id="sendClientsCheckinLateNotificationTimerTask" class="org.jobcenter.springtimertasks.SendClientsCheckinLateNotificationTimerTaskImpl">
-	    <property name="sendClientsCheckinLateNotificationService">
-			<ref bean="sendClientsCheckinLateNotificationService" />
+	    <property name="processClientsStatusForLateCheckinsService">
+			<ref bean="processClientsStatusForLateCheckinsService" />
 	    </property>
 	</bean>
 
@@ -506,6 +504,20 @@
 
 <!--   Internal services -->
 
+	<bean id="clientStatusDBUpdateService" class="org.jobcenter.internalservice.ClientStatusDBUpdateServiceImpl">
+		<property name="clientNodeNameCheck">
+			<ref bean="clientNodeNameCheck" />
+		</property>
+		<property name="getValueFromConfigService">
+			<ref bean="getValueFromConfigService" />
+		</property>
+
+		<property name="nodeClientStatusDAO">
+			<ref bean="nodeClientStatusDAO" />
+		</property>
+	</bean>
+
+
 
 	<bean id="getValueFromConfigService" class="org.jobcenter.internalservice.GetValueFromConfigServiceImpl">
 		<property name="configSystemDAO">
@@ -540,15 +552,14 @@
 	</bean>
 
 
-	<bean id="sendClientsCheckinLateNotificationService" class="org.jobcenter.internalservice.SendClientsCheckinLateNotificationServiceImpl">
-		<property name="getClientsStatusListService">
-			<ref bean="GetClientsStatusListService" />
+	<bean id="processClientsStatusForLateCheckinsService" class="org.jobcenter.internalservice.ProcessClientsStatusForLateCheckinsServiceImpl">
+
+		<property name="clientStatusDBUpdateService">
+			<ref bean="clientStatusDBUpdateService" />
 		</property>
-		<property name="getValueFromConfigService">
-			<ref bean="getValueFromConfigService" />
-		</property>
-		<property name="sendEmailService">
-			<ref bean="sendEmailService" />
+
+		<property name="clientsLateCheckinRetrieveAndSendEmailService">
+			<ref bean="clientsLateCheckinRetrieveAndSendEmailService" />
 		</property>
 
 		<property name="nodeClientStatusDAO">
@@ -556,6 +567,21 @@
 		</property>
 	</bean>
 
+
+	<bean id="clientsLateCheckinRetrieveAndSendEmailService" class="org.jobcenter.internalservice.ClientsLateCheckinRetrieveAndSendEmailServiceImpl">
+
+		<property name="getClientsStatusListService">
+			<ref bean="GetClientsStatusListService" />
+		</property>
+
+		<property name="getValueFromConfigService">
+			<ref bean="getValueFromConfigService" />
+		</property>
+
+		<property name="sendEmailService">
+			<ref bean="sendEmailService" />
+		</property>
+	</bean>
 
 	<bean id="sendEmailService" class="org.jobcenter.internalservice.SendEmailServiceImpl">
 	</bean>
