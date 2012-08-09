@@ -4,9 +4,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.jobcenter.constants.ServerConfigKeyValues;
+import org.jobcenter.constants.ServerCoreConstants;
 import org.jobcenter.internalservice.ClientNodeNameCheck;
 import org.jobcenter.internalservice.ClientStatusDBUpdateService;
 import org.jobcenter.internalservice.ClientsConnectedTrackingService;
+import org.jobcenter.internalservice.GetValueFromConfigService;
 import org.jobcenter.nondbdto.RunInProgressDTO;
 
 import org.jobcenter.request.*;
@@ -20,12 +23,16 @@ import org.jobcenter.response.*;
 
 public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService {
 
+
+
+
 	private static Logger log = Logger.getLogger(ClientStatusUpdateServiceImpl.class);
 
 
 	//  Service
 
 	private ClientStatusDBUpdateService clientStatusDBUpdateService;
+	private GetValueFromConfigService getValueFromConfigService;
 
 	private ClientNodeNameCheck clientNodeNameCheck;
 
@@ -37,6 +44,13 @@ public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService 
 	}
 	public void setClientStatusDBUpdateService(ClientStatusDBUpdateService clientStatusDBUpdateService) {
 		this.clientStatusDBUpdateService = clientStatusDBUpdateService;
+	}
+	public GetValueFromConfigService getGetValueFromConfigService() {
+		return getValueFromConfigService;
+	}
+	public void setGetValueFromConfigService(
+			GetValueFromConfigService getValueFromConfigService) {
+		this.getValueFromConfigService = getValueFromConfigService;
 	}
 	public ClientsConnectedTrackingService getClientsConnectedTrackingService() {
 		return clientsConnectedTrackingService;
@@ -90,7 +104,28 @@ public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService 
 			log.debug( method + ": clientStatusUpdateRequest = " + clientStatusUpdateRequest );
 		}
 
-		clientStatusUpdateRequest.getTimeUntilNextClientStatusUpdate();
+		if ( clientStatusUpdateRequest.isClientAcceptsServerValueForTimeUntilNextClientStatusUpdate() ) {
+
+
+			long now = System.currentTimeMillis();
+
+			int waitTimeForNextClientCheckin = ServerCoreConstants.DEFAULT_CLIENT_CHECKIN_TIME_IN_SECONDS;
+
+			Integer waitTimeForNextClientCheckinFromConfig = getValueFromConfigService.getConfigValueAsInteger( ServerConfigKeyValues.CLIENT_CHECKIN_WAIT_TIME );
+
+			if ( waitTimeForNextClientCheckinFromConfig != null ) {
+
+				waitTimeForNextClientCheckin = waitTimeForNextClientCheckinFromConfig;
+			}
+
+			long nextExpectedStatusUpdatedTime = now + ( waitTimeForNextClientCheckin * 1000 );
+
+			clientStatusUpdateResponse.setWaitTimeForNextClientCheckinSpecifiedByServer( waitTimeForNextClientCheckin );
+
+			clientStatusUpdateRequest.setTimeUntilNextClientStatusUpdate( waitTimeForNextClientCheckin );
+
+		}
+
 
 
 		//  TODO  Update to update the DB to indicate that the client has shut down so that a client late email is not generated
