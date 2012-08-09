@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+ <class name="org.jobcenter.dto.Job" table="job">
+  <id name="id" type="java.lang.Integer">
+   <column name="id"/>
+   <generator class="native"/>
+  </id>
+  <!-- Using version number optimistic locking -->
+  <version column="db_record_version_number" generated="never"
+   name="dbRecordVersionNumber" type="java.lang.Integer"/>
+  <many-to-one class="org.jobcenter.dto.JobType" fetch="select" name="jobType">
+   <column name="job_type_id" not-null="true"/>
+  </many-to-one>
+  <property generated="never" lazy="false" name="statusId" type="java.lang.Integer">
+   <column name="status_id" not-null="true"/>
+  </property>
+  <many-to-one class="org.jobcenter.dto.StatusDTO" fetch="select"
+   insert="false" name="status" update="false">
+   <column name="status_id" not-null="true"/>
+  </many-to-one>
+  <property generated="never" lazy="false" name="requestId" type="java.lang.Integer">
+   <column name="request_id" not-null="true"/>
+  </property>
+  <property generated="never" lazy="false" name="submitDate" type="java.sql.Timestamp">
+   <column length="19" name="submit_date" not-null="true"/>
+  </property>
+  <property generated="never" lazy="false" name="submitter" type="java.lang.String">
+   <column length="200" name="submitter"/>
+  </property>
+  <property generated="never" lazy="false" name="priority" type="java.lang.Integer">
+   <column name="priority" not-null="true"/>
+  </property>
+  <property column="insert_complete" name="insertComplete"
+   not-null="true" type="string"/>
+ </class>
+</hibernate-mapping>
