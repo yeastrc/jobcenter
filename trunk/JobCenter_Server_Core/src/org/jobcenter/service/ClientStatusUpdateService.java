@@ -6,7 +6,7 @@ import org.jobcenter.response.*;
 
 public interface ClientStatusUpdateService  {
 
-	public ClientStatusUpdateResponse clientStatusUpdate( ClientStatusUpdateRequest clientStatusUpdateRequest, String remoteHost );
+	public ClientStatusUpdateResponse clientStatusUpdateFromClient( ClientStatusUpdateRequest clientStatusUpdateRequest, String remoteHost );
 
 
 }

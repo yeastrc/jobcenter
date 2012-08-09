@@ -1,25 +1,6 @@
 package org.jobcenter.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-import org.jobcenter.constants.ServerConfigKeyValues;
-import org.jobcenter.dao.*;
-import org.jobcenter.dto.*;
-import org.jobcenter.internalservice.ClientNodeNameCheck;
-import org.jobcenter.internalservice.GetValueFromConfigService;
-import org.jobcenter.internalservice.SendClientsCheckinLateNotificationService;
-import org.jobcenter.jdbc.*;
-import org.jobcenter.request.*;
-import org.jobcenter.response.*;
+import org.jobcenter.internalservice.ProcessClientsStatusForLateCheckinsService;
 
 
 import org.apache.log4j.Logger;
@@ -54,24 +35,8 @@ public class SendClientsCheckinLateNotificationServiceForWebInitiationImpl imple
 
 	//  Service
 
-//	private ClientNodeNameCheck clientNodeNameCheck;
+	private ProcessClientsStatusForLateCheckinsService processClientsStatusForLateCheckinsService;
 
-	private SendClientsCheckinLateNotificationService sendClientsCheckinLateNotificationService;
-
-
-//	public ClientNodeNameCheck getClientNodeNameCheck() {
-//		return clientNodeNameCheck;
-//	}
-//	public void setClientNodeNameCheck(ClientNodeNameCheck clientNodeNameCheck) {
-//		this.clientNodeNameCheck = clientNodeNameCheck;
-//	}
-	public SendClientsCheckinLateNotificationService getSendClientsCheckinLateNotificationService() {
-		return sendClientsCheckinLateNotificationService;
-	}
-	public void setSendClientsCheckinLateNotificationService(
-			SendClientsCheckinLateNotificationService sendClientsCheckinLateNotificationService) {
-		this.sendClientsCheckinLateNotificationService = sendClientsCheckinLateNotificationService;
-	}
 
 
 	/* (non-Javadoc)
@@ -107,7 +72,20 @@ public class SendClientsCheckinLateNotificationServiceForWebInitiationImpl imple
 //		}
 
 
-		sendClientsCheckinLateNotificationService.sendClientsCheckinLateNotification();
+		processClientsStatusForLateCheckinsService.processClientsStatusForLateCheckins();
+	}
+
+
+
+	public ProcessClientsStatusForLateCheckinsService getProcessClientsStatusForLateCheckinsService() {
+		return processClientsStatusForLateCheckinsService;
+	}
+
+
+
+	public void setProcessClientsStatusForLateCheckinsService(
+			ProcessClientsStatusForLateCheckinsService processClientsStatusForLateCheckinsService) {
+		this.processClientsStatusForLateCheckinsService = processClientsStatusForLateCheckinsService;
 	}
 
 

@@ -3,7 +3,7 @@ package org.jobcenter.springtimertasks;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.jobcenter.internalservice.SendClientsCheckinLateNotificationService;
+import org.jobcenter.internalservice.ProcessClientsStatusForLateCheckinsService;
 
 /**
  *
@@ -13,24 +13,22 @@ public class SendClientsCheckinLateNotificationTimerTaskImpl extends TimerTask {
 
 
 
+
+
 	private static Logger log = Logger.getLogger(SendClientsCheckinLateNotificationTimerTaskImpl.class);
 
 
-	private SendClientsCheckinLateNotificationService sendClientsCheckinLateNotificationService;
+	private ProcessClientsStatusForLateCheckinsService processClientsStatusForLateCheckinsService;
 
-	public SendClientsCheckinLateNotificationService getSendClientsCheckinLateNotificationService() {
-		return sendClientsCheckinLateNotificationService;
+
+	public ProcessClientsStatusForLateCheckinsService getProcessClientsStatusForLateCheckinsService() {
+		return processClientsStatusForLateCheckinsService;
 	}
-	public void setSendClientsCheckinLateNotificationService(
-			SendClientsCheckinLateNotificationService sendClientsCheckinLateNotificationService) {
-		this.sendClientsCheckinLateNotificationService = sendClientsCheckinLateNotificationService;
-
-		if ( log.isDebugEnabled() ) {
-
-			log.debug("setSendClientsCheckinLateNotificationService(...) called");
-		}
-
+	public void setProcessClientsStatusForLateCheckinsService(
+			ProcessClientsStatusForLateCheckinsService processClientsStatusForLateCheckinsService) {
+		this.processClientsStatusForLateCheckinsService = processClientsStatusForLateCheckinsService;
 	}
+
 
 	@Override
 	public void run() {
@@ -41,13 +39,13 @@ public class SendClientsCheckinLateNotificationTimerTaskImpl extends TimerTask {
 		try {
 			if ( log.isDebugEnabled() ) {
 
-				log.debug("calling sendClientsCheckinLateNotificationService.sendClientsCheckinLateNotification();");
+				log.debug("calling processClientsStatusForLateCheckinsService.processClientsStatusForLateCheckins();");
 			}
-			sendClientsCheckinLateNotificationService.sendClientsCheckinLateNotification();
+			processClientsStatusForLateCheckinsService.processClientsStatusForLateCheckins();
 
 		} catch ( Throwable t ) {
 
-			log.error( "Failed to call sendClientsCheckinLateNotificationService.sendClientsCheckinLateNotification();  exception = " + t.toString(), t );
+			log.error( "Failed in call processClientsStatusForLateCheckinsService.processClientsStatusForLateCheckins();  exception = " + t.toString(), t );
 
 		} finally {
 

@@ -3,23 +3,13 @@ package org.jobcenter.internalservice;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
-
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-import org.jobcenter.constants.ServerConfigKeyValues;
-import org.jobcenter.dao.*;
-import org.jobcenter.dto.*;
-import org.jobcenter.service.GetClientsStatusListService;
-
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
+import org.jobcenter.constants.ServerConfigKeyValues;
+import org.jobcenter.dto.Job;
+import org.jobcenter.dto.NodeClientStatusDTO;
+import org.jobcenter.service.GetClientsStatusListService;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,33 +17,40 @@ import org.springframework.transaction.annotation.Transactional;
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    WARNING   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-//The only way to get proper roll backs ( managed by Spring ) is to only use un-checked exceptions.
+//The only way to get proper database roll backs ( managed by Spring ) is to only use un-checked exceptions.
 //
 //The best way to make sure there are no checked exceptions is to have no "throws" on any of the methods.
 
 
 //@Transactional causes Spring to surround calls to methods in this class with a database transaction.
-//        Spring will roll back the transaction if a un-checked exception ( extended from RuntimeException ) is thrown.
-//                 Otherwise it commits the transaction.
+//      Spring will roll back the transaction if a un-checked exception ( extended from RuntimeException ) is thrown.
+//               Otherwise it commits the transaction.
 
+
+/**
+* Does sub processing for the class ProcessClientsStatusForLateCheckinsServiceImpl
+*
+* This is to handle transactions and Hibernate sessions
+*
+* This class does the retrieval of the clients that are late and generates the emails
+*
+*/
+
+//Spring database transaction demarcation.
+//Spring will start a database transaction when any method is called and call commit when it completed
+//  or call roll back if an unchecked exception is thrown.
 @Transactional ( propagation = Propagation.REQUIRED, readOnly = false )
 
+public class ClientsLateCheckinRetrieveAndSendEmailServiceImpl implements ClientsLateCheckinRetrieveAndSendEmailService {
 
 
-public class SendClientsCheckinLateNotificationServiceImpl implements SendClientsCheckinLateNotificationService {
-
-
-
-
-	private static Logger log = Logger.getLogger(SendClientsCheckinLateNotificationServiceImpl.class);
+	private static Logger log = Logger.getLogger(ClientsLateCheckinRetrieveAndSendEmailServiceImpl.class);
 
 
 	private static final String EMAIL_SUBJECT_LINE = "JobCenter clients are late for checkin";
 
 
 	//  Service
-
-//	 private ClientNodeNameCheck clientNodeNameCheck;
 
 	private GetClientsStatusListService getClientsStatusListService;
 
@@ -62,12 +59,12 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 	private SendEmailService sendEmailService;
 
 
-
-	public SendEmailService getSendEmailService() {
-		return sendEmailService;
+	public GetClientsStatusListService getGetClientsStatusListService() {
+		return getClientsStatusListService;
 	}
-	public void setSendEmailService(SendEmailService sendEmailService) {
-		this.sendEmailService = sendEmailService;
+	public void setGetClientsStatusListService(
+			GetClientsStatusListService getClientsStatusListService) {
+		this.getClientsStatusListService = getClientsStatusListService;
 	}
 	public GetValueFromConfigService getGetValueFromConfigService() {
 		return getValueFromConfigService;
@@ -76,107 +73,81 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 			GetValueFromConfigService getValueFromConfigService) {
 		this.getValueFromConfigService = getValueFromConfigService;
 	}
-	public GetClientsStatusListService getGetClientsStatusListService() {
-		return getClientsStatusListService;
+	public SendEmailService getSendEmailService() {
+		return sendEmailService;
 	}
-	public void setGetClientsStatusListService(
-			GetClientsStatusListService getClientsStatusListService) {
-		this.getClientsStatusListService = getClientsStatusListService;
-	}
-
-
-
-//	public ClientNodeNameCheck getClientNodeNameCheck() {
-//		return clientNodeNameCheck;
-//	}
-//	public void setClientNodeNameCheck(ClientNodeNameCheck clientNodeNameCheck) {
-//		this.clientNodeNameCheck = clientNodeNameCheck;
-//	}
-
-
-	//  Hibernate DAO
-
-	private NodeClientStatusDAO nodeClientStatusDAO;
-
-
-	public NodeClientStatusDAO getNodeClientStatusDAO() {
-		return nodeClientStatusDAO;
-	}
-	public void setNodeClientStatusDAO(NodeClientStatusDAO nodeClientStatusDAO) {
-		this.nodeClientStatusDAO = nodeClientStatusDAO;
+	public void setSendEmailService(SendEmailService sendEmailService) {
+		this.sendEmailService = sendEmailService;
 	}
 
-	//  JDBC DAO
 
 
 	private boolean loggedUnusableFromEmailAddressMsg = false;
 	private boolean loggedUnusableToEmailAddressMsg = false;
 
+
+
+
 	/* (non-Javadoc)
-	 * @see org.jobcenter.service.SendClientsCheckinLateNotificationService#sendClientsCheckinLateNotification()
+	 * @see org.jobcenter.internalservice.ClientsLateCheckinRetrieveAndSendEmailService#sendClientsCheckinLateNotification()
 	 */
-	@Override
-	public  void sendClientsCheckinLateNotification(  )
+	public  List<NodeClientStatusDTO> sendClientsCheckinLateNotification(  )
 	{
 
 
 		MailConfig mailConfig = getMailConfig();
 
 
-		if ( mailConfig != null ) {
+		if ( mailConfig == null ) {
 
-			List<NodeClientStatusDTO> clients = getClientsStatusListService.retrieveClientsLateForCheckinList();
+			return null;
 
-			List<NodeClientStatusDTO> clientsThatAreLate = new ArrayList<NodeClientStatusDTO>( clients.size() );
+		}
 
-			if ( clients != null && ! clients.isEmpty() ) {
+		List<NodeClientStatusDTO> clients = getClientsStatusListService.retrieveClientsLateForCheckinList();
 
-				Date nowDate = new Date();
+		List<NodeClientStatusDTO> clientsThatAreLate = new ArrayList<NodeClientStatusDTO>( clients.size() );
 
-				for ( NodeClientStatusDTO client: clients ) {
+		if ( clients != null && ! clients.isEmpty() ) {
 
-					if ( client.getLateForNextCheckinTime().before( nowDate ) ) {
+			Date nowDate = new Date();
 
-						if ( ! client.getNotificationSentThatClientLate() ) {
+			for ( NodeClientStatusDTO client: clients ) {
 
-							if ( log.isDebugEnabled() ) {
+				if ( client.getLateForNextCheckinTime().before( nowDate ) ) {
 
-								log.debug( "Client found to be late.  node name = " + client.getNode().getName()
-										+ ", client last checkin time = " + client.getLastCheckinTime()
-										+ ", client time considered late for next check in = " + client.getLateForNextCheckinTime()
-										+ ", now = " + nowDate );
-							}
+					if ( ! client.getNotificationSentThatClientLate() ) {
 
-							clientsThatAreLate.add( client );
+						if ( log.isDebugEnabled() ) {
+
+							log.debug( "Client found to be late.  node name = " + client.getNode().getName()
+									+ ", client last checkin time = " + client.getLastCheckinTime()
+									+ ", client time considered late for next check in = " + client.getLateForNextCheckinTime()
+									+ ", now = " + nowDate );
 						}
+
+						clientsThatAreLate.add( client );
 					}
 				}
+			}
 
 
-				if ( ! clientsThatAreLate.isEmpty() ) {
+			if ( ! clientsThatAreLate.isEmpty() ) {
 
-					sendMail( clientsThatAreLate, mailConfig );
+				sendMail( clientsThatAreLate, mailConfig );
 
-					//  update email sent indicator and write to db
-					for ( NodeClientStatusDTO client: clientsThatAreLate ) {
 
-						client.setNotificationSentThatClientLate( true );
-
-						//  TODO  need to handle exception here for concurrent update error on the database, similar to
-						//           class ClientStatusUpdateServiceImpl
-
-						nodeClientStatusDAO.saveOrUpdate( client );
-					}
-
-				} else {
-
-					log.debug( "Already sent email for all clients that are late." );
-				}
 			} else {
 
-				log.debug( "No late clients." );
+				log.debug( "Already sent email for all clients that are late." );
 			}
+		} else {
+
+			log.debug( "No late clients." );
 		}
+
+		return clientsThatAreLate;
+
 	}
 
 
@@ -184,7 +155,7 @@ public class SendClientsCheckinLateNotificationServiceImpl implements SendClient
 	/**
 	 * @return
 	 */
-	MailConfig getMailConfig() {
+	private MailConfig getMailConfig() {
 
 
 		String fromEmailAddress = getValueFromConfigService.getConfigValueAsString( ServerConfigKeyValues.CLIENT_CHECKIN_NOTIFICATION_FROM_EMAIL_ADDRESS );
