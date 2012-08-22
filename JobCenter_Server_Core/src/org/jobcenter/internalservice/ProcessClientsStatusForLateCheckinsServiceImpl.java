@@ -92,6 +92,7 @@ public class ProcessClientsStatusForLateCheckinsServiceImpl implements ProcessCl
 				if ( retryCount > 5 ) {
 
 					String msg = "Update of Client status DB FAILED for client node id = " + client.getNodeId()
+					+ ", client version = " + client.getDbRecordVersionNumber()
 					+ ".  Retry count exceeded.  Exception: " + t.toString();
 
 					log.error( msg, t );
@@ -101,15 +102,29 @@ public class ProcessClientsStatusForLateCheckinsServiceImpl implements ProcessCl
 
 				try {
 
-					List nodeClientStatusDTOList = nodeClientStatusDAO.findByNodeId( client.getId() );
+					try {
 
-					if ( nodeClientStatusDTOList != null && ! nodeClientStatusDTOList.isEmpty() ) {
+					Thread.sleep( 100 );
 
-						//  Update existing entry
+					} catch ( Throwable tt ) {
 
-						client = (NodeClientStatusDTO) nodeClientStatusDTOList.get( 0 );
 
-						updateClientValues( client );
+					}
+
+					String msgUpdateException = "Update of Client status DB failed for client node id = " + client.getNodeId()
+					+ ", client version = " + client.getDbRecordVersionNumber()
+					+ ".  Update will be RETRIED.  retryCount = " + retryCount + ".   Exception: " + t.toString();
+
+					log.warn( msgUpdateException, t );
+
+					NodeClientStatusDTO nodeClientStatusDTOFromDB = nodeClientStatusDAO.findById( client.getId() );
+
+					if ( nodeClientStatusDTOFromDB != null ) {
+
+						//  Update client variable with new entry from database
+
+						client = nodeClientStatusDTOFromDB;
+
 					} else {
 
 						String msg =  "Trying to retry update but unable to retrieve NodeClientStatusDTO to update( record not found), id = "
