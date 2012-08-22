@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.ServerConfigKeyValues;
 import org.jobcenter.constants.ServerCoreConstants;
@@ -136,6 +137,7 @@ public class ClientStatusDBUpdateServiceImpl implements ClientStatusDBUpdateServ
 	 */
 	private void updateDBRecordWithStatus( NodeClientStatusDTO nodeClientStatusDTO, ClientStatusUpdateRequest clientStatusUpdateRequest ) {
 
+	
 		nodeClientStatusDTO.setNotificationSentThatClientLate( false );
 
 		nodeClientStatusDTO.setLastCheckinTime( new Date() );
@@ -163,9 +165,9 @@ public class ClientStatusDBUpdateServiceImpl implements ClientStatusDBUpdateServ
 		}
 
 
-		int overageUntilLate = clientStatusUpdateRequest.getTimeUntilNextClientStatusUpdate() * ( clientCheckinOverageBeforeLatePercent / 100 );
+		int overageUntilLate = (int) ( clientStatusUpdateRequest.getTimeUntilNextClientStatusUpdate() * ( ( (float) clientCheckinOverageBeforeLatePercent ) / 100 ) );
 
-		if ( overageUntilLate >  clientCheckinOverageBeforeLateMaxValue ) {
+		if ( ( overageUntilLate >  clientCheckinOverageBeforeLateMaxValue ) || overageUntilLate <= 0  ) {
 
 			overageUntilLate = clientCheckinOverageBeforeLateMaxValue;
 		}
