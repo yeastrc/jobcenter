@@ -283,12 +283,15 @@ CREATE UNIQUE INDEX `config_key_UNIQUE` ON `config_system` (`config_key` ASC) ;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `node_client_status` ;
 
+
 CREATE  TABLE IF NOT EXISTS `node_client_status` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `node_id` INT NOT NULL ,
+  `client_started` TINYINT(1)  NOT NULL DEFAULT true ,
   `last_checkin_time` DATETIME NOT NULL ,
-  `seconds_until_next_checkin` INT NOT NULL ,
-  `late_for_next_checkin_time` DATETIME NOT NULL ,
+  `next_checkin_time` DATETIME NULL ,
+  `seconds_until_next_checkin` INT NULL ,
+  `late_for_next_checkin_time` DATETIME NULL ,
   `db_record_version_number` INT UNSIGNED NOT NULL DEFAULT 1 ,
   `notification_sent_that_client_late` TINYINT(1)  NOT NULL DEFAULT false ,
   PRIMARY KEY (`id`) ,
@@ -302,6 +305,7 @@ ENGINE = InnoDB;
 CREATE INDEX `node_id_index` ON `node_client_status` (`node_id` ASC) ;
 
 CREATE UNIQUE INDEX `node_id_UNIQUE` ON `node_client_status` (`node_id` ASC) ;
+
 
 
 -- -----------------------------------------------------

@@ -42,10 +42,7 @@ public class ServletContextAppListener extends HttpServlet implements
 	public void contextInitialized(ServletContextEvent event) {
 
 
-		log.info( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  Startup of JobCenter application, in Context Listener 'ServletContextAppListener'. !!!!!!!!!!!!!!!!!!!!!!!!" );
-
-		log.warn( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  Startup of JobCenter application, in Context Listener 'ServletContextAppListener'. !!!!!!!!!!!!!!!!!!!!!!!!" );
-
+		log.debug( "Enter contextInitialized(...)" );
 
 		ServletContext context = event.getServletContext();
 

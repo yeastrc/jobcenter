@@ -1,14 +1,12 @@
 package org.jobcenter.internalservice;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.jobcenter.constants.ServerConfigKeyValues;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.NodeClientStatusDTO;
+import org.jobcenter.dtoservernondb.MailConfig;
 import org.jobcenter.service.GetClientsStatusListService;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +42,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class ClientsLateCheckinRetrieveAndSendEmailServiceImpl implements ClientsLateCheckinRetrieveAndSendEmailService {
 
 
+
+
+
+
 	private static Logger log = Logger.getLogger(ClientsLateCheckinRetrieveAndSendEmailServiceImpl.class);
 
 
@@ -56,6 +58,8 @@ public class ClientsLateCheckinRetrieveAndSendEmailServiceImpl implements Client
 
 	private GetValueFromConfigService getValueFromConfigService;
 
+	private GetMailConfig getMailConfig;
+	
 	private SendEmailService sendEmailService;
 
 
@@ -79,13 +83,12 @@ public class ClientsLateCheckinRetrieveAndSendEmailServiceImpl implements Client
 	public void setSendEmailService(SendEmailService sendEmailService) {
 		this.sendEmailService = sendEmailService;
 	}
-
-
-
-	private boolean loggedUnusableFromEmailAddressMsg = false;
-	private boolean loggedUnusableToEmailAddressMsg = false;
-
-
+	public GetMailConfig getGetMailConfig() {
+		return getMailConfig;
+	}
+	public void setGetMailConfig(GetMailConfig getMailConfig) {
+		this.getMailConfig = getMailConfig;
+	}
 
 
 	/* (non-Javadoc)
@@ -95,7 +98,7 @@ public class ClientsLateCheckinRetrieveAndSendEmailServiceImpl implements Client
 	{
 
 
-		MailConfig mailConfig = getMailConfig();
+		MailConfig mailConfig = getMailConfig.getClientCheckinMailConfig();
 
 
 		if ( mailConfig == null ) {
@@ -106,154 +109,20 @@ public class ClientsLateCheckinRetrieveAndSendEmailServiceImpl implements Client
 
 		List<NodeClientStatusDTO> clients = getClientsStatusListService.retrieveClientsLateForCheckinList();
 
-		List<NodeClientStatusDTO> clientsThatAreLate = new ArrayList<NodeClientStatusDTO>( clients.size() );
-
 		if ( clients != null && ! clients.isEmpty() ) {
 
-			Date nowDate = new Date();
+			sendMail( clients, mailConfig );
 
-			for ( NodeClientStatusDTO client: clients ) {
-
-				if ( client.getLateForNextCheckinTime().before( nowDate ) ) {
-
-					if ( ! client.getNotificationSentThatClientLate() ) {
-
-						if ( log.isDebugEnabled() ) {
-
-							log.debug( "Client found to be late.  node name = " + client.getNode().getName()
-									+ ", client last checkin time = " + client.getLastCheckinTime()
-									+ ", client time considered late for next check in = " + client.getLateForNextCheckinTime()
-									+ ", now = " + nowDate );
-						}
-
-						clientsThatAreLate.add( client );
-					}
-				}
-			}
-
-
-			if ( ! clientsThatAreLate.isEmpty() ) {
-
-				sendMail( clientsThatAreLate, mailConfig );
-
-
-			} else {
-
-				log.debug( "Already sent email for all clients that are late." );
-			}
 		} else {
 
-			log.debug( "No late clients." );
+			log.debug( "No late clients or already sent email for all late clients." );
 		}
 
-		return clientsThatAreLate;
+		return clients;
 
 	}
 
 
-
-	/**
-	 * @return
-	 */
-	private MailConfig getMailConfig() {
-
-
-		String fromEmailAddress = getValueFromConfigService.getConfigValueAsString( ServerConfigKeyValues.CLIENT_CHECKIN_NOTIFICATION_FROM_EMAIL_ADDRESS );
-
-		if ( fromEmailAddress == null || fromEmailAddress.isEmpty() ) {
-
-			String msg = "Missing configuration for key '" + ServerConfigKeyValues.CLIENT_CHECKIN_NOTIFICATION_FROM_EMAIL_ADDRESS + "' so unable to send emails.";
-
-			log.warn( msg );
-
-			return null;
-		}
-
-		if ( ServerConfigKeyValues.CLIENT_CHECKIN_EMAIL_IN_PROVIDED_FILE.equals( fromEmailAddress ) ) {
-
-			if ( ! loggedUnusableFromEmailAddressMsg ) {
-
-				String msg = "Unusable value for key '" + ServerConfigKeyValues.CLIENT_CHECKIN_NOTIFICATION_FROM_EMAIL_ADDRESS + "' so unable to send emails.";
-
-				log.warn( msg );
-
-				loggedUnusableFromEmailAddressMsg = true;
-			}
-
-			return null;
-		}
-
-		String smtpEmailHost = getValueFromConfigService.getConfigValueAsString( ServerConfigKeyValues. CLIENT_CHECKIN_NOTIFICATION_SMTP_EMAIL_HOST );
-
-		if ( smtpEmailHost == null || smtpEmailHost.isEmpty() ) {
-
-			String msg = "Missing configuration for key '" + ServerConfigKeyValues.CLIENT_CHECKIN_NOTIFICATION_SMTP_EMAIL_HOST + "' so unable to send emails.";
-
-			log.warn( msg );
-
-			return null;
-		}
-
-		String[] toAddresses = getToAddressList();
-
-		if ( toAddresses == null || toAddresses.length == 0 ) {
-
-			String msg = "Missing configuration for key '" + ServerConfigKeyValues.CLIENT_CHECKIN_NOTIFICATION_TO_EMAIL_ADDRESS_LIST + "' so unable to send emails.";
-
-			log.warn( msg );
-
-			return null;
-		}
-
-
-		if ( ServerConfigKeyValues.CLIENT_CHECKIN_EMAIL_IN_PROVIDED_FILE.equals( toAddresses[0] ) ) {
-
-			if ( ! loggedUnusableToEmailAddressMsg ) {
-
-				String msg = "Unusable value for key '" + ServerConfigKeyValues.CLIENT_CHECKIN_EMAIL_IN_PROVIDED_FILE + "' so unable to send emails.";
-
-				log.warn( msg );
-
-				loggedUnusableToEmailAddressMsg = true;
-			}
-
-			return null;
-		}
-
-
-
-		MailConfig mailConfig = new MailConfig();
-
-		mailConfig.setFromEmailAddress( fromEmailAddress );
-		mailConfig.setToAddresses( toAddresses );
-		mailConfig.setSmtpEmailHost( smtpEmailHost );
-
-		return mailConfig;
-	}
-
-	/**
-	 * @return
-	 */
-	private String[] getToAddressList() {
-
-		String[] toAddresses = null;
-
-		String toAddressesString = getValueFromConfigService.getConfigValueAsString( ServerConfigKeyValues.CLIENT_CHECKIN_NOTIFICATION_TO_EMAIL_ADDRESS_LIST );
-
-		if ( toAddressesString == null || toAddressesString.isEmpty() ) {
-
-			String msg = "Missing configuration for key " + ServerConfigKeyValues.CLIENT_CHECKIN_NOTIFICATION_TO_EMAIL_ADDRESS_LIST;
-
-			log.error( msg );
-
-			return null;
-		}
-
-		toAddresses = toAddressesString.split( "," );
-
-
-		return toAddresses;
-	}
 
 	/**
 	 * @param clients
@@ -324,44 +193,6 @@ public class ClientsLateCheckinRetrieveAndSendEmailServiceImpl implements Client
 
 			throw new RuntimeException( e );
 		}
-
-
-	}
-
-
-
-
-
-	/**
-	 * Holder for the Mail config
-	 *
-	 */
-	private class MailConfig {
-
-		String[] toAddresses;
-		String fromEmailAddress;
-		String smtpEmailHost;
-
-
-		public String[] getToAddresses() {
-			return toAddresses;
-		}
-		public void setToAddresses(String[] toAddresses) {
-			this.toAddresses = toAddresses;
-		}
-		public String getFromEmailAddress() {
-			return fromEmailAddress;
-		}
-		public void setFromEmailAddress(String fromEmailAddress) {
-			this.fromEmailAddress = fromEmailAddress;
-		}
-		public String getSmtpEmailHost() {
-			return smtpEmailHost;
-		}
-		public void setSmtpEmailHost(String smtpEmailHost) {
-			this.smtpEmailHost = smtpEmailHost;
-		}
-
 
 
 	}

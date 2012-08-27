@@ -149,21 +149,14 @@ public class GetClientsStatusListServiceImpl implements GetClientsStatusListServ
 	@Override
 	public  List<NodeClientStatusDTO>  retrieveClientsLateForCheckinList(  )
 	{
-		Date now = new Date();
-
-		List results = nodeClientStatusDAO.findByLastCheckinTimeLessThanParameter( now );
+		List results = nodeClientStatusDAO.findByClientStartedTrueAndNotificationSendClientLateFalseAndLateForNextCheckinLessThanNow( );
 
 		List<NodeClientStatusDTO> clients = (List<NodeClientStatusDTO> ) results;
 
-		//  compute if late
-
 		for ( NodeClientStatusDTO client : clients ) {
 
-			if ( client.getLateForNextCheckinTime().before( now ) ) {
-
-				client.setCheckinIsLate( true );
-			}
-
+			client.setCheckinIsLate( true );
+			
 			populateJobsForClient( client );
 		}
 

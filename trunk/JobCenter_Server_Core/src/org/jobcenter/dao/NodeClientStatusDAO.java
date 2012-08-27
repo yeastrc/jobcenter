@@ -1,6 +1,5 @@
 package org.jobcenter.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import org.jobcenter.dto.NodeClientStatusDTO;
@@ -34,7 +33,7 @@ public interface NodeClientStatusDAO {
 
 	public abstract List findAll();
 
-    public List findByLastCheckinTimeLessThanParameter(Date lessThanLastCheckinTime);
+    public List findByClientStartedTrueAndNotificationSendClientLateFalseAndLateForNextCheckinLessThanNow();
 
 	public abstract NodeClientStatusDTO merge(
 			NodeClientStatusDTO detachedInstance);

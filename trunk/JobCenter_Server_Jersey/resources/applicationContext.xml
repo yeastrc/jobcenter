@@ -172,9 +172,20 @@
 		<property name="getValueFromConfigService">
 			<ref bean="getValueFromConfigService" />
 		</property>
+		<property name="clientStatusDBUpdateService">
+			<ref bean="clientStatusDBUpdateService" />
+		</property>
 		<property name="clientsConnectedTrackingService">
 			<ref bean="clientsConnectedTrackingService" />
 		</property>
+		
+		<property name="sendEmailService">
+			<ref bean="sendEmailService" />
+		</property>
+		<property name="getMailConfig">
+			<ref bean="getMailConfig" />
+		</property>
+			
 
 	</bean>
 
@@ -194,6 +205,12 @@
 		</property>
 		<property name="clientsConnectedTrackingService">
 			<ref bean="clientsConnectedTrackingService" />
+		</property>
+		<property name="getMailConfig">
+			<ref bean="getMailConfig" />
+		</property>
+		<property name="sendEmailService">
+			<ref bean="sendEmailService" />
 		</property>
 
 	</bean>
@@ -524,6 +541,13 @@
 
 
 
+	<bean id="getMailConfig" class="org.jobcenter.internalservice.GetMailConfigImpl">
+		<property name="getValueFromConfigService">
+			<ref bean="getValueFromConfigService" />
+		</property>
+	</bean>
+
+
 	<bean id="getValueFromConfigService" class="org.jobcenter.internalservice.GetValueFromConfigServiceImpl">
 		<property name="configSystemDAO">
 			<ref bean="configSystemDAO" />
@@ -586,6 +610,11 @@
 		<property name="sendEmailService">
 			<ref bean="sendEmailService" />
 		</property>
+		<property name="getMailConfig">
+			<ref bean="getMailConfig" />
+		</property>
+		
+		
 	</bean>
 
 	<bean id="sendEmailService" class="org.jobcenter.internalservice.SendEmailServiceImpl">

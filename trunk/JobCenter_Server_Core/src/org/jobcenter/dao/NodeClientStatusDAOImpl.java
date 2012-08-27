@@ -31,8 +31,11 @@ public class NodeClientStatusDAOImpl extends HibernateDaoSupport implements Node
 	// property constants
 	public static final String NODE_ID = "nodeId";
 	public static final String LAST_CHECKIN_TIME = "lastCheckinTime";
+	public static final String CLIENT_STARTED = "clientStarted";
+	public static final String NEXT_CHECKIN_TIME = "nextCheckinTime";
 	public static final String LATE_FOR_NEXT_CHECKIN_TIME = "lateForNextCheckinTime";
 	public static final String SECONDS_UNTIL_NEXT_CHECKIN = "secondsUntilNextCheckin";
+	public static final String NOTIFICATION_SENT_THAT_CLIENT_LATE = "notificationSentThatClientLate";
 	public static final String DB_RECORD_VERSION_NUMBER = "dbRecordVersionNumber";
 
 	protected void initDao() {
@@ -202,12 +205,17 @@ public class NodeClientStatusDAOImpl extends HibernateDaoSupport implements Node
 	 * @see org.jobcenter.dao.NodeClientStatusDAO#findByLastCheckinTimeLessThanParameter(java.lang.Long)
 	 */
 	@Override
-    public List findByLastCheckinTimeLessThanParameter(Date lessThanLastCheckinTime) {
-        log.debug("finding By LastCheckinTime less than provided parameter");
+    public List findByClientStartedTrueAndNotificationSendClientLateFalseAndLateForNextCheckinLessThanNow() {
+        log.debug("finding By ClientStarted = true AND LastCheckinTime less than provided parameter");
 
         DetachedCriteria detachedCriteria = DetachedCriteria.forClass( NodeClientStatusDTO.class );
 
-        detachedCriteria.add( Property.forName(LAST_CHECKIN_TIME ).lt( lessThanLastCheckinTime ) );
+        detachedCriteria.add( Property.forName(LATE_FOR_NEXT_CHECKIN_TIME ).lt( new Date() ) );
+
+        detachedCriteria.add( Property.forName(CLIENT_STARTED ).eq( true ) );
+
+
+        detachedCriteria.add( Property.forName( NOTIFICATION_SENT_THAT_CLIENT_LATE ).eq( false ) );
 
         //  cannot use since not in hbm file
 //        detachedCriteria.add( Property.forName(STATUS_ID ).eq( instance.getStatusId() ) );
@@ -216,11 +224,11 @@ public class NodeClientStatusDAOImpl extends HibernateDaoSupport implements Node
             List results = getHibernateTemplate().findByCriteria(detachedCriteria);
 
             if ( log.isDebugEnabled() ) {
-            	log.debug("finding By LastCheckinTime less than provided parameter successful, result size: " + results.size());
+            	log.debug("finding By ClientStarted = true AND LastCheckinTime less than provided parameter successful, result size: " + results.size());
             }
             return results;
         } catch (RuntimeException re) {
-            log.error("finding By LastCheckinTime less than provided parameter failed", re);
+            log.error("finding By ClientStarted = true AND LastCheckinTime less than provided parameter failed", re);
             throw re;
         }
     }

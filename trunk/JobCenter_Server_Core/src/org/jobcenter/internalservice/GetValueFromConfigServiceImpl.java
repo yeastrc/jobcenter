@@ -2,6 +2,7 @@ package org.jobcenter.internalservice;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.jobcenter.dao.*;
@@ -55,6 +56,52 @@ public class GetValueFromConfigServiceImpl implements GetValueFromConfigService 
 	//  JDBCDAO
 
 
+	/* (non-Javadoc)
+	 * @see org.jobcenter.service.GetValueFromConfigService#getConfigValueAsInteger(java.lang.String)
+	 */
+	@Override
+	public Boolean getConfigValueAsBoolean( String configKey ) {
+
+
+		Boolean configValue = null;
+
+		String configValueAsString = getConfigValueAsString( configKey );
+		
+		if ( configValueAsString == null ) {
+			
+			log.error( "retrieving '" + configKey + "' from database, value could not be found in database."  );
+			
+			return configValue;
+		}
+
+		try {
+
+			Boolean queryResponseValueBoolean = new Boolean( false );
+			
+			if ( ! StringUtils.isEmpty( configValueAsString ) ) {
+				
+				if ( configValueAsString.startsWith( "Y" )
+						|| configValueAsString.startsWith( "y" )
+						|| configValueAsString.startsWith( "T" )
+						|| configValueAsString.startsWith( "t" )
+						|| configValueAsString.startsWith( "1" ) ) {
+					
+					queryResponseValueBoolean = new Boolean( true );;
+				}
+				
+			}
+			
+			configValue = queryResponseValueBoolean;
+
+
+		} catch ( Throwable t ) {
+
+			log.error( "retrieving '" + configKey + "' from database resulted in value '" + configValueAsString + "' which could not be parsed to an integer."  );
+		}
+
+		return configValue;
+	}
+
 
 	/* (non-Javadoc)
 	 * @see org.jobcenter.service.GetValueFromConfigService#getConfigValueAsInteger(java.lang.String)
@@ -66,6 +113,13 @@ public class GetValueFromConfigServiceImpl implements GetValueFromConfigService 
 		Integer configValue = null;
 
 		String configValueAsString = getConfigValueAsString( configKey );
+		
+		if ( configValueAsString == null ) {
+			
+			log.error( "retrieving '" + configKey + "' from database, value could not be found in database."  );
+			
+			return configValue;
+		}
 
 		try {
 
@@ -133,7 +187,7 @@ public class GetValueFromConfigServiceImpl implements GetValueFromConfigService 
 			} else {
 
 
-				log.error( "retrieving '" + configKey + "' from database retrieved no data."  );
+				log.error( "retrieving '" + configKey + "' from database retrieved no data records."  );
 			}
 
 
