@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+  <data-sources />
+  <form-beans >
+    <form-bean name="listJobsForm" type="org.jobcenter.struts.form.ListJobsForm" />
+    <form-bean name="listRequestsForm" type="org.jobcenter.struts.form.ListRequestsForm" />
+    <form-bean name="viewJobForm" type="org.jobcenter.struts.form.ViewJobForm" />
+    <form-bean name="viewRunForm" type="org.jobcenter.struts.form.ViewRunForm" />
+    <form-bean name="updateJobStatusForm" type="org.jobcenter.struts.form.UpdateJobStatusForm" />
+	<form-bean name="updateJobPriorityForm" type="org.jobcenter.struts.form.UpdateJobPriorityForm" />
+  </form-beans>
+
+  <global-exceptions />
+  <global-forwards />
+  <action-mappings >
+    <action
+      name="listJobsForm"
+      path="/listJobs"
+      scope="request"
+      type="org.jobcenter.struts.action.ListJobsAction"
+      validate="true">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="def.template.listJobs" />
+    </action>
+
+    <action
+      name="listRequestsForm"
+      path="/listRequests"
+      scope="request"
+      type="org.jobcenter.struts.action.ListRequestsAction"
+      validate="true">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="def.template.listRequests" />
+    </action>
+
+
+    <action path="/listNodes" type="org.jobcenter.struts.action.ListNodesAction">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="def.template.listNodes" />
+    </action>
+    <action
+      name="viewJobForm"
+      path="/viewJob"
+      scope="request"
+      type="org.jobcenter.struts.action.ViewJobAction"
+      validate="false">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="def.template.viewJob" />
+    </action>
+    <action
+      name="viewRunForm"
+      path="/viewRun"
+      scope="request"
+      type="org.jobcenter.struts.action.ViewRunAction">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="def.template.viewRun" />
+    </action>
+    <action
+      name="updateJobStatusForm"
+      path="/requeueJob"
+      scope="request"
+      type="org.jobcenter.struts.action.RequeueJobStatusAction">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="/viewJob.do" />
+      <forward name="error" path="/viewJob.do" />
+    </action>
+    <action
+      name="updateJobStatusForm"
+      path="/cancelJob"
+      scope="request"
+      type="org.jobcenter.struts.action.CancelJobAction">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="/viewJob.do" />
+      <forward name="error" path="/viewJob.do" />
+    </action>
+
+     <action
+      name="updateJobPriorityForm"
+      path="/updateJobPriority"
+      scope="request"
+      type="org.jobcenter.struts.action.UpdateJobPriorityAction">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="/viewJob.do" />
+      <forward name="error" path="/viewJob.do" />
+    </action>
+
+
+    <action path="/listJobTypes" type="org.jobcenter.struts.action.ListJobTypesAction">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="def.template.listJobTypes" />
+    </action>
+
+    <action path="/listRequestTypes" type="org.jobcenter.struts.action.ListRequestTypesAction">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="def.template.listRequestTypes" />
+    </action>
+    <action
+      path="/listClientsStatus"
+      type="org.jobcenter.struts.action.ListClientsStatusAction"
+      validate="false">
+      <set-property property="cancellable" value="false" />
+      <forward name="success" path="def.template.listClientsStatus" />
+    </action>
+    <action path="/clientsConnectedList" type="org.jobcenter.struts.action.ClientsConnectedListAction">
+      <set-property property="cancellable" value="false" />
+      <forward name="success" path="def.template.clientsConnectedList" />
+    </action>
+    <action path="/clientsUsingSameNodeNameList" type="org.jobcenter.struts.action.ClientsUsingSameNodeNameListAction">
+      <set-property property="cancellable" value="true" />
+      <forward name="success" path="def.template.clientsUsingSameNodeNameList" />
+    </action>
+    <action path="/clientsFailedToConnectList" type="org.jobcenter.struts.action.ClientsFailedToConnectListAction">
+      <set-property property="cancellable" value="false" />
+      <forward name="success" path="def.template.clientsFailedToConnectList" />
+    </action>
+
+
+  </action-mappings>
+
+  <message-resources parameter="org.jobcenter.struts.ApplicationResources" />
+
+
+
+  <!-- Plugin for Tiles -->
+  <plug-in className="org.apache.struts.tiles.TilesPlugin">
+  <set-property property="definitions-config" value="/WEB-INF/tiles-defs.xml"/>
+  <set-property property="definitions-debug" value="0"/>
+  <set-property property="definitions-parser-details" value="0"/>
+  <set-property property="definitions-parser-validate" value="false"/>
+  </plug-in>
+
+
+
+</struts-config>
+
