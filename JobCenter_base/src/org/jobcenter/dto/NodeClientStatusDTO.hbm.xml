@@ -23,23 +23,33 @@
             <column name="node_id" not-null="true" />
         </many-to-one>
 
+        <property name="clientStarted" type="java.lang.Boolean">
+            <column name="client_started" not-null="true" />
+        </property>
+
+
         <property name="lastCheckinTime" type="java.sql.Timestamp">
             <column name="last_checkin_time" length="19" not-null="true" />
         </property>
+
+        <property name="nextCheckinTime" type="java.sql.Timestamp">
+            <column name="next_checkin_time" length="19" not-null="false" />
+        </property>
+
         <property name="lateForNextCheckinTime" type="java.sql.Timestamp">
-            <column name="late_for_next_checkin_time" length="19" not-null="true" />
+            <column name="late_for_next_checkin_time" length="19" not-null="false" />
         </property>
 
 
         <property name="secondsUntilNextCheckin" type="java.lang.Integer">
-            <column name="seconds_until_next_checkin" not-null="true" />
+            <column name="seconds_until_next_checkin" not-null="false" />
         </property>
-        
+
 
         <property name="notificationSentThatClientLate" type="java.lang.Boolean">
             <column name="notification_sent_that_client_late" not-null="true" />
         </property>
-        
-        
+
+
     </class>
 </hibernate-mapping>

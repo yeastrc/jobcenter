@@ -11,7 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 
 @XmlRootElement(name = "nodeClientStatusDTO")
-public class NodeClientStatusDTO {
+public class NodeClientStatusDTO implements Cloneable {
+
 
 	private Integer id;
 
@@ -19,13 +20,38 @@ public class NodeClientStatusDTO {
 
 	private Node node;
 
+	private Boolean clientStarted;
+
 	private Date lastCheckinTime;
+
+	private Date nextCheckinTime;
 
 	private Date lateForNextCheckinTime;
 
 	private Integer secondsUntilNextCheckin;
-	
+
 	private Boolean notificationSentThatClientLate;
+
+	
+	
+	public Object clone() {
+		
+		NodeClientStatusDTO clone = new NodeClientStatusDTO();
+		
+		clone.id = this.id;
+		clone.nodeId = this.nodeId;
+		clone.node = this.node;
+		clone.clientStarted = this.clientStarted;
+		clone.lastCheckinTime = this.lastCheckinTime;
+		clone.nextCheckinTime = this.nextCheckinTime;
+		clone.lateForNextCheckinTime = this.lateForNextCheckinTime;
+		clone.secondsUntilNextCheckin = this.secondsUntilNextCheckin;
+		clone.notificationSentThatClientLate = this.notificationSentThatClientLate;
+		clone.dbRecordVersionNumber = this.dbRecordVersionNumber;
+		clone.checkinIsLate = this.checkinIsLate;
+		
+		return clone;
+	}
 	
 
 
@@ -38,7 +64,7 @@ public class NodeClientStatusDTO {
 	//  for web interface
 
 	private boolean checkinIsLate;
-	
+
 	private List<Job> runningJobs;
 
 
@@ -102,6 +128,18 @@ public class NodeClientStatusDTO {
 	public void setNotificationSentThatClientLate(
 			Boolean notificationSentThatClientLate) {
 		this.notificationSentThatClientLate = notificationSentThatClientLate;
+	}
+	public Date getNextCheckinTime() {
+		return nextCheckinTime;
+	}
+	public void setNextCheckinTime(Date nextCheckinTime) {
+		this.nextCheckinTime = nextCheckinTime;
+	}
+	public Boolean getClientStarted() {
+		return clientStarted;
+	}
+	public void setClientStarted(Boolean clientStarted) {
+		this.clientStarted = clientStarted;
 	}
 
 

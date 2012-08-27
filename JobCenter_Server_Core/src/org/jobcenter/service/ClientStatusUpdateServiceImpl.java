@@ -2,14 +2,21 @@ package org.jobcenter.service;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import org.jobcenter.constants.ClientStatusUpdateTypeEnum;
 import org.jobcenter.constants.ServerConfigKeyValues;
 import org.jobcenter.constants.ServerCoreConstants;
+import org.jobcenter.dto.NodeClientStatusDTO;
+import org.jobcenter.dtoservernondb.MailConfig;
+import org.jobcenter.dtoservernondb.NodeClientStatusDTOPrevCurrent;
 import org.jobcenter.internalservice.ClientNodeNameCheck;
 import org.jobcenter.internalservice.ClientStatusDBUpdateService;
 import org.jobcenter.internalservice.ClientsConnectedTrackingService;
+import org.jobcenter.internalservice.GetMailConfig;
 import org.jobcenter.internalservice.GetValueFromConfigService;
+import org.jobcenter.internalservice.SendEmailService;
 import org.jobcenter.nondbdto.RunInProgressDTO;
 
 import org.jobcenter.request.*;
@@ -24,9 +31,10 @@ import org.jobcenter.response.*;
 public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService {
 
 
-
-
 	private static Logger log = Logger.getLogger(ClientStatusUpdateServiceImpl.class);
+
+	
+	private static final String EMAIL_SUBJECT_LINE_CLIENT_SHUTDOWN = "JobCenter client shut down.";
 
 
 	//  Service
@@ -37,6 +45,10 @@ public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService 
 	private ClientNodeNameCheck clientNodeNameCheck;
 
 	private ClientsConnectedTrackingService clientsConnectedTrackingService;
+
+	private GetMailConfig getMailConfig;
+	private SendEmailService sendEmailService;
+
 
 
 	public ClientStatusDBUpdateService getClientStatusDBUpdateService() {
@@ -65,7 +77,20 @@ public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService 
 	public void setClientNodeNameCheck(ClientNodeNameCheck clientNodeNameCheck) {
 		this.clientNodeNameCheck = clientNodeNameCheck;
 	}
-
+	public GetMailConfig getGetMailConfig() {
+		return getMailConfig;
+	}
+	public void setGetMailConfig(GetMailConfig getMailConfig) {
+		this.getMailConfig = getMailConfig;
+	}
+	public SendEmailService getSendEmailService() {
+		return sendEmailService;
+	}
+	public void setSendEmailService(SendEmailService sendEmailService) {
+		this.sendEmailService = sendEmailService;
+	}
+	
+	
 
 	/**
 	 * @param jobRequest
@@ -204,12 +229,14 @@ public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService 
 		boolean updatedEntry = false;
 
 		int retryCount = 0;
+		
+		NodeClientStatusDTOPrevCurrent nodeClientStatusDTOPrevCurrent = null;
 
 		while ( ! updatedEntry ) {
 
 			try {
 
-				clientStatusDBUpdateService.updateDBWithStatusFromClient( clientStatusUpdateRequest, remoteHost );
+				nodeClientStatusDTOPrevCurrent = clientStatusDBUpdateService.updateDBWithStatusFromClient( clientStatusUpdateRequest, remoteHost );
 
 				updatedEntry = true;
 
@@ -230,6 +257,75 @@ public class ClientStatusUpdateServiceImpl implements ClientStatusUpdateService 
 					log.error( msg, t );
 
 					throw new RuntimeException( msg, t );
+				}
+			}
+		}
+		
+		ClientStatusUpdateTypeEnum updateType = clientStatusUpdateRequest.getUpdateType();
+		
+		
+		if ( updateType == ClientStatusUpdateTypeEnum.CLIENT_ABOUT_TO_EXIT 
+			 || updateType == ClientStatusUpdateTypeEnum.CLIENT_SHUTDOWN_REQUESTED ) {
+
+
+			if ( nodeClientStatusDTOPrevCurrent != null ) {
+
+				NodeClientStatusDTO nodeClientStatusDTOPrev = nodeClientStatusDTOPrevCurrent.getPrevNodeClientStatusDTO();
+
+				if ( nodeClientStatusDTOPrev != null ) {
+
+					if ( nodeClientStatusDTOPrev.getClientStarted() ) {
+
+						Boolean sendShutdownNotification
+						= getValueFromConfigService.getConfigValueAsBoolean( ServerConfigKeyValues.CLIENT_SHUTDOWN_NOTIFICATION );
+
+						if ( sendShutdownNotification != null && sendShutdownNotification ) {
+
+							MailConfig mailConfig = getMailConfig.getClientCheckinMailConfig();
+
+							if ( mailConfig != null ) {
+
+								// create the message body
+
+								StringBuilder emailBodySB = new StringBuilder(1000);
+
+								emailBodySB.append( "The JobCenter client '" );
+
+								emailBodySB.append( clientStatusUpdateRequest.getNodeName() );
+
+								emailBodySB.append( "' has shut down.\n\n" );
+
+								String emailBody = emailBodySB.toString();
+
+								//  send to configured list of recipients in config table of the database
+
+								for ( String toEmailAddress : mailConfig.getToAddresses() ) {
+
+									if ( ! StringUtils.isEmpty( toEmailAddress ) ) {
+										
+										try {
+											sendEmailService.sendEmail( mailConfig.getSmtpEmailHost(),
+													mailConfig.getFromEmailAddress(), toEmailAddress, EMAIL_SUBJECT_LINE_CLIENT_SHUTDOWN, emailBody );
+										} catch (Throwable e) {
+
+											String msg = "Exception sending email for client startup when client not previously shut down";
+
+											log.error( msg, e );
+
+											throw new RuntimeException( msg, e );
+										}
+									}
+								}
+
+
+							} else {
+
+								log.error( "Notification config key '" + ServerConfigKeyValues.CLIENT_STARTUP_CLIENT_NOT_PREV_SHUTDOWN_NOTIFICATION
+										+ "' = true/yes/1 but the mail config is incomplete or empty " );
+							}
+
+						}
+					}
 				}
 			}
 		}

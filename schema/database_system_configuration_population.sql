@@ -14,4 +14,12 @@ INSERT INTO `config_system` (`config_key`, `config_value`) VALUES ('client.check
 
 
 
+
+INSERT INTO `job_processor`.`config_system` (`config_key`, `config_value`) VALUES ('client.normal.startup.notification', 'false');
+
+INSERT INTO `job_processor`.`config_system` (`config_key`, `config_value`) VALUES ('client.startup.not.prev.shutdown.notification', 'false');
+
+INSERT INTO `job_processor`.`config_system` (`config_key`, `config_value`) VALUES ('client.shutdown.notification', 'false');
+
+
 COMMIT;

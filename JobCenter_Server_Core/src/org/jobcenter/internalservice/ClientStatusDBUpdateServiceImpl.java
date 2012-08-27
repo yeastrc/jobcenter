@@ -6,10 +6,13 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.jobcenter.constants.ClientStatusUpdateTypeEnum;
 import org.jobcenter.constants.ServerConfigKeyValues;
 import org.jobcenter.constants.ServerCoreConstants;
 import org.jobcenter.dao.NodeClientStatusDAO;
 import org.jobcenter.dto.NodeClientStatusDTO;
+import org.jobcenter.dtoservernondb.NodeClientStatusDTOPrevCurrent;
+import org.jobcenter.request.ClientStartupRequest;
 import org.jobcenter.request.ClientStatusUpdateRequest;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,26 +71,60 @@ public class ClientStatusDBUpdateServiceImpl implements ClientStatusDBUpdateServ
 
 		nodeClientStatusDAO.saveOrUpdate( client );
 	}
+	
+	
 
+	/**
+	 * @param clientStartupRequest
+	 * @param timeUntilNextClientStatusUpdate
+	 * @param remoteHost
+	 */
+	@Override
+	public NodeClientStatusDTOPrevCurrent updateDBWithStatusFromClientStartup( ClientStartupRequest clientStartupRequest, int timeUntilNextClientStatusUpdate, String remoteHost ) {
+
+		return updateDBWithStatusFromClientInternal( clientStartupRequest.getNodeName(), 
+				ClientStatusUpdateTypeEnum.CLIENT_UP, 
+				timeUntilNextClientStatusUpdate );
+	}
+	
 
 	/**
 	 * @param clientStatusUpdateRequest
 	 * @param remoteHost
 	 */
 	@Override
-	public void updateDBWithStatusFromClient( ClientStatusUpdateRequest clientStatusUpdateRequest, String remoteHost ) {
+	public NodeClientStatusDTOPrevCurrent updateDBWithStatusFromClient( ClientStatusUpdateRequest clientStatusUpdateRequest, String remoteHost ) {
 
-
+		return updateDBWithStatusFromClientInternal( clientStatusUpdateRequest.getNodeName(), 
+				clientStatusUpdateRequest.getUpdateType(), 
+				clientStatusUpdateRequest.getTimeUntilNextClientStatusUpdate() );
+	}
+	
+	
+	/**
+	 * @param nodeName
+	 * @param updateType
+	 * @param timeUntilNextClientStatusUpdate
+	 * @return TODO
+	 */
+	private NodeClientStatusDTOPrevCurrent updateDBWithStatusFromClientInternal( String nodeName, 
+			ClientStatusUpdateTypeEnum updateType,
+			int timeUntilNextClientStatusUpdate ) {
+		
+		
+		
 		if ( log.isDebugEnabled() ) {
 
 
-			log.debug( "Updating Client status DB for client node name = " + clientStatusUpdateRequest.getNodeName() );
+			log.debug( "Updating Client status DB for client node name = " + nodeName );
 		}
+		
+		NodeClientStatusDTOPrevCurrent nodeClientStatusDTOPrevCurrent = new NodeClientStatusDTOPrevCurrent();
 
 
 		try {
 
-			Integer nodeId = clientNodeNameCheck.getNodeIdForNodeName( clientStatusUpdateRequest.getNodeName() );
+			Integer nodeId = clientNodeNameCheck.getNodeIdForNodeName( nodeName );
 
 			if ( nodeId != null ) {
 
@@ -98,10 +135,16 @@ public class ClientStatusDBUpdateServiceImpl implements ClientStatusDBUpdateServ
 					//  Update existing entry
 
 					NodeClientStatusDTO nodeClientStatusDTO = (NodeClientStatusDTO) nodeClientStatusDTOList.get( 0 );
+					
+					NodeClientStatusDTO nodeClientStatusDTOPrev = (NodeClientStatusDTO) nodeClientStatusDTO.clone();
+					
+					nodeClientStatusDTOPrevCurrent.setPrevNodeClientStatusDTO( nodeClientStatusDTOPrev );
 
-					updateDBRecordWithStatus( nodeClientStatusDTO, clientStatusUpdateRequest );
+					updateDBRecordWithStatus( nodeClientStatusDTO, updateType, timeUntilNextClientStatusUpdate );
 
 					nodeClientStatusDAO.saveOrUpdate( nodeClientStatusDTO );
+					
+					nodeClientStatusDTOPrevCurrent.setCurrentNodeClientStatusDTO( nodeClientStatusDTO );
 
 				} else {
 
@@ -111,9 +154,13 @@ public class ClientStatusDBUpdateServiceImpl implements ClientStatusDBUpdateServ
 
 					nodeClientStatusDTO.setNodeId( nodeId );
 
-					updateDBRecordWithStatus( nodeClientStatusDTO, clientStatusUpdateRequest );
+					updateDBRecordWithStatus( nodeClientStatusDTO, updateType, timeUntilNextClientStatusUpdate );
 
 					nodeClientStatusDAO.save( nodeClientStatusDTO );
+
+					nodeClientStatusDTOPrevCurrent.setCurrentNodeClientStatusDTO( nodeClientStatusDTO );
+					
+					nodeClientStatusDTOPrevCurrent.setPrevNodeClientStatusDTO( null );
 				}
 
 
@@ -121,63 +168,95 @@ public class ClientStatusDBUpdateServiceImpl implements ClientStatusDBUpdateServ
 
 		} catch ( Throwable t ) {
 
+			String msg = "Exception updating client status db, retry controlled elsewhere. client node name = " + nodeName;
 
-			log.warn( "Exception updating client status db, retry controlled elsewhere. client node name = " + clientStatusUpdateRequest.getNodeName() );
+			log.warn( msg );
 
-			throw new RuntimeException( t );
+			throw new RuntimeException( msg, t );
 		}
+		
+		return nodeClientStatusDTOPrevCurrent;
 
 
 	}
 
 
+
 	/**
 	 * @param nodeClientStatusDTO
-	 * @param clientStatusUpdateRequest
+	 * @param updateType
+	 * @param timeUntilNextClientStatusUpdate
 	 */
-	private void updateDBRecordWithStatus( NodeClientStatusDTO nodeClientStatusDTO, ClientStatusUpdateRequest clientStatusUpdateRequest ) {
+	private void updateDBRecordWithStatus( NodeClientStatusDTO nodeClientStatusDTO, 
+			ClientStatusUpdateTypeEnum updateType,
+			int timeUntilNextClientStatusUpdate ) {
 
 	
 		nodeClientStatusDTO.setNotificationSentThatClientLate( false );
 
 		nodeClientStatusDTO.setLastCheckinTime( new Date() );
+		
+		if ( updateType == ClientStatusUpdateTypeEnum.CLIENT_ABOUT_TO_EXIT 
+			 || updateType == ClientStatusUpdateTypeEnum.CLIENT_SHUTDOWN_REQUESTED ) {
 
-		nodeClientStatusDTO.setSecondsUntilNextCheckin( clientStatusUpdateRequest.getTimeUntilNextClientStatusUpdate() );
+			nodeClientStatusDTO.setClientStarted( false );
+			
+			nodeClientStatusDTO.setSecondsUntilNextCheckin( null );
+			
+			nodeClientStatusDTO.setNextCheckinTime( null );
+			
+			nodeClientStatusDTO.setLateForNextCheckinTime( null );
+			
+		} else {
 
-		Calendar timeUntilNextClientStatusUpdateCalendar = Calendar.getInstance();
+			nodeClientStatusDTO.setClientStarted( true );
 
-		timeUntilNextClientStatusUpdateCalendar.add( Calendar.SECOND, clientStatusUpdateRequest.getTimeUntilNextClientStatusUpdate() );
+			nodeClientStatusDTO.setSecondsUntilNextCheckin( timeUntilNextClientStatusUpdate );
 
-		//  Add additional time so not late the split second after it was supposed to check in.
+			Calendar timeUntilNextClientStatusUpdateCalendar = Calendar.getInstance();
+
+			timeUntilNextClientStatusUpdateCalendar.add( Calendar.SECOND, timeUntilNextClientStatusUpdate );
+
+			Date timeUntilNextClientStatusUpdateDate = timeUntilNextClientStatusUpdateCalendar.getTime();
+
+			nodeClientStatusDTO.setNextCheckinTime( timeUntilNextClientStatusUpdateDate );
+
+			//  Add additional time so not late the split second after it was supposed to check in.
 
 
-		int clientCheckinOverageBeforeLatePercent = ServerCoreConstants.DEFAULT_CLIENT_CHECKIN_OVERAGE_BEFORE_LATE_PERCENT;
-		int clientCheckinOverageBeforeLateMaxValue = ServerCoreConstants.DEFAULT_CLIENT_CHECKIN_OVERAGE_BEFORE_LATE_MAX_VALUE;
+			int clientCheckinOverageBeforeLatePercent = ServerCoreConstants.DEFAULT_CLIENT_CHECKIN_OVERAGE_BEFORE_LATE_PERCENT;
+			int clientCheckinOverageBeforeLateMaxValue = ServerCoreConstants.DEFAULT_CLIENT_CHECKIN_OVERAGE_BEFORE_LATE_MAX_VALUE;
 
-		Integer clientCheckinOverageBeforeLatePercentFromConfig = getValueFromConfigService.getConfigValueAsInteger( ServerConfigKeyValues.CLIENT_CHECKIN_OVERAGE_BEFORE_LATE_PERCENT );
-		if ( clientCheckinOverageBeforeLatePercentFromConfig != null ) {
-			clientCheckinOverageBeforeLatePercent = clientCheckinOverageBeforeLatePercentFromConfig;
+			Integer clientCheckinOverageBeforeLatePercentFromConfig = getValueFromConfigService.getConfigValueAsInteger( ServerConfigKeyValues.CLIENT_CHECKIN_OVERAGE_BEFORE_LATE_PERCENT );
+			if ( clientCheckinOverageBeforeLatePercentFromConfig != null ) {
+				clientCheckinOverageBeforeLatePercent = clientCheckinOverageBeforeLatePercentFromConfig;
+			}
+
+			Integer clientCheckinOverageBeforeLateMaxValueFromConfig = getValueFromConfigService.getConfigValueAsInteger( ServerConfigKeyValues.CLIENT_CHECKIN_OVERAGE_BEFORE_LATE_MAX_VALUE );
+			if ( clientCheckinOverageBeforeLateMaxValueFromConfig != null ) {
+				clientCheckinOverageBeforeLateMaxValue = clientCheckinOverageBeforeLateMaxValueFromConfig;
+			}
+
+
+			int overageUntilLate = (int) ( timeUntilNextClientStatusUpdate * ( ( (float) clientCheckinOverageBeforeLatePercent ) / 100 ) );
+
+			if ( ( overageUntilLate >  clientCheckinOverageBeforeLateMaxValue ) || overageUntilLate <= 0  ) {
+
+				overageUntilLate = clientCheckinOverageBeforeLateMaxValue;
+			}
+
+
+			Calendar timeUntilClientLateForNextCheckinTimeCalendar = (Calendar) timeUntilNextClientStatusUpdateCalendar.clone();
+
+			timeUntilClientLateForNextCheckinTimeCalendar.add( Calendar.SECOND, overageUntilLate );
+
+
+			Date timeUntilClientLateForNextCheckinTimeDate = timeUntilClientLateForNextCheckinTimeCalendar.getTime();
+
+
+			nodeClientStatusDTO.setLateForNextCheckinTime( timeUntilClientLateForNextCheckinTimeDate );
+			
 		}
-
-		Integer clientCheckinOverageBeforeLateMaxValueFromConfig = getValueFromConfigService.getConfigValueAsInteger( ServerConfigKeyValues.CLIENT_CHECKIN_OVERAGE_BEFORE_LATE_MAX_VALUE );
-		if ( clientCheckinOverageBeforeLateMaxValueFromConfig != null ) {
-			clientCheckinOverageBeforeLateMaxValue = clientCheckinOverageBeforeLateMaxValueFromConfig;
-		}
-
-
-		int overageUntilLate = (int) ( clientStatusUpdateRequest.getTimeUntilNextClientStatusUpdate() * ( ( (float) clientCheckinOverageBeforeLatePercent ) / 100 ) );
-
-		if ( ( overageUntilLate >  clientCheckinOverageBeforeLateMaxValue ) || overageUntilLate <= 0  ) {
-
-			overageUntilLate = clientCheckinOverageBeforeLateMaxValue;
-		}
-
-		timeUntilNextClientStatusUpdateCalendar.add( Calendar.SECOND, overageUntilLate );
-
-
-		Date timeUntilNextClientStatusUpdateDate = timeUntilNextClientStatusUpdateCalendar.getTime();
-
-		nodeClientStatusDTO.setLateForNextCheckinTime( timeUntilNextClientStatusUpdateDate );
 	}
 
 
