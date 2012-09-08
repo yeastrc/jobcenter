@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN"
+"http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd">
+
+<tiles-definitions>
+
+    <!-- =======================================================  -->
+    <!-- Master definitions                                       -->
+    <!-- =======================================================  -->
+
+    <!-- Master layout without menu, header, and footer -->
+    <definition name="def.master.layout" path="/WEB-INF/jsp/templatelayout.jsp" >
+        <put name="onbodyload"      value=""/>
+        <put name="header"         value="/WEB-INF/jsp/header.jsp" />  <!-- Header -->
+    </definition>
+
+	<!-- Banner for the pages, takes in the title -->
+    <definition name="def.template.banner" path="/WEB-INF/jsp/banner.jsp" >
+        <put name="title"        value="${title}" />  <!-- The page title, to be defined via jsp. -->
+    </definition>
+
+    <definition name="def.template.error" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/error.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.index" extends="def.master.layout" >
+        <put name="content"      value="/index.jsp"/> <!-- Content -->
+    </definition>
+
+
+    <definition name="def.template.home" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/homepage.jsp"/> <!-- Content -->
+    </definition>
+
+
+    <definition name="def.template.search" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/search.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.listJobs" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/listJobs.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.listRequests" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/listRequests.jsp"/> <!-- Content -->
+    </definition>
+
+
+    <definition name="def.template.viewJob" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/viewJob.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.deleteJobSuccess" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/deleteJobSuccess.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.viewRun" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/viewRun.jsp"/> <!-- Content -->
+    </definition>
+
+
+
+    <definition name="def.template.listNodes" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/listNodes.jsp"/> <!-- Content -->
+    </definition>
+
+
+    <definition name="def.template.listJobTypes" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/listJobTypes.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.listRequestTypes" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/listRequestTypes.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.listClientsStatus" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/listClientsStatus.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.clientsConnectedList" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/clientsConnectedList.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.clientsUsingSameNodeNameList" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/clientsUsingSameNodeNameList.jsp"/> <!-- Content -->
+    </definition>
+
+    <definition name="def.template.clientsFailedToConnectList" extends="def.master.layout" >
+        <put name="content"      value="/WEB-INF/jsp/clientsFailedToConnectList.jsp"/> <!-- Content -->
+    </definition>
+        
+    
+    
+  </tiles-definitions>
+
