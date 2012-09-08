@@ -124,7 +124,7 @@ public class GetClientsStatusListServiceImpl implements GetClientsStatusListServ
 
 		for ( NodeClientStatusDTO client : clients ) {
 
-			if ( client.getLateForNextCheckinTime().before( now ) ) {
+			if ( client.getLateForNextCheckinTime() != null && client.getLateForNextCheckinTime().before( now ) ) {
 
 				client.setCheckinIsLate( true );
 			}
