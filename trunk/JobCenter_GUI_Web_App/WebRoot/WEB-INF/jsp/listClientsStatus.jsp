@@ -11,6 +11,7 @@ listClientsStatus.jsp<br/>
   <tr>
 	<th nowrap="nowrap">Node Name</th>
 	<th nowrap="nowrap">Late</th>
+	<th nowrap="nowrap">Up/Down</th>
 	<th nowrap="nowrap">Last Checkin Time</th>
 	<th nowrap="nowrap">Time considered late for next checkin time</th>
 	<th nowrap="nowrap">Running jobs</th>
@@ -29,18 +30,30 @@ listClientsStatus.jsp<br/>
 		<c:if test="${ item.checkinIsLate }"></span ></c:if>
 	</td>
 	<td nowrap="nowrap">
+		<c:choose>
+			<c:when test="${ item.clientStarted }">
+				Client was started
+			</c:when>
+			<c:otherwise>
+				Client has been shut down
+			</c:otherwise>
+		
+		</c:choose>
+	</td>
+	
+	<td nowrap="nowrap">
 		<c:out value="${ item.lastCheckinTime }"></c:out>
 	</td>
 	<td nowrap="nowrap">
 		<c:out value="${ item.lateForNextCheckinTime }"></c:out>
 	</td>
 
-	<td >
+	<td  nowrap="nowrap">
 
 	  <c:forEach var="job" items="${ item.runningJobs }" varStatus="jobItemStatus">
 
 		 <a href="viewJob.do?jobId=<c:out value="${ job.id }"></c:out>" ><c:out value="${ job.jobType.name }"></c:out>
-	   	 (<c:out value="${ job.currentRun.id }"></c:out>)</a><c:if test="${ jobItemStatus.count < fn:length(item.runningJobs) }" >,</c:if>
+	   	 (<c:out value="${ job.currentRun.id }"></c:out>)</a><c:if test="${ jobItemStatus.count < fn:length(item.runningJobs) }" ><br /></c:if>
 	   		
 	  </c:forEach >
 	  

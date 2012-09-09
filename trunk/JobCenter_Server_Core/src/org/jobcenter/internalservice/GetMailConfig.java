@@ -9,4 +9,5 @@ public interface GetMailConfig {
 	 */
 	public abstract MailConfig getClientCheckinMailConfig();
 
+	public abstract MailConfig getClientStatusMailConfig();
 }

@@ -472,6 +472,42 @@
 <!-- ================================== -->
 
 
+<!--   Internal Scheduler Services -->
+
+	<bean id="sendClientStatusEmailDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="clientsStatusRetrieveAndSendEmailService" />
+		<property name="targetMethod" value="sendClientsStatusNotification" />
+		<property name="concurrent" value="false" />
+	</bean>
+
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="sendClientStatusEmailDetail" />
+
+		<!-- run every morning at 6 AM -->
+<!--  		
+-->
+		<property name="cronExpression" value="0 0 6 * * ?" />
+
+		<!-- Testing, set at current time for run now -->
+		
+<!--  		
+		<property name="cronExpression" value="0 40 18 * * ?" />
+-->
+		
+	</bean>
+	
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    	<property name="triggers">
+        	<list>
+            	<ref bean="cronTrigger" />
+        	</list>
+    	</property>
+	</bean>
+
+<!-- ================================== -->
+
+
 <!--   Internal Timer Services -->
 
 
@@ -525,6 +561,33 @@
 
 
 <!--   Internal services -->
+
+	<bean id="clientsStatusRetrieveAndSendEmailService" class="org.jobcenter.internalservice.ClientsStatusRetrieveAndSendEmailServiceImpl">
+
+		<property name="getClientsStatusListService">
+			<ref bean="GetClientsStatusListService" />
+		</property>
+		<property name="getValueFromConfigService">
+			<ref bean="getValueFromConfigService" />
+		</property>
+		<property name="getMailConfig">
+			<ref bean="getMailConfig" />
+		</property>
+		<property name="sendEmailService">
+			<ref bean="sendEmailService" />
+		</property>
+		<property name="runDAO">
+			<ref bean="runDAO" />
+		</property>
+		<property name="jobDAO">
+			<ref bean="jobDAO" />
+		</property>
+
+		<property name="nodeClientStatusDAO">
+			<ref bean="nodeClientStatusDAO" />
+		</property>
+	</bean>
+
 
 	<bean id="clientStatusDBUpdateService" class="org.jobcenter.internalservice.ClientStatusDBUpdateServiceImpl">
 		<property name="clientNodeNameCheck">

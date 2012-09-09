@@ -22,7 +22,18 @@ public interface ServerConfigKeyValues {
 	
 	public static final String CLIENT_SHUTDOWN_NOTIFICATION = "client.shutdown.notification";
 	
+	
+	
+	
+	public static final String CLIENT_STATUS_NOTIFICATION = "client.status.notification";
+	
+	public static final String CLIENT_STATUS_NOTIFICATION_FROM_EMAIL_ADDRESS = "client.status.notification.from.email";
 
+	public static final String CLIENT_STATUS_NOTIFICATION_TO_EMAIL_ADDRESS_LIST = "client.status.notification.to.email";
+
+	public static final String CLIENT_STATUS_NOTIFICATION_SERVER_ADDRESS = "client.status.notification.server.address";
+	
+	
 	//  Special default values
 
 	public static final String CLIENT_CHECKIN_EMAIL_IN_PROVIDED_FILE = "***";

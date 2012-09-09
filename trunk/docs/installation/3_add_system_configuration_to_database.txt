@@ -15,9 +15,30 @@ These values should only need to change if you want to receive email notificatio
 
            'client.checkin.notification.smtp.email.host', 'localhost' - IP address of the SMTP email server
 
-    'client.checkin.notification.from.email', '***' - From email address for the email
-    'client.checkin.notification.to.email', '***') - To email address for the email
+    		'client.checkin.notification.from.email', '***' - From email address for the email
+    		'client.checkin.notification.to.email', '***' - To email address for the email.  To email is a comma delimited list
 
+    If you want email notifications that a client has started up, set the value for 'client.normal.startup.notification' to 'true'.
+
+    If you want email notifications that a client has started up when it previously did not shut down (it probably crashed), 
+       set the value for 'client.startup.not.prev.shutdown.notification' to 'true'.
+       
+    If you want email notifications that a client has shut down, set the value for 'client.shutdown.notification' to 'true'.
+
+
+These values should only need to change if you want to receive a daily email with the current status of the clients.
+
+		Send an email with the current client status at 6 am each day
+
+	'client.status.notification', 'false');  - change the 'false' to 'true' to send the email
+
+	'client.status.notification.from.email', '***');   - From email address for the email
+	'client.status.notification.to.email', '***' - To email address for the email.  To email is a comma delimited list
+	
+	'client.status.notification.server.address', '***' - The "base" URL of the Web GUI (for links to running jobs in the email)  
+			Set this so that there are links to view the running jobs in the JobCenter GUI
+			(example:  'http://localhost/jobcenter') Replace "localhost" with the URL or IP address of the server you are running the web app on.  
+			If this is empty, then there will not be links to the running jobs.
 
 
 
