@@ -1,6 +1,7 @@
 package org.jobcenter.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,6 +9,8 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.RunMessageTypesConstants;
+import org.jobcenter.constants.ServerConfigKeyValues;
+import org.jobcenter.constants.ServerCoreConstants;
 import org.jobcenter.dao.JobDAO;
 import org.jobcenter.dao.RunDAO;
 import org.jobcenter.dao.StatusDAO;
@@ -16,6 +19,7 @@ import org.jobcenter.dto.RunDTO;
 import org.jobcenter.dto.RunMessageDTO;
 import org.jobcenter.dto.StatusDTO;
 import org.jobcenter.internalservice.ClientNodeNameCheck;
+import org.jobcenter.internalservice.GetValueFromConfigService;
 import org.jobcenter.jdbc.JobJDBCDAO;
 import org.jobcenter.request.UpdateServerFromJobRunOnClientRequest;
 import org.jobcenter.response.UpdateServerFromJobRunOnClientResponse;
@@ -48,18 +52,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFromJobRunOnClientService {
 
+
+
 	private static Logger log = Logger.getLogger(UpdateServerFromJobRunOnClientServiceImpl.class);
 
 
 	//  Service
 
 	private ClientNodeNameCheck clientNodeNameCheck;
+	private GetValueFromConfigService getValueFromConfigService;
 
+	
 	public ClientNodeNameCheck getClientNodeNameCheck() {
 		return clientNodeNameCheck;
 	}
 	public void setClientNodeNameCheck(ClientNodeNameCheck clientNodeNameCheck) {
 		this.clientNodeNameCheck = clientNodeNameCheck;
+	}
+	public GetValueFromConfigService getGetValueFromConfigService() {
+		return getValueFromConfigService;
+	}
+	public void setGetValueFromConfigService(
+			GetValueFromConfigService getValueFromConfigService) {
+		this.getValueFromConfigService = getValueFromConfigService;
 	}
 
 	//  DAO
@@ -179,11 +194,59 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 			List<RunMessageDTO> runMessages = runFromRequest.getRunMessages();
 
 
-			StatusDTO newStatus = statusDAO.findById(  jobFromRequest.getStatusId() );
+			// update job
+
+			Job job = jobDAO.findById( jobFromRequest.getId() );
+
+			if ( job == null ) {
+
+				String msg = ", Unable to find job to update it, id = " + jobFromRequest.getId();
+
+				log.error( method + msg );
+
+				throw new RuntimeException( msg );
+			}
+			
+			int newStatusIdForJob = jobFromRequest.getStatusId();
+
+			if ( newStatusIdForJob == JobStatusValuesConstants.JOB_STATUS_SOFT_ERROR ) {
+				
+				Integer softErrorRetryCountMax = getValueFromConfigService.getConfigValueAsInteger( ServerConfigKeyValues.SOFT_ERROR_RETRY_COUNT_MAX );
+				
+				if ( softErrorRetryCountMax == null ) {
+					
+					softErrorRetryCountMax = ServerCoreConstants.DEFAULT_SOFT_ERROR_RETRY_COUNT_MAX;
+				}
+				
+				int jobSoftErrorRetryCount = job.getSoftErrorRetryCount();
+				jobSoftErrorRetryCount++;
+				job.setSoftErrorRetryCount( jobSoftErrorRetryCount );
+				
+				if ( jobSoftErrorRetryCount > softErrorRetryCountMax ) {
+					
+					newStatusIdForJob = JobStatusValuesConstants.JOB_STATUS_HARD_ERROR;
+					
+
+					RunMessageDTO runMessageDTO = new RunMessageDTO();
+					runMessages.add( runMessageDTO );
+
+					runMessageDTO.setType( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR );
+
+					runMessageDTO.setMessage( "Job has exceeded soft error retry count of " + softErrorRetryCountMax + " so it is set to hard error." );
+				
+				} else {
+					
+					Date delayJobUntil = new Date( System.currentTimeMillis() + ( ServerCoreConstants.SOFT_ERROR_DELAY_TIME * 1000 ) );
+					
+					job.setDelayJobUntil( delayJobUntil );
+				}
+			}
+
+			StatusDTO newStatus = statusDAO.findById( newStatusIdForJob );
 
 			if ( newStatus == null ) {
 
-				String msg = "New job status not found in status table so not valid, = " +  jobFromRequest.getStatusId();
+				String msg = "New job status not found in status table so not valid, = " + newStatusIdForJob;
 
 				log.error( msg );
 
@@ -198,7 +261,7 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 
 				runMessageDTO.setType( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR );
 
-				runMessageDTO.setMessage( "System error.  Status id value set by module is not a valid status value.  Status id value from module = " + jobFromRequest.getStatusId() );
+				runMessageDTO.setMessage( "System error.  Status id value set by module is not a valid status value.  Status id value from module = " + newStatusIdForJob );
 
 //				throw new RuntimeException( msg );
 			}
@@ -212,24 +275,12 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 
 			runDAO.saveOrUpdate( run );
 
-			// update job
-
-			Job job = jobDAO.findById( jobFromRequest.getId() );
-
-			if ( job == null ) {
-
-				String msg = ", Unable to find job to update it, id = " + jobFromRequest.getId();
-
-				log.error( method + msg );
-
-				throw new RuntimeException( msg );
-			}
-
 			if ( log.isDebugEnabled() ) {
-				log.debug( method + " job id = " + job.getId() + ".  job status was = " + job.getStatusId() + ", changing job status to " + jobFromRequest.getStatusId() );
+				log.debug( method + " job id = " + job.getId() + ".  job status was = " + job.getStatusId() + ", changing job status to " + newStatusIdForJob );
 			}
 
 			job.setStatus( newStatus );
+
 
 			jobDAO.saveOrUpdate( job );
 

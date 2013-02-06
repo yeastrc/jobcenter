@@ -44,8 +44,11 @@ public class SendClientsCheckinLateNotificationTimerTaskImpl extends TimerTask {
 			processClientsStatusForLateCheckinsService.processClientsStatusForLateCheckins();
 
 		} catch ( Throwable t ) {
+			
+			if ( log != null ) {
 
-			log.error( "Failed in call processClientsStatusForLateCheckinsService.processClientsStatusForLateCheckins();  exception = " + t.toString(), t );
+				log.error( "Failed in call processClientsStatusForLateCheckinsService.processClientsStatusForLateCheckins();  exception = " + t.toString(), t );
+			}
 
 		} finally {
 

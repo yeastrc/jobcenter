@@ -240,8 +240,10 @@ public class ClientStartupServiceImpl implements ClientStartupService {
 									String msg = "Exception sending email for client startup when client not previously shut down";
 
 									log.error( msg, e );
+									
+									//  Don't rethrow exception.  Still want the client to come up.
 
-									throw new RuntimeException( msg, e );
+//									throw new RuntimeException( msg, e );
 								}
 							}
 						}

@@ -1,22 +1,32 @@
 package org.jobcenter.service;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.Constants;
+import org.jobcenter.constants.JobConstants;
 import org.jobcenter.constants.JobStatusValuesConstants;
+import org.jobcenter.constants.RunMessageTypesConstants;
+import org.jobcenter.constants.ServerConfigKeyValues;
+import org.jobcenter.constants.ServerCoreConstants;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.RunDTO;
+import org.jobcenter.dto.RunMessageDTO;
 import org.jobcenter.internalservice.ClientNodeNameCheck;
+import org.jobcenter.internalservice.GetValueFromConfigService;
+import org.jobcenter.internalservice.SaveJobSentToClientService;
 import org.jobcenter.jdbc.*;
 import org.jobcenter.request.JobRequest;
 import org.jobcenter.request.JobRequestModuleInfo;
-import org.jobcenter.response.BaseResponse;
 import org.jobcenter.response.JobResponse;
+import org.jobcenter.service_response.GetJobServiceResponse;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +52,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 public class GetNextJobForClientServiceImpl implements GetNextJobForClientService {
 
+
+
+
+
+
+
+
+
 	private static Logger log = Logger.getLogger(GetNextJobForClientServiceImpl.class);
 
 
@@ -54,6 +72,9 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 	//  Service
 
 	private ClientNodeNameCheck clientNodeNameCheck;
+	private GetValueFromConfigService getValueFromConfigService;
+
+	private SaveJobSentToClientService saveJobSentToClientService;
 
 	public ClientNodeNameCheck getClientNodeNameCheck() {
 		return clientNodeNameCheck;
@@ -61,14 +82,28 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 	public void setClientNodeNameCheck(ClientNodeNameCheck clientNodeNameCheck) {
 		this.clientNodeNameCheck = clientNodeNameCheck;
 	}
-
-	//  DAO
+	public SaveJobSentToClientService getSaveJobSentToClientService() {
+		return saveJobSentToClientService;
+	}
+	public void setSaveJobSentToClientService(
+			SaveJobSentToClientService saveJobSentToClientService) {
+		this.saveJobSentToClientService = saveJobSentToClientService;
+	}
+	public GetValueFromConfigService getGetValueFromConfigService() {
+		return getValueFromConfigService;
+	}
+	public void setGetValueFromConfigService(
+			GetValueFromConfigService getValueFromConfigService) {
+		this.getValueFromConfigService = getValueFromConfigService;
+	}
+	
+	
+	// JDBC DAO
 
 	private GetNextJobForClientJDBCDAO getNextJobForClientJDBCDAO;
-
-
 	private JobJDBCDAO jobJDBCDAO;
 
+	
 	public JobJDBCDAO getJobJDBCDAO() {
 		return jobJDBCDAO;
 	}
@@ -84,13 +119,14 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 	}
 
 
+
 	/**
 	 * @param jobRequest
 	 * @param remoteHost
 	 * @return
 	 * @throws Exception
 	 */
-	public JobResponse getNextJobForClientService( JobRequest jobRequest, String remoteHost )
+	public GetJobServiceResponse getNextJobForClientService( JobRequest jobRequest, String remoteHost )
 	{
 		final String method = "getNextJobForClientService";
 
@@ -128,14 +164,19 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 
 			log.debug( "JobService::retrieveJob  jobRequest.getNodeName() = |" + jobRequest.getNodeName() + "|, remoteHost = |" + remoteHost + "|."  );
 		}
+		
+		{
 
+			GetJobServiceResponse getJobServiceResponse = new GetJobServiceResponse();
 
-		JobResponse jobResponse = new JobResponse();
+			JobResponse jobResponse = new JobResponse();
+			getJobServiceResponse.setJobResponse( jobResponse );
 
+			if ( ! clientNodeNameCheck.validateNodeNameAndNetworkAddress( jobResponse, jobRequest.getNodeName(), remoteHost ) ) {
 
-		if ( ! clientNodeNameCheck.validateNodeNameAndNetworkAddress( jobResponse, jobRequest.getNodeName(), remoteHost ) ) {
+				return getJobServiceResponse;
+			}
 
-			return jobResponse;
 		}
 
 		Integer nodeId = clientNodeNameCheck.getNodeIdForNodeName( jobRequest.getNodeName() );
@@ -143,49 +184,9 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 
 
 
-		Job job = getNextJobForClient( jobRequest, nodeId );
+		GetJobServiceResponse getJobServiceResponse = getNextJobForClient( jobRequest, nodeId, remoteHost );
 
-		jobResponse.setJob( job );
-
-		if ( job == null ) {
-
-			jobResponse.setJobFound( false );
-		} else {
-
-			jobResponse.setJobFound( true );
-
-
-			if ( log.isInfoEnabled() ) {
-
-
-				log.info( method + "Found job for node to process.  nodeName = |" + jobRequest.getNodeName() + "|, remoteHost = |" + remoteHost + "|."
-						+  "  job = " + job.getId() );
-
-				try {
-
-					ByteArrayOutputStream oStream = new ByteArrayOutputStream();
-
-					JAXBContext jc = JAXBContext.newInstance( Constants.DTO_PACKAGE_PATH, thisClassLoader );
-
-					Marshaller marshaller = jc.createMarshaller();
-
-					marshaller.marshal( job, oStream );
-
-					String jobXML = oStream.toString();
-
-					log.info( method + "Found job for node to process.  nodeName = |" + jobRequest.getNodeName() + "|, remoteHost = |" + remoteHost + "|."
-							+  "  job id = " + job.getId() + ", job = " + jobXML );
-
-				} catch (Throwable t) {
-
-					log.error( method + ": Exception:  Logging job returned to client: Job Id = " + job.getId() + ", Exception = " + t.toString() + '.', t );
-				}
-
-			}
-
-		}
-
-		return jobResponse;
+		return getJobServiceResponse;
 	}
 
 
@@ -194,13 +195,18 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 	 * @param remoteHost
 	 * @return
 	 */
-	private Job getNextJobForClient( JobRequest jobRequest, Integer nodeId ) {
+	private GetJobServiceResponse getNextJobForClient( JobRequest jobRequest, Integer nodeId, String remoteHost ) {
 
 		final String method = "getNextJobForClient";
 
 		if ( log.isDebugEnabled() ) {
 			log.debug( "Entering " + method );
 		}
+		
+		GetJobServiceResponse getJobServiceResponse = new GetJobServiceResponse();
+		JobResponse jobResponse = new JobResponse();
+		getJobServiceResponse.setJobResponse( jobResponse );
+
 
 		Job job = null;
 
@@ -210,19 +216,66 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 
 			job = getNextJobForClientJDBCDAO.retrieveNextJobRecordForJobRequest( jobRequest );
 
-			if ( job != null ) {
+			if ( job == null ) {
 
-				jobJDBCDAO.updateJobStatusOnIdAndDbRecordVersionNumber( job, JobStatusValuesConstants.JOB_STATUS_RUNNING );
+				jobResponse.setJobFound( false );
+			} else {
 
-				currentRun = jobJDBCDAO.insertRunTableRecord( nodeId, job);
+				jobResponse.setJobFound( true );
 
-				currentRun.setJob( job );
-
-				job.setCurrentRun( currentRun );
-
-				job.setCurrentRunId( currentRun.getId() );
 
 				jobJDBCDAO.retrieveJobParameters( job );
+
+				int jobParameterCount = 0;
+
+				Map<String, String> jobParameters = job.getJobParameters();
+
+				if ( jobParameters != null ) {
+
+					jobParameterCount = jobParameters.size();
+				}
+
+				if ( job.getJobParameterCount() != JobConstants.JOB_PARAMETER_COUNT_NOT_SET && jobParameterCount != job.getJobParameterCount() ) {
+
+					String msg = "Resetting job to 'Submitted' and delaying job.  job.getJobParameterCount() does not match number of parameters retrieved from the job parameters table."
+						+ "  job.getJobParameterCount() = " + job.getJobParameterCount() 
+						+ ", number of parameters retrieved from the job parameters table = " + jobParameterCount
+						+ ", job id = " + job.getId()
+						+ ", job.getCurrentRunId() = " + job.getCurrentRunId();
+
+					log.error( msg );
+
+					delayJob( job, nodeId );
+					
+					getJobServiceResponse.setTryAgain( true );
+
+				} else {
+
+					jobJDBCDAO.updateJobStatusOnIdAndDbRecordVersionNumber( job, JobStatusValuesConstants.JOB_STATUS_RUNNING );
+
+					currentRun = jobJDBCDAO.insertRunTableRecord( nodeId, job);
+
+					currentRun.setJob( job );
+
+					job.setCurrentRun( currentRun );
+
+					job.setCurrentRunId( currentRun.getId() );
+
+					job.setJobParameterCountWhenRetrievedByGetJob( jobParameterCount );
+
+					Boolean saveJobSentToClientForDebugging = getValueFromConfigService.getConfigValueAsBoolean( ServerConfigKeyValues.SAVE_JOB_SENT_TO_CLIENT_FOR_DEBUGGING );
+					
+					if ( saveJobSentToClientForDebugging != null && saveJobSentToClientForDebugging == true ) {
+					
+						saveJobSentToClientService.saveJobSentToClient( job  );
+					}
+					
+					
+					jobResponse.setJob( job );
+
+
+					logRetrievedJob(jobRequest, remoteHost, job);
+				}
 			}
 
 		} catch (Throwable sqlEx) {
@@ -238,10 +291,92 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 
 		}
 
-		return job;
+		return getJobServiceResponse;
 
 	}
 
 
+	/**
+	 * @param job
+	 * @param nodeId
+	 */
+	private void delayJob( Job job, int nodeId ) {
+		
+		int paramErrorRetryCount = job.getParamErrorRetryCount();
+		paramErrorRetryCount++;
+		job.setParamErrorRetryCount( paramErrorRetryCount );
+		
+		if ( paramErrorRetryCount > ServerCoreConstants.PARAM_ERROR_RETRY_COUNT_MAX ) {
+			
+			jobJDBCDAO.updateJobStatusOnIdAndDbRecordVersionNumber( job, JobStatusValuesConstants.JOB_STATUS_HARD_ERROR);
+			
+
+			List<RunMessageDTO> runMessages = new ArrayList<RunMessageDTO>();
+
+			RunMessageDTO runMessageDTO = new RunMessageDTO();
+			runMessages.add( runMessageDTO );
+
+			runMessageDTO.setType( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR );
+
+			runMessageDTO.setMessage( "System error. Problem processing job parameters, param count mismatch." );
+			
+			RunDTO currentRun = jobJDBCDAO.insertRunTableRecord( nodeId, job, JobStatusValuesConstants.JOB_STATUS_HARD_ERROR );
+
+			currentRun.setJob( job );
+
+
+			// save run messages
+
+			for ( RunMessageDTO runMessage : runMessages ) {
+
+				jobJDBCDAO.insertRunMessageFromModuleRecord( runMessage, currentRun );
+			}
+			
+		} else {
+			
+			jobJDBCDAO.updateDelayUntilAndParamErrorCntOnId( job.getId() );
+			
+		}
+	}
+
+	
+	/**
+	 * @param jobRequest
+	 * @param remoteHost
+	 * @param method
+	 * @param job
+	 */
+	private void logRetrievedJob(JobRequest jobRequest, String remoteHost, Job job) {
+		
+		final String method = "logRetrievedJob";
+		
+		if ( log.isInfoEnabled() ) {
+
+
+			log.info( method + "Found job for node to process.  nodeName = |" + jobRequest.getNodeName() + "|, remoteHost = |" + remoteHost + "|."
+					+  "  job = " + job.getId() );
+
+			try {
+
+				ByteArrayOutputStream oStream = new ByteArrayOutputStream();
+
+				JAXBContext jc = JAXBContext.newInstance( Constants.DTO_PACKAGE_PATH, thisClassLoader );
+
+				Marshaller marshaller = jc.createMarshaller();
+
+				marshaller.marshal( job, oStream );
+
+				String jobXML = oStream.toString();
+
+				log.info( method + "Found job for node to process.  nodeName = |" + jobRequest.getNodeName() + "|, remoteHost = |" + remoteHost + "|."
+						+  "  job id = " + job.getId() + ", job = " + jobXML );
+
+			} catch (Throwable t) {
+
+				log.error( method + ": Exception:  Logging job returned to client: Job Id = " + job.getId() + ", Exception = " + t.toString() + '.', t );
+			}
+
+		}
+	}
 
 }

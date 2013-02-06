@@ -14,8 +14,15 @@ public interface JobJDBCDAO {
 
 
 	public  void updateJobStatusOnIdAndDbRecordVersionNumber( Job job, int newJobStatus );
+	
+	public  void updateDelayUntilAndParamErrorCntOnId( int jobId );
+	
+		
 
 	public RunDTO insertRunTableRecord( int nodeId, Job job );
+	
+	public  RunDTO insertRunTableRecord( int nodeId, Job job, int statusId );
+
 
 	public  List<Integer> getRunIdsByJobId( int jobId );
 

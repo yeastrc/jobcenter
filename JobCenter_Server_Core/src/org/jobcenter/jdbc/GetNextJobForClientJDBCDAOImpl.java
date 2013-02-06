@@ -20,19 +20,21 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	private static Logger log = Logger.getLogger(GetNextJobForClientJDBCDAOImpl.class);
 
 
-
-
-
 	private static String
-		getJobForJobRequestQuerySqlString
-		= "SELECT job.id AS job_id, job.request_id, job.job_type_id, job.priority AS job_priority, job.status_id, job.submit_date, job.submitter, "
-			+ " job.db_record_version_number AS job_db_record_version_number, "
-			+ " jt.id AS jt_id, jt.name, jt.description, jt.priority AS jt_priority, jt.module_name, jt.minimum_module_version "
-			+ "   FROM job INNER JOIN job_type AS jt ON job.job_type_id = jt.id"
-			+ " WHERE ( status_id = " + JobStatusValuesConstants.JOB_STATUS_SUBMITTED
-			+ "           OR  status_id = "  + JobStatusValuesConstants.JOB_STATUS_SOFT_ERROR
-			+ "           OR  status_id = "  + JobStatusValuesConstants.JOB_STATUS_REQUEUED + " )  "
-				+ " AND insert_complete = 'T' AND enabled = 1 AND ( ";
+	getJobForJobRequestQuerySqlString
+	= "SELECT job.*, job.id AS job_id, job.priority AS job_priority, "
+		+ " jt.id AS jt_id, jt.name, jt.description, jt.priority AS jt_priority, jt.module_name, jt.minimum_module_version "
+		+ "   FROM job INNER JOIN job_type AS jt ON job.job_type_id = jt.id"
+		
+		+ " WHERE ( status_id = " + JobStatusValuesConstants.JOB_STATUS_SUBMITTED
+		+ "           OR  status_id = "  + JobStatusValuesConstants.JOB_STATUS_SOFT_ERROR
+		+ "           OR  status_id = "  + JobStatusValuesConstants.JOB_STATUS_REQUEUED + " )  "
+		
+		+     " AND ( delay_job_until IS NULL OR delay_job_until < NOW()  ) " //  delay_job_until is not set or is in the past
+		
+		+     " AND insert_complete = 'T' AND enabled = 1 "
+		+     " AND ( ";
+
 
 	private static String
 	getJobForJobRequestQuerySqlStringOrderBy
@@ -145,6 +147,8 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 
 				int statusId = rs.getInt( "status_id" );
 
+				int jobParameterCount  = rs.getInt( "job_parameter_count" );
+
 				Date submitDate = rs.getTimestamp( "submit_date" );
 
 				String submitter = rs.getString( "submitter" );
@@ -156,13 +160,18 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 				job.setJobTypeId( jobTypeId );
 				job.setPriority( priority );
 				job.setStatusId( statusId );
+				job.setJobParameterCount( jobParameterCount );
 
 				job.setSubmitDate( submitDate );
 				job.setSubmitter( submitter );
 
-				// Current database record version number, for optimistic locking version tracking
 
-				job.setDbRecordVersionNumber(  rs.getInt( "job_db_record_version_number" ) );
+				job.setDelayJobUntil( rs.getTimestamp( "delay_job_until" ) );
+				job.setParamErrorRetryCount( rs.getInt( "param_error_retry_count" ) );
+				job.setSoftErrorRetryCount( rs.getInt( "soft_error_retry_count" ) );
+
+				// Current database record version number, for optimistic locking version tracking
+				job.setDbRecordVersionNumber(  rs.getInt( "db_record_version_number" ) );
 
 
 				JobType jobType = new JobType();

@@ -54,6 +54,7 @@
 				<value>org/jobcenter/dto/Request.hbm.xml</value>
 				<value>/org/jobcenter/dto/NodeClientStatusDTO.hbm.xml</value>
 				<value>org/jobcenter/dto/NodeAccessRule.hbm.xml</value>
+				<value>org/jobcenter/dto/JobSentToClient.hbm.xml</value>
 
 				<value>org/jobcenter/dtoserver/ConfigSystem.hbm.xml</value>
 
@@ -221,7 +222,12 @@
 		<property name="clientNodeNameCheck">
 			<ref bean="clientNodeNameCheck" />
 		</property>
-
+		<property name="getValueFromConfigService">
+			<ref bean="getValueFromConfigService" />
+		</property>
+		<property name="saveJobSentToClientService">
+			<ref bean="saveJobSentToClientService" />
+		</property>
 
 		<property name="getNextJobForClientJDBCDAO">
 			<ref bean="getNextJobForClientJDBCDAO" />
@@ -229,6 +235,8 @@
 		<property name="jobJDBCDAO">
 			<ref bean="jobJDBCDAO" />
 		</property>
+		
+
 	</bean>
 
 	<bean id="SubmitJobService" class="org.jobcenter.service.SubmitJobServiceImpl">
@@ -301,6 +309,9 @@
 
 		<property name="clientNodeNameCheck">
 			<ref bean="clientNodeNameCheck" />
+		</property>
+		<property name="getValueFromConfigService">
+			<ref bean="getValueFromConfigService" />
 		</property>
 
 		<property name="jobDAO">
@@ -684,6 +695,15 @@
 	</bean>
 
 
+	<bean id="saveJobSentToClientService" class="org.jobcenter.internalservice.SaveJobSentToClientServiceImpl">
+
+		<property name="jobSentToClientDAO">
+			<ref bean="jobSentToClientDAO" />
+		</property>
+	</bean>
+
+
+
 
 	<!-- ================================== -->
 
@@ -780,6 +800,12 @@
 	</bean>
 
 	<bean id="configSystemDAO" class="org.jobcenter.dao.ConfigSystemDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean id="jobSentToClientDAO" class="org.jobcenter.dao.JobSentToClientDAOImpl">
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
 		</property>

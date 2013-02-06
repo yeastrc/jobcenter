@@ -14,6 +14,7 @@ import org.jobcenter.request.JobRequest;
 import org.jobcenter.request.JobRequestModuleInfo;
 import org.jobcenter.response.JobResponse;
 import org.jobcenter.service.GetNextJobForClientService;
+import org.jobcenter.service_response.GetJobServiceResponse;
 
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.resource.Singleton;
@@ -74,10 +75,17 @@ public class GetNextJobForClientToProcess {
 
 
 		try {
+			
+			
+			while ( true ) { //  loop here since outside the transaction management of Spring
 
-			JobResponse jobResponse = getNextJobForClientService.getNextJobForClientService( jobRequest, remoteHost );
+				GetJobServiceResponse getJobServiceResponse = getNextJobForClientService.getNextJobForClientService( jobRequest, remoteHost );
 
-			return jobResponse;
+				if ( ! getJobServiceResponse.isTryAgain() ) {
+					
+					return getJobServiceResponse.getJobResponse();
+				}
+			}
 
 		} catch (Throwable e) {
 

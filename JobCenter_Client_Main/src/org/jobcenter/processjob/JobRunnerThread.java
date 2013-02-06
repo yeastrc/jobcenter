@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jobcenter.constants.JobConstants;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.RunMessageTypesConstants;
 import org.jobcenter.dto.Job;
@@ -216,7 +217,7 @@ public class JobRunnerThread extends Thread  {
 
 							log.info( "Setting current thread context class loader to class loader for module.  module sub directory " + moduleHolder.getModuleConfigDTO().getModuleSubDirectory() );
 						}
-						
+
 				        Thread.currentThread().setContextClassLoader( module.getClass().getClassLoader() );
 
 						//  pass shutdown request to the module.  Then can only wait for the module to return to process the results and exit the loop.
@@ -451,7 +452,33 @@ public class JobRunnerThread extends Thread  {
 
 				} else {
 
-					moduleRunStatus = processJob( runMessages, runOutputParams );
+					int jobParamsMapSize = job.getJobParameters().size();
+
+					if ( job.getJobParameterCount() != JobConstants.JOB_PARAMETER_COUNT_NOT_SET
+						&& jobParamsMapSize != job.getJobParameterCount() ) {
+
+						//  The number of job parameters passed does not match the value jobParameterCount on the Job object
+
+
+						moduleRunStatus = JobStatusValuesConstants.JOB_STATUS_SOFT_ERROR;
+
+						RunMessageDTO runMessageDTO = new RunMessageDTO();
+
+						runMessageDTO.setType( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR );
+
+						runMessageDTO.setMessage( "Setting soft error to retry the job.  "
+								+ "Number of job parameters passed to client does not match jobParameterCount field."
+								+ "  Number of parameters passed = " + jobParamsMapSize
+								+ ", jobParameterCount = " + job.getJobParameterCount() + ".");
+
+						runMessages.add( runMessageDTO );
+
+
+
+					} else {
+
+						moduleRunStatus = processJob( runMessages, runOutputParams );
+					}
 				}
 
 
