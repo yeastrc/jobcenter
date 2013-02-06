@@ -1,15 +1,17 @@
 
 The overall installation is to:
 
-1) build the application 
-	- Do NOT do if downloaded the ZIP file.
-	- Only do if downloaded the code from Subversion on Google Code. 
+1) Install required third party software
 
-2) create the database
-3) add configuration values in the database
-4) install the server in a Java application server (such as Tomcat) with Java 6 or higher installed.
-5) install the client on a machine with Java 6 or higher installed.
-6) configure_client_in_database
-7) install one or more modules in the client.
-8) update database with configuration for installed modules.
+2) build the application
+	- Do NOT do if downloaded the ZIP file.
+	- Only do if downloaded the code from Subversion on Google Code.
+
+3) create the database
+4) add configuration values in the database
+5) install the server in a Java application server (such as Tomcat) with Java 6 or higher installed.
+6) install the client on a machine with Java 6 or higher installed.
+7) configure_client_in_database
+8) install one or more modules in the client.
+9) update database with configuration for installed modules.
 
