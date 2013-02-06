@@ -32,7 +32,22 @@
   <property generated="never" lazy="false" name="priority" type="java.lang.Integer">
    <column name="priority" not-null="true"/>
   </property>
-  <property column="insert_complete" name="insertComplete"
-   not-null="true" type="string"/>
+  
+  <property generated="never" lazy="false" name="jobParameterCount" type="java.lang.Integer">
+   <column name="job_parameter_count" not-null="false"/>
+  </property>
+  
+  <property generated="never" lazy="false" name="delayJobUntil" type="java.sql.Timestamp">
+   <column length="19" name="delay_job_until" not-null="false"/>
+  </property>
+  
+  <property generated="never" lazy="false" name="paramErrorRetryCount" type="java.lang.Integer">
+   <column name="param_error_retry_count" not-null="true"/>
+  </property>
+  <property generated="never" lazy="false" name="softErrorRetryCount" type="java.lang.Integer">
+   <column name="soft_error_retry_count" not-null="true"/>
+  </property>
+  
+  <property column="insert_complete" name="insertComplete"  not-null="true" type="string"/>
  </class>
 </hibernate-mapping>

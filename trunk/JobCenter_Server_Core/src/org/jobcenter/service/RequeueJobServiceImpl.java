@@ -6,7 +6,6 @@ import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.dao.*;
 import org.jobcenter.dto.*;
 import org.jobcenter.internalservice.ClientNodeNameCheck;
-import org.jobcenter.jdbc.*;
 
 import org.jobcenter.request.*;
 import org.jobcenter.response.*;
@@ -154,6 +153,11 @@ public class RequeueJobServiceImpl implements RequeueJobService {
 		}
 		
 		job.setStatus( newStatus );
+		
+		//  reset these fields
+		job.setDelayJobUntil( null );
+		job.setParamErrorRetryCount( 0 );
+		job.setSoftErrorRetryCount( 0 );
 		
 		jobDAO.saveOrUpdate( job );
 		

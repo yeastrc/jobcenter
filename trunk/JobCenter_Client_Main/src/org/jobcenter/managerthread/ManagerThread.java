@@ -410,11 +410,11 @@ public class ManagerThread extends Thread {
 			log.info( "ClientControlFile: filename = '" + Constants.CLIENT_RUN_CONTROL_FILENAME + "' filepath is = '" + clientControlFile.getAbsolutePath() + "'." );
 
 			clientControlFileWriter = new BufferedWriter( new FileWriter( clientControlFile ) );
-			
+
 			if ( log.isDebugEnabled() ) {
-				
+
 				StringBuilder contentsSB = new StringBuilder( 2000);
-				
+
 				for ( String line : Constants.CLIENT_RUN_CONTROL_INITIAL_CONTENTS ) {
 
 					contentsSB.append( line  );
@@ -569,16 +569,6 @@ public class ManagerThread extends Thread {
 		keepRunning = false;  // Set thread of the current object to exit main processing loop.
 
 
-		//  call clientStatusUpdateThread
-
-
-		if ( clientStatusUpdateThread != null ) {
-
-			clientStatusUpdateThread.setStopRequestType( stopRequestType );
-
-			clientStatusUpdateThread.shutdown();
-		}
-
 
 
 		//  call getJobThread.shutdown();
@@ -621,6 +611,16 @@ public class ManagerThread extends Thread {
 
 		waitForWorkerThreadsToComplete();
 
+
+		//  call clientStatusUpdateThread
+
+
+		if ( clientStatusUpdateThread != null ) {
+
+			clientStatusUpdateThread.setStopRequestType( stopRequestType );
+
+			clientStatusUpdateThread.shutdown();
+		}
 
 
 		waitForClientStatusUpdateThreadToComplete();
@@ -913,9 +913,9 @@ public class ManagerThread extends Thread {
 
 		if ( getJobThread != null ) {
 
-			boolean getJobThreadExited = false;
+//			boolean getJobThreadExited = false;
 
-			while ( ! getJobThreadExited ) {
+//			while ( ! getJobThreadExited ) {
 				try {
 					getJobThread.join( WAIT_TIME_FOR_GET_JOB_THREAD_TO_EXIT_IN_SECONDS * 1000 );
 				} catch (InterruptedException e) {
@@ -927,13 +927,17 @@ public class ManagerThread extends Thread {
 
 					log.error( "The thread 'getJobThread' has not exited in the allocated time of "
 							+ WAIT_TIME_FOR_GET_JOB_THREAD_TO_EXIT_IN_SECONDS
-							+ " seconds.  The wait for 'getJobThread' to exit will be repeated with the same wait time." );
+							+ " seconds.  The thread 'getJobThread' will not be waited for any further." );
+
+//					log.error( "The thread 'getJobThread' has not exited in the allocated time of "
+//							+ WAIT_TIME_FOR_GET_JOB_THREAD_TO_EXIT_IN_SECONDS
+//							+ " seconds.  The wait for 'getJobThread' to exit will be repeated with the same wait time." );
 
 				} else {
 
-					getJobThreadExited = true;
+//					getJobThreadExited = true;
 				}
-			}
+//			}
 
 		} else {
 

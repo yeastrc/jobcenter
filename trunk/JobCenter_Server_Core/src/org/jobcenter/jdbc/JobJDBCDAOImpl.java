@@ -128,6 +128,85 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	}
 
 
+	
+
+
+
+	/**
+	 *
+	 */
+	private static String
+	updateDelayUntilAndParamErrorCntOnIdSqlString
+	= "UPDATE job SET delay_job_until = "
+		+ " DATE_ADD( NOW(),INTERVAL " + ServerCoreConstants.PARAM_ERROR_DELAY_TIME + " SECOND), " 
+		+ " param_error_retry_count = param_error_retry_count + 1 "
+		+ "   WHERE id = ?" ;
+
+
+
+	@Override
+	public void updateDelayUntilAndParamErrorCntOnId( int jobId ) {
+		{
+			final String method = "updateDelayUntilAndParamErrorCntOnId( Job job )";
+
+
+			if ( log.isDebugEnabled() ) {
+				log.debug( "Entering " + method );
+			}
+
+			PreparedStatement pstmt = null;
+
+			int rowsUpdated = 0;
+
+			Connection connection = null;
+
+			try {
+				connection = getConnection( );
+
+				pstmt = connection.prepareStatement( updateDelayUntilAndParamErrorCntOnIdSqlString );
+				
+				pstmt.setInt( 1, jobId );
+
+				rowsUpdated = pstmt.executeUpdate();
+
+				if ( rowsUpdated <= 0 ) {
+
+					log.info( method + ":No Rows Updated:  jobId = " + jobId
+							+ " \nSQL = '" + updateDelayUntilAndParamErrorCntOnIdSqlString );
+
+					throw new RecordNotUpdatedException( "RecordNotUpdatedException" );
+				}
+
+
+			} catch (RecordNotUpdatedException ex) {
+
+				throw ex;
+
+
+			} catch (Throwable sqlEx) {
+
+				log.error( method + ":Exception:  job.getId() = " + jobId 
+						+ " \nSQL = '" + updateJobStatusOnIdAndStatusIdSqlString
+						+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+				//  Wrap in RuntimeException for Spring Transactional rollback
+				throw new RuntimeException( sqlEx );
+
+			} finally {
+
+				if (connection != null) {
+					try {
+						connection.close();
+					} catch (SQLException ex) {
+						// ignore
+					}
+				}
+
+			}
+		}
+
+	}
+
 
 
 
@@ -232,6 +311,17 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 
 
+	/**
+	 * @param nodeId
+	 * @param job
+	 * @return
+	 */
+	@Override
+	public  RunDTO insertRunTableRecord( int nodeId, Job job )
+	{
+		return insertRunTableRecord( nodeId, job, JobStatusValuesConstants.JOB_STATUS_RUNNING );
+	}
+
 	private static final String
 	addRunRecordSqlString
 	= "INSERT INTO run "
@@ -242,10 +332,11 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	/**
 	 * @param nodeId
 	 * @param job
+	 * @param statusId
 	 * @return
 	 */
 	@Override
-	public  RunDTO insertRunTableRecord( int nodeId, Job job )
+	public  RunDTO insertRunTableRecord( int nodeId, Job job, int statusId )
 	{
 		final String method = "insertRunTableRecord";
 
@@ -280,7 +371,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			pstmt.setInt( 1, nodeId);
 
 			pstmt.setInt( 2, job.getId() );
-			pstmt.setInt( 3, JobStatusValuesConstants.JOB_STATUS_RUNNING );
+			pstmt.setInt( 3, statusId );
 
 			rowsInserted = pstmt.executeUpdate();
 
@@ -836,8 +927,8 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 */
 	private static String
 	insertJobSqlString
-	= "INSERT INTO job ( request_id, job_type_id, submitter, priority,  status_id, insert_complete, submit_date  )  "
-		+ "  VALUES ( ?, ?, ?, ?, ?, ?, NOW() ) " ;
+	= "INSERT INTO job ( request_id, job_type_id, submitter, priority,  status_id, job_parameter_count, insert_complete, submit_date  )  "
+		+ "  VALUES ( ?, ?, ?, ?, ?, ?, ?, NOW() ) " ;
 
 	/**
 	 * @param job
@@ -883,8 +974,9 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			pstmt.setInt( 4, job.getPriority() );
 
 			pstmt.setInt( 5, job.getStatusId() );
+			pstmt.setInt( 6, job.getJobParameterCount() );
 
-			pstmt.setString( 6, job.getInsertComplete() );
+			pstmt.setString( 7, job.getInsertComplete() );
 
 			rowsUpdated = pstmt.executeUpdate();
 
@@ -1705,6 +1797,14 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 
 
+	/**
+	 * @param sqlSB
+	 * @param listJobsRequest
+	 * @param getCount
+	 * @param connection
+	 * @return
+	 * @throws Throwable
+	 */
 	private PreparedStatement getJobListPreparedStmt( StringBuilder sqlSB, ListJobsRequest listJobsRequest, boolean getCount, Connection connection ) throws Throwable {
 
 		PreparedStatement pstmt = null;

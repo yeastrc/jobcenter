@@ -239,10 +239,20 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 		}
 
 		job.setRequestId( requestId );
+		
+		
+		int jobParameterCount = -1;
+		
+		Map<String, String> jobParameters = job.getJobParameters();
+		
+		if ( jobParameters != null ) {
+
+			jobParameterCount = jobParameters.size();
+		}
+		
+		job.setJobParameterCount( jobParameterCount );
 
 		jobJDBCDAO.insertJob( job );
-
-		Map<String,String > jobParameters = job.getJobParameters();
 
 		if ( jobParameters != null && ( ! jobParameters.isEmpty() ) ) {
 

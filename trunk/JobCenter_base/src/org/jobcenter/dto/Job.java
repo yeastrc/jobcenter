@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.jobcenter.constants.JobConstants;
 import org.jobcenter.util.JobUtilities;
 
 
@@ -40,7 +41,13 @@ public class Job {
 	private int statusId;
 
 	private String insertComplete = "T";
-
+	
+	private int jobParameterCount = JobConstants.JOB_PARAMETER_COUNT_NOT_SET;
+	
+	private Date delayJobUntil;
+	private int paramErrorRetryCount;
+	private int softErrorRetryCount;
+	
 
 	/**
 	 * Current database record version number, for optimistic locking version tracking
@@ -68,6 +75,12 @@ public class Job {
 
 	private Map<String, String> jobParameters;
 
+	private int jobParameterCountWhenRetrievedByGetJob = -1;
+
+	private int jobParameterCountComputedInClient = -1;
+
+	
+	
 
 	public static class ReverseSortByIdComparator implements Comparator<Job> {
 
@@ -307,5 +320,65 @@ public class Job {
 		this.insertComplete = insertComplete;
 	}
 
+	public int getJobParameterCount() {
+		return jobParameterCount;
+	}
+
+
+	public void setJobParameterCount(int jobParameterCount) {
+		this.jobParameterCount = jobParameterCount;
+	}
+
+
+	public int getJobParameterCountWhenRetrievedByGetJob() {
+		return jobParameterCountWhenRetrievedByGetJob;
+	}
+
+
+	public void setJobParameterCountWhenRetrievedByGetJob(
+			int jobParameterCountWhenRetrievedByGetJob) {
+		this.jobParameterCountWhenRetrievedByGetJob = jobParameterCountWhenRetrievedByGetJob;
+	}
+
+
+	public int getJobParameterCountComputedInClient() {
+		return jobParameterCountComputedInClient;
+	}
+
+
+	public void setJobParameterCountComputedInClient(
+			int jobParameterCountComputedInClient) {
+		this.jobParameterCountComputedInClient = jobParameterCountComputedInClient;
+	}
+
+
+	public Date getDelayJobUntil() {
+		return delayJobUntil;
+	}
+
+
+	public void setDelayJobUntil(Date delayJobUntil) {
+		this.delayJobUntil = delayJobUntil;
+	}
+
+
+	public int getParamErrorRetryCount() {
+		return paramErrorRetryCount;
+	}
+
+
+	public void setParamErrorRetryCount(int paramErrorRetryCount) {
+		this.paramErrorRetryCount = paramErrorRetryCount;
+	}
+
+
+	public int getSoftErrorRetryCount() {
+		return softErrorRetryCount;
+	}
+
+
+	public void setSoftErrorRetryCount(int softErrorRetryCount) {
+		this.softErrorRetryCount = softErrorRetryCount;
+	}
 
 }

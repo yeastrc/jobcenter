@@ -34,6 +34,12 @@ public interface ServerConfigKeyValues {
 	public static final String CLIENT_STATUS_NOTIFICATION_SERVER_ADDRESS = "client.status.notification.server.address";
 	
 	
+	public static final String SAVE_JOB_SENT_TO_CLIENT_FOR_DEBUGGING = "save.job.sent.to.client.for.debugging";
+	
+	
+	public static final String SOFT_ERROR_RETRY_COUNT_MAX = "soft.error.retry.count.max";
+	
+	
 	//  Special default values
 
 	public static final String CLIENT_CHECKIN_EMAIL_IN_PROVIDED_FILE = "***";

@@ -33,4 +33,11 @@ INSERT INTO config_system (config_key, config_value) VALUES ('client.status.noti
 INSERT INTO config_system (config_key, config_value) VALUES ('client.status.notification.server.address', '');
 
 
+
+--  soft error retry count max - a hard error is generated once this is reached, defaults to 5 if this is empty or cannot be parsed
+INSERT INTO config_system (config_key, config_value) VALUES ('soft.error.retry.count.max', '5');
+
+--  save each job sent to a client to the table 'job_sent_to_client'
+INSERT INTO config_system (config_key, config_value) VALUES ('save.job.sent.to.client.for.debugging', 'false');
+
 COMMIT;
