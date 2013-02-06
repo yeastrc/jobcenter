@@ -1,3 +1,0 @@
-
-This directory contains sample files that can be copied to the "config" directory
-for overriding the configuration in the jar file for this module.

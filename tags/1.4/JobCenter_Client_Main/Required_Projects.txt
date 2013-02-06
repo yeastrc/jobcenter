@@ -1,6 +1,0 @@
-
-Required Projects:
-
-JobCenter_base
-JobCenter_Client_Module_Interface
-JobCenter_Client_Root
