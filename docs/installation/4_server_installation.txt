@@ -19,6 +19,11 @@ This resource needs to be added to the context.xml file in the conf directory of
                         maxActive="100"
                         maxIdle="30"
                         maxWait="10000"
+
+                        minEvictableIdleTimeMillis="14400000"
+                        timeBetweenEvictionRunsMillis="3600000"
+                        numTestsPerEvictionRun="100"
+                                                
                         username="jobcenter"
                         password="jobcenter"
                         driverClassName="com.mysql.jdbc.Driver"
