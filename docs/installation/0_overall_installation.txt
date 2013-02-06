@@ -1,7 +1,10 @@
 
 The overall installation is to:
 
-1) build the application
+1) build the application 
+	- Do NOT do if downloaded the ZIP file.
+	- Only do if downloaded the code from Subversion on Google Code. 
+
 2) create the database
 3) add configuration values in the database
 4) install the server in a Java application server (such as Tomcat) with Java 6 or higher installed.
