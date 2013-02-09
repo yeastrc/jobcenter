@@ -8,6 +8,10 @@ SET AUTOCOMMIT=0;
 
 USE jobcenter;
 
+INSERT INTO config_system (`config_key`, `config_value`) VALUES ('client.checkin.wait.time', '300');
+INSERT INTO config_system (`config_key`, `config_value`) VALUES ('client.checkin.overage.before.late.percent', '40');
+INSERT INTO config_system (`config_key`, `config_value`) VALUES ('client.checkin.overage.before.late.max.value', '500');
+
 INSERT INTO config_system (config_key, config_value) VALUES ('client.checkin.notification.from.email', '***');
 
 --  to.email is a comma delimited list
