@@ -1,0 +1,8 @@
+
+To view the Jobcenter web GUI, open a browser and put
+"http://localhost:8080/jobcenter/" in the URL
+
+Click the link "list jobs" to view jobs and their status.
+
+Continue to "6_run_the_test_job_submitter.txt" for how to submit a job.
+Then return to the web GUI to view the job's status.
