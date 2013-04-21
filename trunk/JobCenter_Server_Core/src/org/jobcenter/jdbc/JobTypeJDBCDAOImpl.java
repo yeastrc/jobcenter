@@ -27,94 +27,97 @@ public class JobTypeJDBCDAOImpl extends JDBCBaseDAO implements JobTypeJDBCDAO {
 	@Override
 	public  List<JobType> getJobTypes( )
 	{
-		final String method = "getJobTypes";
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+		final List<JobType> jobTypes = new ArrayList<JobType>();
 
-		List<JobType> jobTypes = new ArrayList<JobType>();
-
-		JobType jobType = null;
-
-		Connection connection = null;
-
-		PreparedStatement pstmt = null;
-
-		ResultSet rs = null;
-
-		try {
-
-			connection = getConnection( );
-
-			//			connection = JobCenterDBConnectionFactory.getConnection( );
+		
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
+				final String method = "WORK-getJobTypes";
 
-			pstmt = connection.prepareStatement( getJobTypesQuerySqlString );
-
-			rs = pstmt.executeQuery();
-
-			while ( rs.next() ) {
-
-				jobType = new JobType();
-
-				jobType.setId( rs.getInt( "id" ) );
-				jobType.setPriority( rs.getInt( "priority" ) );
-				jobType.setName( rs.getString( "name" ) );
-				jobType.setDescription( rs.getString( "description" ) );
-				jobType.setModuleName( rs.getString( "module_name" ) );
-				jobType.setEnabled( rs.getBoolean( "enabled" ) );
-				jobType.setMinimumModuleVersion( rs.getShort( "minimum_module_version" ) );
-
-				jobTypes.add( jobType );
-			}
-
-		} catch (Exception sqlEx) {
-
-			log.error( method + ":Exception: \nSQL = '" + getJobTypesQuerySqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			if (connection != null) {
-				try {
-					connection.rollback();
-
-				} catch (SQLException ex) {
-					// ignore
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
 				}
-			}
 
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
+				JobType jobType = null;
 
-		} finally {
+//				Connection connection = null;
 
-			if (rs != null) {
+				PreparedStatement pstmt = null;
+
+				ResultSet rs = null;
+
 				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
+
+//					connection = getConnection( );
+
+					//			connection = JobCenterDBConnectionFactory.getConnection( );
+
+
+
+					pstmt = connection.prepareStatement( getJobTypesQuerySqlString );
+
+					rs = pstmt.executeQuery();
+
+					while ( rs.next() ) {
+
+						jobType = new JobType();
+
+						jobType.setId( rs.getInt( "id" ) );
+						jobType.setPriority( rs.getInt( "priority" ) );
+						jobType.setName( rs.getString( "name" ) );
+						jobType.setDescription( rs.getString( "description" ) );
+						jobType.setModuleName( rs.getString( "module_name" ) );
+						jobType.setEnabled( rs.getBoolean( "enabled" ) );
+						jobType.setMinimumModuleVersion( rs.getShort( "minimum_module_version" ) );
+
+						jobTypes.add( jobType );
+					}
+
+				} catch (Exception sqlEx) {
+
+					log.error( method + ":Exception: \nSQL = '" + getJobTypesQuerySqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					if (connection != null) {
+						try {
+							connection.rollback();
+
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+
+//					releaseConnection( connection );
 				}
+
 			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
-
+		} );
 
 		return jobTypes;
 	}

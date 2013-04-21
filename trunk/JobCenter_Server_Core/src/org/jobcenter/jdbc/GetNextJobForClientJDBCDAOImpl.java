@@ -17,7 +17,7 @@ import org.jobcenter.request.JobRequestModuleInfo;
 
 public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNextJobForClientJDBCDAO {
 
-	private static Logger log = Logger.getLogger(GetNextJobForClientJDBCDAOImpl.class);
+	private static final Logger log = Logger.getLogger(GetNextJobForClientJDBCDAOImpl.class);
 
 
 	private static String
@@ -46,208 +46,218 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	 * @return
 	 */
 	@Override
-	public Job retrieveNextJobRecordForJobRequest( JobRequest jobRequest )
+	public Job retrieveNextJobRecordForJobRequest( final JobRequest jobRequest )
 	{
-		final String method = "retrieveJobForJobRequest";
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+		//  Declare array to store result in.
+		
+		final Job jobResult[] = { null };
+		
+		
+		
+		
+		
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+	        public void execute(Connection connection) throws SQLException {
 
-		if ( jobRequest == null ) {
+	        	final String method = "retrieveJobForJobRequest-Work";
 
-			log.error("JobService::retrieveJob  IllegalArgument:jobRequest == null");
+	        	if ( log.isDebugEnabled() ) {
+	        		log.debug( "Entering " + method );
+	        	}
 
-			throw new IllegalArgumentException( "jobRequest == null" );
-		}
+	        	if ( jobRequest == null ) {
 
-		List<JobRequestModuleInfo> clientModules = jobRequest.getClientModules();
+	        		log.error("JobService::retrieveJob  IllegalArgument:jobRequest == null");
 
-		if ( clientModules == null ) {
+	        		throw new IllegalArgumentException( "jobRequest == null" );
+	        	}
 
-			log.error( method + "  IllegalArgument:jobRequest.getClientModules() == null");
+	        	List<JobRequestModuleInfo> clientModules = jobRequest.getClientModules();
 
-			throw new IllegalArgumentException( "jobRequest.getClientModules() == null" );
-		}
+	        	if ( clientModules == null ) {
 
-		if ( clientModules.isEmpty() ) {
+	        		log.error( method + "  IllegalArgument:jobRequest.getClientModules() == null");
 
-			log.error( method + " IllegalArgument:jobRequest.getClientModules() is empty");
+	        		throw new IllegalArgumentException( "jobRequest.getClientModules() == null" );
+	        	}
 
-			throw new IllegalArgumentException( "jobRequest.getClientModules() is empty" );
-		}
+	        	if ( clientModules.isEmpty() ) {
 
+	        		log.error( method + " IllegalArgument:jobRequest.getClientModules() is empty");
 
+	        		throw new IllegalArgumentException( "jobRequest.getClientModules() is empty" );
+	        	}
 
-		Job job = null;
 
 
-		PreparedStatement pstmt = null;
+	        	Job job = null;
 
-		ResultSet rs = null;
 
-		StringBuilder sql = new StringBuilder( 1000 );
+	        	PreparedStatement pstmt = null;
 
-		sql.append( getJobForJobRequestQuerySqlString );
+	        	ResultSet rs = null;
 
-		boolean first = true;
+	        	StringBuilder sql = new StringBuilder( 1000 );
 
-		for ( JobRequestModuleInfo moduleInfo : clientModules ) {
+	        	sql.append( getJobForJobRequestQuerySqlString );
 
-			if ( first ) {
+	        	boolean first = true;
 
-				first = false;
-			} else {
+	        	for ( JobRequestModuleInfo moduleInfo : clientModules ) {
 
-				sql.append( " OR ");
-			}
+	        		if ( first ) {
 
-			sql.append( " ( jt.module_name = ? AND jt.minimum_module_version <= ? ) " );
-		}
+	        			first = false;
+	        		} else {
 
-		sql.append( getJobForJobRequestQuerySqlStringOrderBy );
+	        			sql.append( " OR ");
+	        		}
 
-		String sqlString = sql.toString();
+	        		sql.append( " ( jt.module_name = ? AND jt.minimum_module_version <= ? ) " );
+	        	}
 
-		Connection connection = null;
+	        	sql.append( getJobForJobRequestQuerySqlStringOrderBy );
 
+	        	String sqlString = sql.toString();
 
-		try {
 
-			connection = getConnection( );
+	        	try {
 
-			pstmt = connection.prepareStatement( sqlString );
+	        		pstmt = connection.prepareStatement( sqlString );
 
-			int paramIndex = 0;
+	        		int paramIndex = 0;
 
-			for ( JobRequestModuleInfo moduleInfo : clientModules ) {
+	        		for ( JobRequestModuleInfo moduleInfo : clientModules ) {
 
-				paramIndex++;
+	        			paramIndex++;
 
-				pstmt.setString( paramIndex, moduleInfo.getModuleName() );
+	        			pstmt.setString( paramIndex, moduleInfo.getModuleName() );
 
-				paramIndex++;
+	        			paramIndex++;
 
-				pstmt.setInt( paramIndex, moduleInfo.getModuleVersion() );
-			}
+	        			pstmt.setInt( paramIndex, moduleInfo.getModuleVersion() );
+	        		}
 
 
-			rs = pstmt.executeQuery();
+	        		rs = pstmt.executeQuery();
 
-			if ( rs.next() ) {
+	        		if ( rs.next() ) {
 
 
-				int job_id = rs.getInt( "job_id" );
+	        			int job_id = rs.getInt( "job_id" );
 
-				int requestId = rs.getInt( "request_id" );
+	        			int requestId = rs.getInt( "request_id" );
 
-				int jobTypeId = rs.getInt( "job_type_id" );
+	        			int jobTypeId = rs.getInt( "job_type_id" );
 
-				int priority = rs.getInt( "job_priority" );
+	        			int priority = rs.getInt( "job_priority" );
 
-				int statusId = rs.getInt( "status_id" );
+	        			int statusId = rs.getInt( "status_id" );
 
-				int jobParameterCount  = rs.getInt( "job_parameter_count" );
+	        			int jobParameterCount  = rs.getInt( "job_parameter_count" );
 
-				Date submitDate = rs.getTimestamp( "submit_date" );
+	        			Date submitDate = rs.getTimestamp( "submit_date" );
 
-				String submitter = rs.getString( "submitter" );
+	        			String submitter = rs.getString( "submitter" );
 
-				job = new Job();
+	        			job = new Job();
 
-				job.setId( job_id );
-				job.setRequestId( requestId );
-				job.setJobTypeId( jobTypeId );
-				job.setPriority( priority );
-				job.setStatusId( statusId );
-				job.setJobParameterCount( jobParameterCount );
+	        			job.setId( job_id );
+	        			job.setRequestId( requestId );
+	        			job.setJobTypeId( jobTypeId );
+	        			job.setPriority( priority );
+	        			job.setStatusId( statusId );
+	        			job.setJobParameterCount( jobParameterCount );
 
-				job.setSubmitDate( submitDate );
-				job.setSubmitter( submitter );
+	        			job.setSubmitDate( submitDate );
+	        			job.setSubmitter( submitter );
 
 
-				job.setDelayJobUntil( rs.getTimestamp( "delay_job_until" ) );
-				job.setParamErrorRetryCount( rs.getInt( "param_error_retry_count" ) );
-				job.setSoftErrorRetryCount( rs.getInt( "soft_error_retry_count" ) );
+	        			job.setDelayJobUntil( rs.getTimestamp( "delay_job_until" ) );
+	        			job.setParamErrorRetryCount( rs.getInt( "param_error_retry_count" ) );
+	        			job.setSoftErrorRetryCount( rs.getInt( "soft_error_retry_count" ) );
 
-				// Current database record version number, for optimistic locking version tracking
-				job.setDbRecordVersionNumber(  rs.getInt( "db_record_version_number" ) );
+	        			// Current database record version number, for optimistic locking version tracking
+	        			job.setDbRecordVersionNumber(  rs.getInt( "db_record_version_number" ) );
 
 
-				JobType jobType = new JobType();
+	        			JobType jobType = new JobType();
 
-				job.setJobType( jobType );
+	        			job.setJobType( jobType );
 
-				int jobTypeRecordId = rs.getInt( "jt_id" );
+	        			int jobTypeRecordId = rs.getInt( "jt_id" );
 
-				int jobTypePriority = rs.getInt( "jt_priority" );
+	        			int jobTypePriority = rs.getInt( "jt_priority" );
 
-				int minimumModuleVersion = rs.getInt( "minimum_module_version" );
+	        			int minimumModuleVersion = rs.getInt( "minimum_module_version" );
 
-				String jobTypeName = rs.getString( "name" );
+	        			String jobTypeName = rs.getString( "name" );
 
-				String jobTypeModuleName =  rs.getString( "module_name" );
+	        			String jobTypeModuleName =  rs.getString( "module_name" );
 
-				jobType.setId( jobTypeRecordId );
+	        			jobType.setId( jobTypeRecordId );
 
-				jobType.setPriority( jobTypePriority );
+	        			jobType.setPriority( jobTypePriority );
 
-				jobType.setMinimumModuleVersion( minimumModuleVersion );
+	        			jobType.setMinimumModuleVersion( minimumModuleVersion );
 
-				jobType.setModuleName( jobTypeModuleName );
+	        			jobType.setModuleName( jobTypeModuleName );
 
-				jobType.setName( jobTypeName );
+	        			jobType.setName( jobTypeName );
 
-			}
+	        		}
 
 
-		} catch (Throwable sqlEx) {
+	        	} catch (Throwable sqlEx) {
 
-			log.error( method + ":Exception: \nSQL = '" + sqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+	        		log.error( method + ":Exception: \nSQL = '" + sqlString
+	        				+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
 
-			if (connection != null) {
-				try {
-					connection.rollback();
+	        		if (connection != null) {
+	        			try {
+	        				connection.rollback();
 
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
+	        			} catch (SQLException ex) {
+	        				// ignore
+	        			}
+	        		}
 
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
+	        		//  Wrap in RuntimeException for Spring Transactional rollback
+	        		throw new RuntimeException( sqlEx );
 
-		} finally {
+	        	} finally {
 
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
+	        		if (rs != null) {
+	        			try {
+	        				rs.close();
+	        			} catch (SQLException ex) {
+	        				// ignore
+	        			}
+	        		}
 
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
+	        		if (pstmt != null) {
+	        			try {
+	        				pstmt.close();
+	        			} catch (SQLException ex) {
+	        				// ignore
+	        			}
+	        		}
 
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
+	        	}
 
-		}
-
-		return job;
-	}
+	        	// store the resulting job in the array declared in the surrounding method
+	        	jobResult[0] = job;
+	        }
+		} );
+		
+		
+		//  Outside the call to do work, the jobResult[0] has been updated.
+		
+    	return jobResult[0];
+		
+	}		
+		
 
 
 
