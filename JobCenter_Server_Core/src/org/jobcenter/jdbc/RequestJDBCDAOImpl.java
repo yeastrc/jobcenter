@@ -117,233 +117,233 @@ public class RequestJDBCDAOImpl extends JDBCBaseDAO implements RequestJDBCDAO {
 	/* (non-Javadoc)
 	 * @see org.jobcenter.jdbc.RequestJDBCDAO#getRequestIdList(org.jobcenter.request.ListRequestsRequest)
 	 */
-	public  List<Integer>  getRequestIdList( ListRequestsRequest listRequestsRequest )
+	public  List<Integer>  getRequestIdList( final ListRequestsRequest listRequestsRequest )
 	{
-		final String method = "getRequestIdList";
+		final List<Integer> requestIdList = new ArrayList<Integer>( ServerCoreConstants.MAX_JOBS_RETURNED + 1 );
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
-
-		List<Integer> requestIdList = new ArrayList<Integer>( ServerCoreConstants.MAX_JOBS_RETURNED + 1 );
-
-		Connection connection = null;
-
-		PreparedStatement pstmt = null;
-
-		ResultSet rs = null;
-
-		String sql = null;
-
-		try {
-
-			connection = getConnection( );
-
-			StringBuilder sqlSB = new StringBuilder( 1000 );
-
-			sqlSB.append( getRequestIdListQuerySqlStringMainQuery );
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-			boolean firstMaxJobIdCriteria = true;
+				final String method = "WORK-getRequestIdList";
 
-			StringBuilder sqlMaxJobIdCriteriaSB = new StringBuilder( 1000 );
-			
-			
-			boolean firstOtherCriteria = true;
-
-			StringBuilder sqlOtherCriteriaSB = new StringBuilder( 1000 );
-			
-			
-			// job limiting parameters
-			
-			
-			Set<Integer> statusIds = listRequestsRequest.getStatusIds();
-
-			if ( statusIds != null && ( ! statusIds.isEmpty() ) ) {
-
-				if ( firstMaxJobIdCriteria ) {
-					firstMaxJobIdCriteria = false;
-				} else {
-					sqlMaxJobIdCriteriaSB.append( " AND " );
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
 				}
 
-				sqlMaxJobIdCriteriaSB.append( " ( status_id IN ( " );
+//				Connection connection = null;
 
-				boolean firstStatus = true;
+				PreparedStatement pstmt = null;
 
-				for ( int status : statusIds ) {
+				ResultSet rs = null;
 
-					if ( firstStatus ) {
-						firstStatus = false;
-					} else {
+				String sql = null;
 
-						sqlMaxJobIdCriteriaSB.append( ", " );
+				try {
+
+//					connection = getConnection( );
+
+					StringBuilder sqlSB = new StringBuilder( 1000 );
+
+					sqlSB.append( getRequestIdListQuerySqlStringMainQuery );
+
+
+					boolean firstMaxJobIdCriteria = true;
+
+					StringBuilder sqlMaxJobIdCriteriaSB = new StringBuilder( 1000 );
+
+
+					boolean firstOtherCriteria = true;
+
+					StringBuilder sqlOtherCriteriaSB = new StringBuilder( 1000 );
+
+
+					// job limiting parameters
+
+
+					Set<Integer> statusIds = listRequestsRequest.getStatusIds();
+
+					if ( statusIds != null && ( ! statusIds.isEmpty() ) ) {
+
+						if ( firstMaxJobIdCriteria ) {
+							firstMaxJobIdCriteria = false;
+						} else {
+							sqlMaxJobIdCriteriaSB.append( " AND " );
+						}
+
+						sqlMaxJobIdCriteriaSB.append( " ( status_id IN ( " );
+
+						boolean firstStatus = true;
+
+						for ( int status : statusIds ) {
+
+							if ( firstStatus ) {
+								firstStatus = false;
+							} else {
+
+								sqlMaxJobIdCriteriaSB.append( ", " );
+							}
+							sqlMaxJobIdCriteriaSB.append( status );
+						}
+
+						sqlMaxJobIdCriteriaSB.append( " ) ) " );
 					}
-					sqlMaxJobIdCriteriaSB.append( status );
-				}
 
-				sqlMaxJobIdCriteriaSB.append( " ) ) " );
-			}
+					String jobTypeName = listRequestsRequest.getJobTypeName();
 
-			String jobTypeName = listRequestsRequest.getJobTypeName();
+					if ( ! StringUtils.isEmpty( jobTypeName ) ) {
 
-			if ( ! StringUtils.isEmpty( jobTypeName ) ) {
+						if ( firstOtherCriteria ) {
+							firstOtherCriteria = false;
+						} else {
+							sqlOtherCriteriaSB.append( " AND " );
+						}
+						sqlOtherCriteriaSB.append( " jt.name = ? " );
+					}
 
-				if ( firstOtherCriteria ) {
-					firstOtherCriteria = false;
-				} else {
-					sqlOtherCriteriaSB.append( " AND " );
-				}
-				sqlOtherCriteriaSB.append( " jt.name = ? " );
-			}
+					if ( listRequestsRequest.getRequestId() != null ) {
 
-			if ( listRequestsRequest.getRequestId() != null ) {
+						if ( firstOtherCriteria ) {
+							firstOtherCriteria = false;
+						} else {
+							sqlOtherCriteriaSB.append( " AND " );
+						}
+						sqlOtherCriteriaSB.append( " job.request_id = ? " );
+					}
 
-				if ( firstOtherCriteria ) {
-					firstOtherCriteria = false;
-				} else {
-					sqlOtherCriteriaSB.append( " AND " );
-				}
-				sqlOtherCriteriaSB.append( " job.request_id = ? " );
-			}
+					if ( ! StringUtils.isEmpty( listRequestsRequest.getRequestTypeName() ) ) {
 
-			if ( ! StringUtils.isEmpty( listRequestsRequest.getRequestTypeName() ) ) {
-
-				if ( firstOtherCriteria ) {
-					firstOtherCriteria = false;
-				} else {
-					sqlOtherCriteriaSB.append( " AND " );
-				}
-				sqlOtherCriteriaSB.append( " rt.name = ? " );
-			}
+						if ( firstOtherCriteria ) {
+							firstOtherCriteria = false;
+						} else {
+							sqlOtherCriteriaSB.append( " AND " );
+						}
+						sqlOtherCriteriaSB.append( " rt.name = ? " );
+					}
 
 
-			if ( ! firstMaxJobIdCriteria ) {
-				
-				//  found MaxJobId criteria ( utilizes the job with the highest id for a given request )
-				
-				
-				sqlSB.append( getRequestIdListQuerySqlStringMaxJobIdCriteriaStart );
-				
-				String sqlMaxJobIdCriteria = sqlMaxJobIdCriteriaSB.toString();
-				
-				sqlSB.append( sqlMaxJobIdCriteria );
-				
-				sqlSB.append( getRequestIdListQuerySqlStringMaxJobIdCriteriaEnd );
-			}
-			
-			
-			if ( ! firstOtherCriteria ) {
-				
-				//  found other criteria
-				
-				
-				sqlSB.append( getRequestIdListQuerySqlStringOtherCriteriaStart );
-				
-				String sqlOtherCriteria = sqlOtherCriteriaSB.toString();
-				
-				sqlSB.append( sqlOtherCriteria );
-				
-				sqlSB.append( getRequestIdListQuerySqlStringOtherCriteriaEnd );
-			}
-			
-			
-			
-			sqlSB.append( getRequestIdListQuerySqlStringLastPart );
+					if ( ! firstMaxJobIdCriteria ) {
+
+						//  found MaxJobId criteria ( utilizes the job with the highest id for a given request )
 
 
-			sql = sqlSB.toString();
+						sqlSB.append( getRequestIdListQuerySqlStringMaxJobIdCriteriaStart );
 
-			pstmt = connection.prepareStatement( sql );
+						String sqlMaxJobIdCriteria = sqlMaxJobIdCriteriaSB.toString();
 
-			int paramCounter = 0;
+						sqlSB.append( sqlMaxJobIdCriteria );
 
-			// search params
-
-			if ( ! StringUtils.isEmpty( jobTypeName ) ) {
-
-				paramCounter++;
-				pstmt.setString( paramCounter, jobTypeName );
-			}
-
-			if ( listRequestsRequest.getRequestId() != null ) {
-
-				paramCounter++;
-				pstmt.setInt( paramCounter,  listRequestsRequest.getRequestId()  );
-			}
-
-			if ( ! StringUtils.isEmpty( listRequestsRequest.getRequestTypeName() ) ) {
-
-				paramCounter++;
-				pstmt.setString( paramCounter,  listRequestsRequest.getRequestTypeName()  );
-			}
-
-			//  Limit params
-
-			if ( listRequestsRequest.getIndexStart() != null ) {
-
-				paramCounter++;
-				pstmt.setInt( paramCounter,  listRequestsRequest.getIndexStart() );
-			} else {
-				paramCounter++;
-				pstmt.setInt( paramCounter, 0 );
-			}
-
-			if ( listRequestsRequest.getJobsReturnCountMax() != null
-					&& listRequestsRequest.getJobsReturnCountMax() <= ServerCoreConstants.MAX_REQUESTS_RETURNED ) {
-
-				paramCounter++;
-				pstmt.setInt( paramCounter,  listRequestsRequest.getJobsReturnCountMax() );
-			} else {
-				paramCounter++;
-				pstmt.setInt( paramCounter,  ServerCoreConstants.MAX_JOBS_RETURNED );
-			}
+						sqlSB.append( getRequestIdListQuerySqlStringMaxJobIdCriteriaEnd );
+					}
 
 
-			rs = pstmt.executeQuery();
+					if ( ! firstOtherCriteria ) {
 
-			while ( rs.next() ) {
-
-				int requestId = rs.getInt( "request_id" );
-
-				requestIdList.add( requestId );
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception: \nSQL = '" + sql
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
+						//  found other criteria
 
 
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
+						sqlSB.append( getRequestIdListQuerySqlStringOtherCriteriaStart );
+
+						String sqlOtherCriteria = sqlOtherCriteriaSB.toString();
+
+						sqlSB.append( sqlOtherCriteria );
+
+						sqlSB.append( getRequestIdListQuerySqlStringOtherCriteriaEnd );
+					}
+
+
+
+					sqlSB.append( getRequestIdListQuerySqlStringLastPart );
+
+
+					sql = sqlSB.toString();
+
+					pstmt = connection.prepareStatement( sql );
+
+					int paramCounter = 0;
+
+					// search params
+
+					if ( ! StringUtils.isEmpty( jobTypeName ) ) {
+
+						paramCounter++;
+						pstmt.setString( paramCounter, jobTypeName );
+					}
+
+					if ( listRequestsRequest.getRequestId() != null ) {
+
+						paramCounter++;
+						pstmt.setInt( paramCounter,  listRequestsRequest.getRequestId()  );
+					}
+
+					if ( ! StringUtils.isEmpty( listRequestsRequest.getRequestTypeName() ) ) {
+
+						paramCounter++;
+						pstmt.setString( paramCounter,  listRequestsRequest.getRequestTypeName()  );
+					}
+
+					//  Limit params
+
+					if ( listRequestsRequest.getIndexStart() != null ) {
+
+						paramCounter++;
+						pstmt.setInt( paramCounter,  listRequestsRequest.getIndexStart() );
+					} else {
+						paramCounter++;
+						pstmt.setInt( paramCounter, 0 );
+					}
+
+					if ( listRequestsRequest.getJobsReturnCountMax() != null
+							&& listRequestsRequest.getJobsReturnCountMax() <= ServerCoreConstants.MAX_REQUESTS_RETURNED ) {
+
+						paramCounter++;
+						pstmt.setInt( paramCounter,  listRequestsRequest.getJobsReturnCountMax() );
+					} else {
+						paramCounter++;
+						pstmt.setInt( paramCounter,  ServerCoreConstants.MAX_JOBS_RETURNED );
+					}
+
+
+					rs = pstmt.executeQuery();
+
+					while ( rs.next() ) {
+
+						int requestId = rs.getInt( "request_id" );
+
+						requestIdList.add( requestId );
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception: \nSQL = '" + sql
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+//					releaseConnection( connection );
 				}
 			}
-		}
+		} );
 
 
 		return requestIdList;

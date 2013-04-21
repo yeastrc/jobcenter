@@ -106,7 +106,7 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 
 		if ( log.isDebugEnabled() ) {
 
-			log.debug( "JobService::retrieveJob  submitJobRequest.getNodeName() = |" + submitJobRequest.getNodeName() + "|, remoteHost = |" + remoteHost + "|."  );
+			log.debug( "SubmitJobServiceImpl::submitJob  submitJobRequest.getNodeName() = |" + submitJobRequest.getNodeName() + "|, remoteHost = |" + remoteHost + "|."  );
 		}
 
 		SubmitJobResponse submitJobResponse = new SubmitJobResponse();
@@ -130,7 +130,7 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 
 			if ( log.isInfoEnabled() ) {
 
-				log.info( "JobService::retrieveJob: RequestTypeName not found:  submitJobRequest.getRequestTypeName() = |" + submitJobRequest.getRequestTypeName() + "|."  );
+				log.info( "SubmitJobServiceImpl::submitJob: RequestTypeName not found:  submitJobRequest.getRequestTypeName() = |" + submitJobRequest.getRequestTypeName() + "|."  );
 			}
 
 			submitJobResponse.setErrorResponse( true );
@@ -154,7 +154,7 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 
 				if ( log.isInfoEnabled() ) {
 
-					log.info( "JobService::retrieveJob: RequestTypeName not found:  submitJobRequest.getRequestTypeName() = |" + submitJobRequest.getRequestTypeName() + "|."  );
+					log.info( "SubmitJobServiceImpl::submitJob: RequestTypeName not found:  submitJobRequest.getRequestTypeName() = |" + submitJobRequest.getRequestTypeName() + "|."  );
 				}
 
 				submitJobResponse.setErrorResponse( true );
@@ -179,7 +179,7 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 
 			if ( log.isInfoEnabled() ) {
 
-				log.info( "JobService::retrieveJob: JobTypeName not found:  submitJobRequest.getJobTypeName() = |" + submitJobRequest.getJobTypeName() + "|."  );
+				log.info( "SubmitJobServiceImpl::submitJob: JobTypeName not found:  submitJobRequest.getJobTypeName() = |" + submitJobRequest.getJobTypeName() + "|."  );
 			}
 
 			submitJobResponse.setErrorResponse( true );
@@ -197,7 +197,7 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 
 			if ( log.isInfoEnabled() ) {
 
-				log.info( "JobService::retrieveJob: JobType record disabled :  submitJobRequest.getName() = |" + submitJobRequest.getJobTypeName() + "|."  );
+				log.info( "SubmitJobServiceImpl::submitJob: JobType record disabled :  submitJobRequest.getName() = |" + submitJobRequest.getJobTypeName() + "|."  );
 			}
 
 			submitJobResponse.setErrorResponse( true );

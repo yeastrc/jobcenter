@@ -28,87 +28,87 @@ public class RequestTypeJDBCDAOImpl extends JDBCBaseDAO implements RequestTypeJD
 	 */
 	public  List<RequestTypeDTO> getRequestTypes( )
 	{
-		final String method = "getRequestTypes";
+		final List<RequestTypeDTO> requestTypes = new ArrayList<RequestTypeDTO>();
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
-		List<RequestTypeDTO> requestTypes = new ArrayList<RequestTypeDTO>();
 
-		RequestTypeDTO requestType = null;
+				final String method = "WORK-getRequestTypes";
 
-		Connection connection = null;
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
 
-		PreparedStatement pstmt = null;
+				RequestTypeDTO requestType = null;
 
-		ResultSet rs = null;
+//				Connection connection = null;
 
-		try {
+				PreparedStatement pstmt = null;
 
-			connection = getConnection( );
+				ResultSet rs = null;
 
-//			connection = JobCenterDBConnectionFactory.getConnection( );
-
-			pstmt = connection.prepareStatement( getRequestTypesQuerySqlString );
-
-			rs = pstmt.executeQuery();
-
-			while ( rs.next() ) {
-
-				requestType = new RequestTypeDTO();
-
-				requestType.setId( rs.getInt( "id" ) );
-				requestType.setName( rs.getString( "name" ) );
-
-				requestTypes.add( requestType );
-
-			}
-
-		} catch (Exception sqlEx) {
-
-			log.error( method + ":Exception: \nSQL = '" + getRequestTypesQuerySqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			if (connection != null) {
 				try {
-					connection.rollback();
 
-				} catch (SQLException ex) {
-					// ignore
+//					connection = getConnection( );
+
+					//			connection = JobCenterDBConnectionFactory.getConnection( );
+
+					pstmt = connection.prepareStatement( getRequestTypesQuerySqlString );
+
+					rs = pstmt.executeQuery();
+
+					while ( rs.next() ) {
+
+						requestType = new RequestTypeDTO();
+
+						requestType.setId( rs.getInt( "id" ) );
+						requestType.setName( rs.getString( "name" ) );
+
+						requestTypes.add( requestType );
+
+					}
+
+				} catch (Exception sqlEx) {
+
+					log.error( method + ":Exception: \nSQL = '" + getRequestTypesQuerySqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					if (connection != null) {
+						try {
+							connection.rollback();
+
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+//					releaseConnection( connection );
 				}
 			}
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
+		} );
 
 
 		return requestTypes;

@@ -55,76 +55,87 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @throws Exception
 	 */
 	@Override
-	public  void updateJobStatusOnIdAndDbRecordVersionNumber( Job job, int newJobStatus )
+	public  void updateJobStatusOnIdAndDbRecordVersionNumber( final Job job, final int newJobStatus )
 	{
-		final String method = "updateJobStatus( Job job, int newJobStatus )";
+		
 
-		if ( job == null ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", job == null" );
-		}
-
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
-
-		PreparedStatement pstmt = null;
-
-		int rowsUpdated = 0;
-
-		Connection connection = null;
-
-		try {
-			connection = getConnection( );
-
-			pstmt = connection.prepareStatement( updateJobStatusOnIdAndStatusIdSqlString );
-
-			pstmt.setInt( 1, newJobStatus );
-
-			pstmt.setInt( 2, job.getDbRecordVersionNumber() + 1 );
-
-			pstmt.setInt( 3, job.getId() );
-
-			pstmt.setInt( 4, job.getDbRecordVersionNumber() );
-
-			rowsUpdated = pstmt.executeUpdate();
-
-			if ( rowsUpdated <= 0 ) {
-
-				log.info( method + ":No Rows Updated:  job.getId() = " + job.getId() + ", job.getDbRecordVersionNumber() = " + job.getDbRecordVersionNumber()
-						+ " \nSQL = '" + updateJobStatusOnIdAndStatusIdSqlString );
-
-				throw new RecordNotUpdatedException( "RecordNotUpdatedException" );
-			}
-
-			//  increment since did same on db using SQL
-			job.setDbRecordVersionNumber( job.getDbRecordVersionNumber() + 1 );
-
-		} catch (RecordNotUpdatedException ex) {
-
-			throw ex;
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		} catch (Throwable sqlEx) {
+				final String method = "WORK-updateJobStatus( Job job, int newJobStatus )";
 
-			log.error( method + ":Exception:  job.getId() = " + job.getId() + ", job.getDbRecordVersionNumber() = " + job.getDbRecordVersionNumber()
-					+ " \nSQL = '" + updateJobStatusOnIdAndStatusIdSqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+				if ( job == null ) {
 
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
+					throw new IllegalArgumentException( "in method method: " + method  + ", job == null" );
+				}
 
-		} finally {
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
 
-			if (connection != null) {
+				PreparedStatement pstmt = null;
+
+				int rowsUpdated = 0;
+
+				//		Connection connection = null;
+
 				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
+					//			connection = getConnection( );
+
+					pstmt = connection.prepareStatement( updateJobStatusOnIdAndStatusIdSqlString );
+
+					pstmt.setInt( 1, newJobStatus );
+
+					pstmt.setInt( 2, job.getDbRecordVersionNumber() + 1 );
+
+					pstmt.setInt( 3, job.getId() );
+
+					pstmt.setInt( 4, job.getDbRecordVersionNumber() );
+
+					rowsUpdated = pstmt.executeUpdate();
+
+					if ( rowsUpdated <= 0 ) {
+
+						log.info( method + ":No Rows Updated:  job.getId() = " + job.getId() + ", job.getDbRecordVersionNumber() = " + job.getDbRecordVersionNumber()
+								+ " \nSQL = '" + updateJobStatusOnIdAndStatusIdSqlString );
+
+						throw new RecordNotUpdatedException( "RecordNotUpdatedException" );
+					}
+
+					//  increment since did same on db using SQL
+					job.setDbRecordVersionNumber( job.getDbRecordVersionNumber() + 1 );
+
+				} catch (RecordNotUpdatedException ex) {
+
+					throw ex;
+
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:  job.getId() = " + job.getId() + ", job.getDbRecordVersionNumber() = " + job.getDbRecordVersionNumber()
+							+ " \nSQL = '" + updateJobStatusOnIdAndStatusIdSqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+					
+//					releaseConnection( connection );
+
 				}
 			}
-
-		}
+		} );
 	}
 
 
@@ -145,64 +156,75 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 
 	@Override
-	public void updateDelayUntilAndParamErrorCntOnId( int jobId ) {
+	public void updateDelayUntilAndParamErrorCntOnId( final int jobId ) {
 		{
-			final String method = "updateDelayUntilAndParamErrorCntOnId( Job job )";
+			
+
+			super.doJDBCWork(  new JDBCBaseWorkIF() {
+				public void execute(Connection connection) throws SQLException {
 
 
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Entering " + method );
-			}
-
-			PreparedStatement pstmt = null;
-
-			int rowsUpdated = 0;
-
-			Connection connection = null;
-
-			try {
-				connection = getConnection( );
-
-				pstmt = connection.prepareStatement( updateDelayUntilAndParamErrorCntOnIdSqlString );
-				
-				pstmt.setInt( 1, jobId );
-
-				rowsUpdated = pstmt.executeUpdate();
-
-				if ( rowsUpdated <= 0 ) {
-
-					log.info( method + ":No Rows Updated:  jobId = " + jobId
-							+ " \nSQL = '" + updateDelayUntilAndParamErrorCntOnIdSqlString );
-
-					throw new RecordNotUpdatedException( "RecordNotUpdatedException" );
-				}
+					final String method = "WORK-updateDelayUntilAndParamErrorCntOnId( Job job )";
 
 
-			} catch (RecordNotUpdatedException ex) {
+					if ( log.isDebugEnabled() ) {
+						log.debug( "Entering " + method );
+					}
 
-				throw ex;
+					PreparedStatement pstmt = null;
 
+					int rowsUpdated = 0;
 
-			} catch (Throwable sqlEx) {
+					//			Connection connection = null;
 
-				log.error( method + ":Exception:  job.getId() = " + jobId 
-						+ " \nSQL = '" + updateJobStatusOnIdAndStatusIdSqlString
-						+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-				//  Wrap in RuntimeException for Spring Transactional rollback
-				throw new RuntimeException( sqlEx );
-
-			} finally {
-
-				if (connection != null) {
 					try {
-						connection.close();
-					} catch (SQLException ex) {
-						// ignore
+						//				connection = getConnection( );
+
+						pstmt = connection.prepareStatement( updateDelayUntilAndParamErrorCntOnIdSqlString );
+
+						pstmt.setInt( 1, jobId );
+
+						rowsUpdated = pstmt.executeUpdate();
+
+						if ( rowsUpdated <= 0 ) {
+
+							log.info( method + ":No Rows Updated:  jobId = " + jobId
+									+ " \nSQL = '" + updateDelayUntilAndParamErrorCntOnIdSqlString );
+
+							throw new RecordNotUpdatedException( "RecordNotUpdatedException" );
+						}
+
+
+					} catch (RecordNotUpdatedException ex) {
+
+						throw ex;
+
+
+					} catch (Throwable sqlEx) {
+
+						log.error( method + ":Exception:  job.getId() = " + jobId 
+								+ " \nSQL = '" + updateJobStatusOnIdAndStatusIdSqlString
+								+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+						//  Wrap in RuntimeException for Spring Transactional rollback
+						throw new RuntimeException( sqlEx );
+
+					} finally {
+
+
+						if (pstmt != null) {
+							try {
+								pstmt.close();
+							} catch (SQLException ex) {
+								// ignore
+							}
+						}
+						
+//						releaseConnection( connection );
+
 					}
 				}
-
-			}
+			} );
 		}
 
 	}
@@ -226,88 +248,89 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @throws Exception
 	 */
 	@Override
-	public  void retrieveJobParameters( Job job )
+	public  void retrieveJobParameters( final Job job )
 	{
-		final String method = "retrieveJobParameters( Job job )";
 
-		if ( job == null ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", job == null" );
-		}
-
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		PreparedStatement pstmt = null;
+				final String method = "WORK-retrieveJobParameters( Job job )";
 
-		ResultSet rs = null;
+				if ( job == null ) {
 
-
-		Connection connection = null;
-
-		try {
-			connection = getConnection( );
-
-			//  Retrieve job parameters
-
-			Map<String, String> jobParameters = new HashMap<String, String>();
-
-			job.setJobParameters( jobParameters );
-
-
-			pstmt = connection.prepareStatement( getJobParametersQuerySqlString );
-
-			pstmt.setInt( 1, job.getId() );
-
-			rs = pstmt.executeQuery();
-
-			while ( rs.next() ) {
-
-				String paramKey = rs.getString( "key" );
-
-				String paramValue = rs.getString( "value" );
-
-				jobParameters.put(paramKey, paramValue);
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception:   job.getId() = " + job.getId() + "\nSQL = '" + getJobParametersQuerySqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
+					throw new IllegalArgumentException( "in method method: " + method  + ", job == null" );
 				}
-			}
 
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
 				}
-			}
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
 
+
+				PreparedStatement pstmt = null;
+
+				ResultSet rs = null;
+
+
+				//		Connection connection = null;
+
+				try {
+					//			connection = getConnection( );
+
+					//  Retrieve job parameters
+
+					Map<String, String> jobParameters = new HashMap<String, String>();
+
+					job.setJobParameters( jobParameters );
+
+
+					pstmt = connection.prepareStatement( getJobParametersQuerySqlString );
+
+					pstmt.setInt( 1, job.getId() );
+
+					rs = pstmt.executeQuery();
+
+					while ( rs.next() ) {
+
+						String paramKey = rs.getString( "key" );
+
+						String paramValue = rs.getString( "value" );
+
+						jobParameters.put(paramKey, paramValue);
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:   job.getId() = " + job.getId() + "\nSQL = '" + getJobParametersQuerySqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+//					releaseConnection( connection );
+				}
+
+			}
+		} );
 	}
-
 
 
 
@@ -336,99 +359,105 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @return
 	 */
 	@Override
-	public  RunDTO insertRunTableRecord( int nodeId, Job job, int statusId )
+	public  RunDTO insertRunTableRecord( final int nodeId, final Job job, final int statusId )
 	{
-		final String method = "insertRunTableRecord";
+
+		final RunDTO[]  runDTOResult = { null };
+		
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		if ( job == null ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", job == null" );
-		}
+				final String method = "WORK-insertRunTableRecord";
 
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+				if ( job == null ) {
 
-		RunDTO runDTO = null;
-
-		int rowsInserted = 0;
-
-		PreparedStatement pstmt = null;
-
-		ResultSet rsGenKeys = null;
-
-		Connection connection = null;
-
-
-		try {
-
-			connection = getConnection( );
-
-			pstmt = connection.prepareStatement( addRunRecordSqlString, Statement.RETURN_GENERATED_KEYS );
-
-			pstmt.setInt( 1, nodeId);
-
-			pstmt.setInt( 2, job.getId() );
-			pstmt.setInt( 3, statusId );
-
-			rowsInserted = pstmt.executeUpdate();
-
-			rsGenKeys = pstmt.getGeneratedKeys();
-
-
-			if ( rsGenKeys.next() ) {
-
-				int insertedId = rsGenKeys.getInt( 1 );
-
-				runDTO = new RunDTO();
-
-				runDTO.setId( insertedId );
-
-				runDTO.setJobId( job.getId() );
-				runDTO.setNodeId( nodeId );
-				runDTO.setStartDate( new Date() );
-				runDTO.setStatusId( JobStatusValuesConstants.JOB_STATUS_RUNNING );
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception:   job.getId() = " + job.getId() + "\nSQL = '" + addRunRecordSqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-
-			if (rsGenKeys != null) {
-				try {
-					rsGenKeys.close();
-				} catch (SQLException ex) {
-					// ignore
+					throw new IllegalArgumentException( "in method method: " + method  + ", job == null" );
 				}
-			}
 
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
+
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
 				}
-			}
-			if (connection != null) {
+
+				RunDTO runDTO = null;
+
+				int rowsInserted = 0;
+
+				PreparedStatement pstmt = null;
+
+				ResultSet rsGenKeys = null;
+
+				//		Connection connection = null;
+
+
 				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
+
+					//			connection = getConnection( );
+
+					pstmt = connection.prepareStatement( addRunRecordSqlString, Statement.RETURN_GENERATED_KEYS );
+
+					pstmt.setInt( 1, nodeId);
+
+					pstmt.setInt( 2, job.getId() );
+					pstmt.setInt( 3, statusId );
+
+					rowsInserted = pstmt.executeUpdate();
+
+					rsGenKeys = pstmt.getGeneratedKeys();
+
+
+					if ( rsGenKeys.next() ) {
+
+						int insertedId = rsGenKeys.getInt( 1 );
+
+						runDTO = new RunDTO();
+
+						runDTO.setId( insertedId );
+
+						runDTO.setJobId( job.getId() );
+						runDTO.setNodeId( nodeId );
+						runDTO.setStartDate( new Date() );
+						runDTO.setStatusId( JobStatusValuesConstants.JOB_STATUS_RUNNING );
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:   job.getId() = " + job.getId() + "\nSQL = '" + addRunRecordSqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+
+					if (rsGenKeys != null) {
+						try {
+							rsGenKeys.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+//					releaseConnection( connection );
+
 				}
+				
+				runDTOResult[ 0 ] = runDTO;
 			}
+		} );
 
-		}
-
-		return runDTO;
+		return runDTOResult[ 0 ];
 	}
 
 
@@ -444,71 +473,73 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @return
 	 */
 	@Override
-	public  List<Integer> getRunIdsByJobId( int jobId )
+	public  List<Integer> getRunIdsByJobId( final int jobId )
 	{
-		final String method = "getRunIdsByJobId( int jobId )";
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+		final List<Integer> runIds = new ArrayList<Integer>();
 
-		List<Integer> runIds = new ArrayList<Integer>();
-
-		PreparedStatement pstmt = null;
-
-		ResultSet rs = null;
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		Connection connection = null;
+				final String method = "WORK-getRunIdsByJobId( int jobId )";
 
-		try {
-			connection = getConnection( );
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
+
+				PreparedStatement pstmt = null;
+
+				ResultSet rs = null;
 
 
-			pstmt = connection.prepareStatement( getRunIdsByJobIdSqlString );
+				//		Connection connection = null;
 
-			pstmt.setInt( 1, jobId );
-
-			rs = pstmt.executeQuery();
-
-			while ( rs.next() ) {
-
-				runIds.add( rs.getInt( "id" ) );
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception:   jobId = " + jobId + "\nSQL = '" + getRunIdsByJobIdSqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rs != null) {
 				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
+					//			connection = getConnection( );
+
+
+					pstmt = connection.prepareStatement( getRunIdsByJobIdSqlString );
+
+					pstmt.setInt( 1, jobId );
+
+					rs = pstmt.executeQuery();
+
+					while ( rs.next() ) {
+
+						runIds.add( rs.getInt( "id" ) );
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:   jobId = " + jobId + "\nSQL = '" + getRunIdsByJobIdSqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+//					releaseConnection( connection );
 				}
 			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
+		} );
 
 		return runIds;
 
@@ -539,91 +570,92 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @param run
 	 * @throws Exception
 	 */
-	public  void insertRunMessageFromModuleRecord( RunMessageDTO runMessage, RunDTO run )
+	public  void insertRunMessageFromModuleRecord( final RunMessageDTO runMessage, final RunDTO run )
 	{
-		final String method = "insertRunMessageFromModuleRecord";
 
-		if ( runMessage == null ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", runMessageFromModule == null" );
-		}
-
-		if ( run == null ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", run == null" );
-		}
-
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		int rowsInserted = 0;
+				final String method = "WORK-insertRunMessageFromModuleRecord";
 
-		Connection connection = null;
+				if ( runMessage == null ) {
 
-		PreparedStatement pstmt = null;
+					throw new IllegalArgumentException( "in method method: " + method  + ", runMessageFromModule == null" );
+				}
 
-		ResultSet rsGenKeys = null;
+				if ( run == null ) {
 
-		try {
+					throw new IllegalArgumentException( "in method method: " + method  + ", run == null" );
+				}
 
-			connection = getConnection( );
-
-			pstmt = connection.prepareStatement( addRunMessageRecordSqlString, Statement.RETURN_GENERATED_KEYS );
-
-			pstmt.setInt( 1, run.getId() );
-
-			pstmt.setInt( 2, runMessage.getType() );
-			pstmt.setString( 3, runMessage.getMessage() );
-
-			rowsInserted = pstmt.executeUpdate();
-
-			rsGenKeys = pstmt.getGeneratedKeys();
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
 
 
-			if ( rsGenKeys.next() ) {
+				int rowsInserted = 0;
 
-				int insertedId = rsGenKeys.getInt( 1 );
+//				Connection connection = null;
 
-				runMessage.setId( insertedId );
-			}
+				PreparedStatement pstmt = null;
 
-		} catch (Throwable sqlEx) {
+				ResultSet rsGenKeys = null;
 
-			log.error( method + ":Exception:   run.getId() = " + run.getId() + "\nSQL = '" + addRunMessageRecordSqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rsGenKeys != null) {
 				try {
-					rsGenKeys.close();
-				} catch (SQLException ex) {
-					// ignore
+
+//					connection = getConnection( );
+
+					pstmt = connection.prepareStatement( addRunMessageRecordSqlString, Statement.RETURN_GENERATED_KEYS );
+
+					pstmt.setInt( 1, run.getId() );
+
+					pstmt.setInt( 2, runMessage.getType() );
+					pstmt.setString( 3, runMessage.getMessage() );
+
+					rowsInserted = pstmt.executeUpdate();
+
+					rsGenKeys = pstmt.getGeneratedKeys();
+
+
+					if ( rsGenKeys.next() ) {
+
+						int insertedId = rsGenKeys.getInt( 1 );
+
+						runMessage.setId( insertedId );
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:   run.getId() = " + run.getId() + "\nSQL = '" + addRunMessageRecordSqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rsGenKeys != null) {
+						try {
+							rsGenKeys.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+//					releaseConnection( connection );
+
 				}
 			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-		}
-
+		} );
 	}
 
 
@@ -644,81 +676,82 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @see org.jobcenter.jdbc.JobJDBCDAO#insertRunOutputParam(java.lang.String, java.lang.String, org.jobcenter.dto.RunDTO)
 	 */
 	@Override
-	public  void insertRunOutputParam ( String key, String value, RunDTO run ) {
+	public  void insertRunOutputParam ( final String key, final String value, final RunDTO run ) {
 
-		final String method = "insertRunOutputParam( String key, String value, RunDTO run )";
-
-		if ( key == null || key.isEmpty()  ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", key == null or empty " );
-		}
-
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
-
-		PreparedStatement pstmt = null;
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		ResultSet rsKeys = null;
+				final String method = "WORK-insertRunOutputParam( String key, String value, RunDTO run )";
+
+				if ( key == null || key.isEmpty()  ) {
+
+					throw new IllegalArgumentException( "in method method: " + method  + ", key == null or empty " );
+				}
+
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
+
+				PreparedStatement pstmt = null;
 
 
-		int rowsUpdated = 0;
-
-		Connection connection = null;
+				ResultSet rsKeys = null;
 
 
-		try {
+				int rowsUpdated = 0;
 
-			connection = getConnection( );
+//				Connection connection = null;
 
 
-			pstmt = connection.prepareStatement( insertRunOutputParameterSqlString );
-
-			pstmt.setString( 1, key );
-
-			pstmt.setString( 2, value );
-
-			pstmt.setInt( 3, run.getId() );
-
-			rowsUpdated = pstmt.executeUpdate();
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception:  runId = " + run.getId() + ", key = " + key
-					+ " \nSQL = '" + insertRunOutputParameterSqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rsKeys != null) {
 				try {
-					rsKeys.close();
-				} catch (SQLException ex) {
-					// ignore
+
+//					connection = getConnection( );
+
+
+					pstmt = connection.prepareStatement( insertRunOutputParameterSqlString );
+
+					pstmt.setString( 1, key );
+
+					pstmt.setString( 2, value );
+
+					pstmt.setInt( 3, run.getId() );
+
+					rowsUpdated = pstmt.executeUpdate();
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:  runId = " + run.getId() + ", key = " + key
+							+ " \nSQL = '" + insertRunOutputParameterSqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rsKeys != null) {
+						try {
+							rsKeys.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+//					releaseConnection( connection );
 				}
 			}
-
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
+		} );
 	}
 
 
@@ -736,85 +769,86 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @param run
 	 */
 	@Override
-	public  void retrieveRunOutputParams( RunDTO run )
+	public  void retrieveRunOutputParams( final RunDTO run )
 	{
-		final String method = "retrieveRunOutputParams( RunDTO run )";
-
-		if ( run == null ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", run == null" );
-		}
-
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		PreparedStatement pstmt = null;
+				final String method = "WORK-retrieveRunOutputParams( RunDTO run )";
 
-		ResultSet rs = null;
+				if ( run == null ) {
 
+					throw new IllegalArgumentException( "in method method: " + method  + ", run == null" );
+				}
 
-		Connection connection = null;
-
-		try {
-			connection = getConnection( );
-
-			//  Retrieve runOutputParams
-
-			Map<String, String> runOutputParams = new HashMap<String, String>();
-
-			run.setRunOutputParams( runOutputParams );
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
 
 
-			pstmt = connection.prepareStatement( getRunOutputParamsQuerySqlString );
+				PreparedStatement pstmt = null;
 
-			pstmt.setInt( 1, run.getId() );
+				ResultSet rs = null;
 
-			rs = pstmt.executeQuery();
 
-			while ( rs.next() ) {
+//				Connection connection = null;
 
-				String paramKey = rs.getString( "key" );
-
-				String paramValue = rs.getString( "value" );
-
-				runOutputParams.put(paramKey, paramValue);
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception:   run.getId() = " + run.getId() + "\nSQL = '" + getRunOutputParamsQuerySqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rs != null) {
 				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
+//					connection = getConnection( );
+
+					//  Retrieve runOutputParams
+
+					Map<String, String> runOutputParams = new HashMap<String, String>();
+
+					run.setRunOutputParams( runOutputParams );
+
+
+					pstmt = connection.prepareStatement( getRunOutputParamsQuerySqlString );
+
+					pstmt.setInt( 1, run.getId() );
+
+					rs = pstmt.executeQuery();
+
+					while ( rs.next() ) {
+
+						String paramKey = rs.getString( "key" );
+
+						String paramValue = rs.getString( "value" );
+
+						runOutputParams.put(paramKey, paramValue);
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:   run.getId() = " + run.getId() + "\nSQL = '" + getRunOutputParamsQuerySqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+//					releaseConnection( connection );
 				}
 			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
+		} );
 
 	}
 
@@ -834,90 +868,96 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public  int insertRequest( int requestType )
+	public  int insertRequest( final int requestType )
 	{
-		final String method = "insertRequest( int requestType )";
 
-		int requestId = 0;
+		final int[] requestIdResult = { 0 };
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
-
-		PreparedStatement pstmt = null;
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		ResultSet rsKeys = null;
+				final String method = "insertRequest( int requestType )";
 
+				int requestId = 0;
 
-		int rowsUpdated = 0;
-
-		Connection connection = null;
-
-
-		try {
-
-			connection = getConnection( );
-
-			pstmt = connection.prepareStatement( insertRequestSqlString, Statement.RETURN_GENERATED_KEYS );
-
-			pstmt.setInt( 1, requestType);
-
-			rowsUpdated = pstmt.executeUpdate();
-
-			rsKeys = pstmt.getGeneratedKeys();
-
-
-			if ( rsKeys.next() ) {
-
-				requestId = rsKeys.getInt( 1 );
-
-			} else {
-
-				String msg =  "Failed retrieval of generated id for insertion of job record." ;
-
-				log.error( msg );
-
-				throw new Exception( msg );
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception:  requestType = " + requestType
-					+ " \nSQL = '" + insertRequestSqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rsKeys != null) {
-				try {
-					rsKeys.close();
-				} catch (SQLException ex) {
-					// ignore
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
 				}
-			}
+
+				PreparedStatement pstmt = null;
 
 
-			if (pstmt != null) {
+				ResultSet rsKeys = null;
+
+
+				int rowsUpdated = 0;
+
+				//		Connection connection = null;
+
+
 				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
 
-		return requestId;
+					//			connection = getConnection( );
+
+					pstmt = connection.prepareStatement( insertRequestSqlString, Statement.RETURN_GENERATED_KEYS );
+
+					pstmt.setInt( 1, requestType);
+
+					rowsUpdated = pstmt.executeUpdate();
+
+					rsKeys = pstmt.getGeneratedKeys();
+
+
+					if ( rsKeys.next() ) {
+
+						requestId = rsKeys.getInt( 1 );
+
+					} else {
+
+						String msg =  "Failed retrieval of generated id for insertion of job record." ;
+
+						log.error( msg );
+
+						throw new Exception( msg );
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:  requestType = " + requestType
+							+ " \nSQL = '" + insertRequestSqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rsKeys != null) {
+						try {
+							rsKeys.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					//			releaseConnection( connection );
+				}
+
+				requestIdResult[ 0 ] = requestId;
+	        }
+		} );
+
+		return requestIdResult[ 0 ];
 
 	}
 
@@ -935,102 +975,109 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @param newJobStatus
 	 * @throws Exception
 	 */
-	public  void insertJob ( Job job )
+	public  void insertJob ( final Job job )
 	{
-		final String method = "insertJob( Job job )";
-
-		if ( job == null  ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", job == null " );
-		}
-
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
-
-		PreparedStatement pstmt = null;
+		
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+	        public void execute(Connection connection) throws SQLException {
 
 
-		ResultSet rsKeys = null;
+	        	final String method = "WORM-insertJob( Job job )";
+
+	        	if ( job == null  ) {
+
+	        		throw new IllegalArgumentException( "in method method: " + method  + ", job == null " );
+	        	}
+
+	        	if ( log.isDebugEnabled() ) {
+	        		log.debug( "Entering " + method );
+	        	}
+
+	        	PreparedStatement pstmt = null;
 
 
-		int rowsUpdated = 0;
-
-		Connection connection = null;
+	        	ResultSet rsKeys = null;
 
 
-		try {
+	        	int rowsUpdated = 0;
 
-			connection = getConnection( );
-
-			pstmt = connection.prepareStatement( insertJobSqlString, Statement.RETURN_GENERATED_KEYS );
-
-			pstmt.setInt( 1, job.getRequestId() );
-
-			pstmt.setInt( 2, job.getJobTypeId() );
-
-			pstmt.setString( 3, job.getSubmitter() );
-
-			pstmt.setInt( 4, job.getPriority() );
-
-			pstmt.setInt( 5, job.getStatusId() );
-			pstmt.setInt( 6, job.getJobParameterCount() );
-
-			pstmt.setString( 7, job.getInsertComplete() );
-
-			rowsUpdated = pstmt.executeUpdate();
-
-			// set to 1 since DB default
-			job.setDbRecordVersionNumber( 1 );
+	        	//		Connection connection = null;
 
 
-			rsKeys = pstmt.getGeneratedKeys();
+	        	try {
+
+	        		//			connection = getConnection( );
+
+	        		pstmt = connection.prepareStatement( insertJobSqlString, Statement.RETURN_GENERATED_KEYS );
+
+	        		pstmt.setInt( 1, job.getRequestId() );
+
+	        		pstmt.setInt( 2, job.getJobTypeId() );
+
+	        		pstmt.setString( 3, job.getSubmitter() );
+
+	        		pstmt.setInt( 4, job.getPriority() );
+
+	        		pstmt.setInt( 5, job.getStatusId() );
+	        		pstmt.setInt( 6, job.getJobParameterCount() );
+
+	        		pstmt.setString( 7, job.getInsertComplete() );
+
+	        		rowsUpdated = pstmt.executeUpdate();
+
+	        		// set to 1 since DB default
+	        		job.setDbRecordVersionNumber( 1 );
 
 
-			if ( rsKeys.next() ) {
-
-				int id = rsKeys.getInt( 1 );
-
-				job.setId( id );
-
-			} else {
-
-				String msg =  "Failed retrieval of generated id for insertion of job record." ;
-
-				log.error( msg );
-
-				throw new Exception( msg );
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception:  job.getJobTypeId() = " + job.getJobTypeId() + ", job.getSubmitter() = " + job.getSubmitter()
-					+ " \nSQL = '" + insertJobSqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rsKeys != null) {
-				try {
-					rsKeys.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
+	        		rsKeys = pstmt.getGeneratedKeys();
 
 
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
+	        		if ( rsKeys.next() ) {
 
-		}
+	        			int id = rsKeys.getInt( 1 );
+
+	        			job.setId( id );
+
+	        		} else {
+
+	        			String msg =  "Failed retrieval of generated id for insertion of job record." ;
+
+	        			log.error( msg );
+
+	        			throw new Exception( msg );
+	        		}
+
+	        	} catch (Throwable sqlEx) {
+
+	        		log.error( method + ":Exception:  job.getJobTypeId() = " + job.getJobTypeId() + ", job.getSubmitter() = " + job.getSubmitter()
+	        				+ " \nSQL = '" + insertJobSqlString
+	        				+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+	        		//  Wrap in RuntimeException for Spring Transactional rollback
+	        		throw new RuntimeException( sqlEx );
+
+	        	} finally {
+
+	        		if (rsKeys != null) {
+	        			try {
+	        				rsKeys.close();
+	        			} catch (SQLException ex) {
+	        				// ignore
+	        			}
+	        		}
+
+
+	        		if (pstmt != null) {
+	        			try {
+	        				pstmt.close();
+	        			} catch (SQLException ex) {
+	        				// ignore
+	        			}
+	        		}
+
+	        	}
+	        }
+		} );
 	}
 
 
@@ -1048,57 +1095,65 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @param newJobStatus
 	 * @throws Exception
 	 */
-	public  void markJobInsertComplete ( Job job )
+	public  void markJobInsertComplete ( final Job job )
 	{
-		final String method = "markJobInsertComplete( Job job )";
+		
 
-		if ( job == null  ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", job == null " );
-		}
-
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
-
-		PreparedStatement pstmt = null;
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		int rowsUpdated = 0;
+				final String method = "WORK-markJobInsertComplete( Job job )";
 
-		Connection connection = null;
+				if ( job == null  ) {
+
+					throw new IllegalArgumentException( "in method method: " + method  + ", job == null " );
+				}
+
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
+
+				PreparedStatement pstmt = null;
 
 
-		try {
+				int rowsUpdated = 0;
 
-			connection = getConnection( );
+				//		Connection connection = null;
 
-			pstmt = connection.prepareStatement( markJobInsertCompleteSqlString );
 
-			pstmt.setInt( 1, job.getId() );
-
-			rowsUpdated = pstmt.executeUpdate();
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception:  job.getJobTypeId() = " + job.getJobTypeId() + ", job.getSubmitter() = " + job.getSubmitter()
-					+ " \nSQL = '" + insertJobSqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (pstmt != null) {
 				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
+
+					//			connection = getConnection( );
+
+					pstmt = connection.prepareStatement( markJobInsertCompleteSqlString );
+
+					pstmt.setInt( 1, job.getId() );
+
+					rowsUpdated = pstmt.executeUpdate();
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:  job.getJobTypeId() = " + job.getJobTypeId() + ", job.getSubmitter() = " + job.getSubmitter()
+							+ " \nSQL = '" + insertJobSqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
 				}
 			}
-
-		}
+		} );
 	}
 
 
@@ -1116,83 +1171,84 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	/* (non-Javadoc)
 	 * @see org.jobcenter.jdbc.JobJDBCDAO#insertJobParameter(java.lang.String, java.lang.String, int)
 	 */
-	public  void insertJobParameter ( String key, String value, int jobId )
+	public  void insertJobParameter ( final String key, final String value, final int jobId )
 	{
-		final String method = "insertJobParameters( String key, String value, int jobId )";
 
-		if ( key == null || key.isEmpty()  ) {
-
-			throw new IllegalArgumentException( "in method method: " + method  + ", key == null or empty " );
-		}
-
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
-
-		PreparedStatement pstmt = null;
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		ResultSet rsKeys = null;
+				final String method = "WORM-insertJobParameters( String key, String value, int jobId )";
+
+				if ( key == null || key.isEmpty()  ) {
+
+					throw new IllegalArgumentException( "in method method: " + method  + ", key == null or empty " );
+				}
+
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
+
+				PreparedStatement pstmt = null;
 
 
-		int rowsUpdated = 0;
-
-		Connection connection = null;
+				ResultSet rsKeys = null;
 
 
-		try {
+				int rowsUpdated = 0;
 
-			connection = getConnection( );
-
-
-			pstmt = connection.prepareStatement( insertJobParameterSqlString );
-
-			pstmt.setString( 1, key );
-
-			pstmt.setString( 2, value );
-
-			pstmt.setInt( 3, jobId );
-
-			rowsUpdated = pstmt.executeUpdate();
+				//		Connection connection = null;
 
 
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception:  jobId = " + jobId + ", key = " + key
-					+ " \nSQL = '" + insertJobParameterSqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rsKeys != null) {
 				try {
-					rsKeys.close();
-				} catch (SQLException ex) {
-					// ignore
+
+					//			connection = getConnection( );
+
+
+					pstmt = connection.prepareStatement( insertJobParameterSqlString );
+
+					pstmt.setString( 1, key );
+
+					pstmt.setString( 2, value );
+
+					pstmt.setInt( 3, jobId );
+
+					rowsUpdated = pstmt.executeUpdate();
+
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:  jobId = " + jobId + ", key = " + key
+							+ " \nSQL = '" + insertJobParameterSqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rsKeys != null) {
+						try {
+							rsKeys.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+					//			releaseConnection( connection );
 				}
 			}
-
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-		}
+		} );
 	}
 
 
@@ -1211,67 +1267,65 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	@Override
 	public  void healthCheck ( )
 	{
-		final String method = "healthCheck( )";
-
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
-
-		Connection connection = null;
-
-		PreparedStatement pstmt = null;
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
 
-		ResultSet rs = null;
+				final String method = "WORK-healthCheck( )";
 
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
 
-		try {
-			connection = getConnection( );
+//				Connection connection = null;
 
-			pstmt = connection.prepareStatement( sqlHealthCheck );
+				PreparedStatement pstmt = null;
+				ResultSet rs = null;
 
-			rs = pstmt.executeQuery();
-
-			if ( rs.next() ) {
-
-
-
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception: SQL = '" + sqlHealthCheck
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-			if (rs != null) {
 				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
+//					connection = getConnection( );
+
+					pstmt = connection.prepareStatement( sqlHealthCheck );
+
+					rs = pstmt.executeQuery();
+
+					if ( rs.next() ) {
+
+
+
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception: SQL = '" + sqlHealthCheck
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+//					releaseConnection( connection );
+
 				}
 			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-		}
+		} );
 	}
 
 
@@ -1286,76 +1340,79 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @return
 	 */
 	@Override
-	public  Integer getRequestFromIdAndRequestType( int id, int type )
+	public  Integer getRequestFromIdAndRequestType( final int id, final int type )
 	{
-		final String method = "getRequestFromIdAndRequestType";
+		final Integer[] requestIdSearchResult = { null };
+		
+		
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
 
-		Integer requestIdSearchResult = null;
+				final String method = "WORK-getRequestFromIdAndRequestType";
 
-		Connection connection = null;
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
 
-		PreparedStatement pstmt = null;
 
-		ResultSet rs = null;
+//				Connection connection = null;
 
-		try {
+				PreparedStatement pstmt = null;
 
-			connection = getConnection( );
+				ResultSet rs = null;
 
-			pstmt = connection.prepareStatement( getRequestFromIdAndRequestTypeQuerySqlString );
-
-			pstmt.setInt( 1, id );
-			pstmt.setInt( 2, type );
-
-			rs = pstmt.executeQuery();
-
-			if ( rs.next() ) {
-
-				requestIdSearchResult = new Integer( rs.getInt( "id" ) );
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception: \nSQL = '" + getRequestFromIdAndRequestTypeQuerySqlString
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rs != null) {
 				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
+
+//					connection = getConnection( );
+
+					pstmt = connection.prepareStatement( getRequestFromIdAndRequestTypeQuerySqlString );
+
+					pstmt.setInt( 1, id );
+					pstmt.setInt( 2, type );
+
+					rs = pstmt.executeQuery();
+
+					if ( rs.next() ) {
+
+						requestIdSearchResult[ 0 ] = new Integer( rs.getInt( "id" ) );
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception: \nSQL = '" + getRequestFromIdAndRequestTypeQuerySqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+
+//					releaseConnection( connection );
 				}
 			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
+		} );
 
 
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
-
-
-		return requestIdSearchResult;
+		return requestIdSearchResult[ 0 ];
 	}
 
 
@@ -1607,13 +1664,7 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	//			}
 	//
 	//
-	//			if (connection != null) {
-	//				try {
-	//					connection.close();
-	//				} catch (SQLException ex) {
-	//					// ignore
-	//				}
-	//			}
+	//	releaseConnection( connection );
 	//		}
 	//
 	//
@@ -1632,81 +1683,84 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 
 	@Override
-	public  int  getJobCount( ListJobsRequest listJobsRequest )
+	public  int  getJobCount( final ListJobsRequest listJobsRequest )
 	{
-		final String method = "getJobIdList";
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+		final int[] jobCount = { 0 };
+		
+		
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
-		int jobCount = 0;
 
-		Connection connection = null;
+				final String method = "WORK-getJobIdList";
 
-		PreparedStatement pstmt = null;
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
 
-		ResultSet rs = null;
+//				Connection connection = null;
 
-		String sql = null;
+				PreparedStatement pstmt = null;
 
-		try {
+				ResultSet rs = null;
 
-			connection = getConnection( );
+				String sql = null;
 
-			StringBuilder sqlSB = new StringBuilder( 1000 );
-
-			sqlSB.append( "SELECT COUNT(job.id) AS job_count " );
-
-			pstmt = getJobListPreparedStmt( sqlSB, listJobsRequest, true /* getCount */, connection );
-
-			sql = sqlSB.toString();
-
-			rs = pstmt.executeQuery();
-
-			while ( rs.next() ) {
-
-				jobCount = rs.getInt( "job_count" );
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception: \nSQL = '" + sql
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rs != null) {
 				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
+
+//					connection = getConnection( );
+
+					StringBuilder sqlSB = new StringBuilder( 1000 );
+
+					sqlSB.append( "SELECT COUNT(job.id) AS job_count " );
+
+					pstmt = getJobListPreparedStmt( sqlSB, listJobsRequest, true /* getCount */, connection );
+
+					sql = sqlSB.toString();
+
+					rs = pstmt.executeQuery();
+
+					while ( rs.next() ) {
+
+						jobCount[0] = rs.getInt( "job_count" );
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception: \nSQL = '" + sql
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+
+//					releaseConnection( connection );
 				}
 			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
+		} );
 
 
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
-
-
-		return jobCount;
+		return jobCount[ 0 ];
 	}
 
 
@@ -1716,80 +1770,83 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	 * @return
 	 */
 	@Override
-	public  List<Integer>  getJobIdList( ListJobsRequest listJobsRequest )
+	public  List<Integer>  getJobIdList( final ListJobsRequest listJobsRequest )
 	{
-		final String method = "getJobIdList";
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Entering " + method );
-		}
+		final List<Integer> jobIdList = new ArrayList<Integer>();
 
-		List<Integer> jobIdList = new ArrayList<Integer>();
+		
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
 
-		Connection connection = null;
 
-		PreparedStatement pstmt = null;
+				final String method = "WORK-getJobIdList";
 
-		ResultSet rs = null;
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
 
-		String sql = null;
+//				Connection connection = null;
 
-		try {
+				PreparedStatement pstmt = null;
 
-			connection = getConnection( );
+				ResultSet rs = null;
 
-			StringBuilder sqlSB = new StringBuilder( 1000 );
+				String sql = null;
 
-			sqlSB.append( "SELECT job.id " );
-
-			pstmt = getJobListPreparedStmt( sqlSB, listJobsRequest, false /* getCount */, connection );
-
-			sql = sqlSB.toString();
-
-			rs = pstmt.executeQuery();
-
-			while ( rs.next() ) {
-
-				int job_id = rs.getInt( "id" );
-
-				jobIdList.add( job_id );
-			}
-
-		} catch (Throwable sqlEx) {
-
-			log.error( method + ":Exception: \nSQL = '" + sql
-					+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
-
-			//  Wrap in RuntimeException for Spring Transactional rollback
-			throw new RuntimeException( sqlEx );
-
-		} finally {
-
-			if (rs != null) {
 				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// ignore
+
+//					connection = getConnection( );
+
+					StringBuilder sqlSB = new StringBuilder( 1000 );
+
+					sqlSB.append( "SELECT job.id " );
+
+					pstmt = getJobListPreparedStmt( sqlSB, listJobsRequest, false /* getCount */, connection );
+
+					sql = sqlSB.toString();
+
+					rs = pstmt.executeQuery();
+
+					while ( rs.next() ) {
+
+						int job_id = rs.getInt( "id" );
+
+						jobIdList.add( job_id );
+					}
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception: \nSQL = '" + sql
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (rs != null) {
+						try {
+							rs.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+
+//					releaseConnection( connection );
 				}
 			}
-
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-
-
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					// ignore
-				}
-			}
-		}
+		} );
 
 
 		return jobIdList;
