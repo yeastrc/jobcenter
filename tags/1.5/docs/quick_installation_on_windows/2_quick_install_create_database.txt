@@ -1,0 +1,40 @@
+
+Open MsSQL Workbench
+
+On the left side under "Open Connection to Start Querying" double click "Local Instance ..."
+
+Create the database
+
+	Open the file schema\database_creation.sql
+
+	Copy the text
+
+	Paste the text in MsSQL Workbench in the middle under "Query 1"
+
+	Ensure no text is selected
+
+	On the "Query" menu click the first choice of "Execute (All or Selection)
+
+	Below the pasted SQL there is a window titled "Output"
+	All the lines should have a green check mark on the left side.
+
+	The database has been created
+
+	Select all the SQL in the "Query 1" window ( CTRL-A or Edit Menu )
+	Press the "Delete" key to delete all the selected text.
+
+Populate the database:
+
+	Open the file schema\database_system_configuration_population.sql
+
+	Copy the text
+
+	Paste the text in MsSQL Workbench in the middle under "Query 1"
+
+	Ensure no text is selected
+
+	On the "Query" menu click the first choice of "Execute (All or Selection)
+
+	Below the pasted SQL there is a window titled "Output"
+	All the lines should have a green check mark on the left side.
+

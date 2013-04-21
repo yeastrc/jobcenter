@@ -1,0 +1,29 @@
+
+Jobcenter Client Time Control.
+
+In project JobCenter_Client_Main.
+
+
+The following classes are used for time control:
+
+Main classes:
+
+	org.jobcenter.client.timecontrol.TimeControl
+	org.jobcenter.client.timecontrol.TimeControlEntry
+
+Loads the config:
+
+	org.jobcenter.config.RetrieveTimeControlConfig
+
+Time processing:
+
+	org.jobcenter.util.CurrentDateTime;
+	org.jobcenter.util.CurrentDateTimeImpl;
+
+
+Calling to load configuration:
+
+
+			RetrieveTimeControlConfig retrieveTimeControlConfig = new RetrieveTimeControlConfig();
+
+			retrieveTimeControlConfig.loadTimeControlConfig();

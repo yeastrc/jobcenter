@@ -1,0 +1,80 @@
+
+
+Required Third party software
+
+Jobcenter requires a (1)database, (2)Java Platform Standard Edition JDK, and (3)Java Web Application Server
+
+These should be installed before continuing the jobcenter installation.
+
+Please note the userid and password you create in the database as that will be required in the
+jobcenter installation process.
+
+The supplied documentation and installation scripts require:
+
+1) database - MySQL Community Server version 5.6   http://www.mysql.com/downloads/mysql
+
+	At "Recommended Download:" click Download
+
+	To the right of "Windows (x86, 32-bit), MSI Installer" click Download
+
+	Near the bottom of the page click the link "No thanks, just start my download."
+
+	Open the downloaded file
+
+	Choose:   Developer default
+
+	At "MySQL Server Configuration", Uncheck "Open Firewall port for network access"
+
+	 Enter a Root password.  It is important to remember this password.  It will be required in the steps below.
+	 	Possibly either write it down or store it in a text file on the computer.
+
+	Leave "MySQL Workbench" open, you will need it later.
+
+2) Java Platform, Standard Edition JDK - http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+		Below "Here are the Java SE downloads in detail:", under "JDK" click "Download"
+
+		Under the first block that starts with " Java SE Development Kit" and then something like 7u##
+		Click the radio button to left of "Accept License Agreement"
+		Go below that to "Windows x86" ( or "Windows x64" if you have 64 bit Windows )
+			and click the link to the right of that under the column "Download".
+		Open the downloaded file
+
+
+3) Java Web Application Server - Tomcat - http://tomcat.apache.org/
+
+		On the Left hand side below "Download" click on the link "Tomcat 7.0"
+		Under "Binary Distributions" Click the link "32-bit/64-bit Windows Service Installer"
+		Run the downloaded file.
+
+		It is HIGHLY recommended that you do not install Tomcat under C:\Program Files
+		You will need to change files under Tomcat and it will be difficult if it is under C:\Program Files
+
+		Something like C:\webtools\tomcat7 is recommended
+
+		Make a note of where you install Tomcat.  You will need to place files inside that later.
+
+
+
+4) Java connector for MySQL   http://www.mysql.com/downloads/connector/j/5.0.html
+
+	To the right of "Platform Independent (Architecture Independent), ZIP Archive" click "Download"
+
+	Near the bottom of the page click the link "No thanks, just start my download."
+
+	Unzip the downloaded file
+
+	Navigate inside the downloaded file and find a file named mysql-connector-java-#.#.#-bin.jar
+		( the #.#.# may be 5.0.8 but may be something else )
+
+		Copy that file to a folder under the base directory of where Tomcat installed of
+		<Tomcat base>\lib
+
+
+5)  It is recommended to install a text editor for changing configuration files.
+	Double clicking on many configuration files will not bring up an editor.
+
+    Notepad++ at http://notepad-plus-plus.org/ is one such editor.
+    			After installation, in Windows Explorer right click on a file to edit and choose "Edit with Notepad++"
+
+

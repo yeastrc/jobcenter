@@ -1,0 +1,6 @@
+
+
+  In the folder "submit_job_to_DoNothingTestModule_Test_Jar" there is a file
+  "jobcenter_Submit_Job_To_DoNothingTestModule.jar"
+  Double click that file to submit a job to the "DoNothingTestModule"
+  that is pre-installed in the client.
