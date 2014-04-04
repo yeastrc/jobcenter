@@ -5,7 +5,7 @@
     <tstamp/>
 
   	<!-- name of jar or whatever that is copied to deploy -->
-    <property name="deployablename" value="jobcenter_jobsubmission_client.jar" />
+    <property name="deployablename" value="jobcenter_jobsubmission_client_Jersey_1.3.jar" />
 
     <property name="src" value="src" />
     <property name="build" value="build" />

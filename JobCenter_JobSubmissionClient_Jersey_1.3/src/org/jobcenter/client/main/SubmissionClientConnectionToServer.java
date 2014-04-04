@@ -8,6 +8,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 
+import org.jobcenter.client_exceptions.JobcenterSubmissionServerErrorException;
 import org.jobcenter.constants.Constants;
 import org.jobcenter.constants.WebServiceURLConstants;
 import org.jobcenter.coreinterfaces.JobSubmissionInterface;
@@ -97,11 +98,14 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	 * @param priority
 	 * @param jobParameters
 	 * @return requestId - the next assigned id related to the particular requestTypeName.  Will return the passed in requestId if one is provided ( not null )
-	 * @throws Throwable - throws an error if any errors related to submitting the job
+	 * @throws JobcenterSubmissionServerErrorException.  Also throws other Runtime Exceptions
 	 */
 	@Override
 
-	public int submitJob( String requestTypeName, Integer requestId, String jobTypeName, String submitter, Integer priority, Map<String, String> jobParameters ) throws Throwable {
+	public int submitJob( String requestTypeName, Integer requestId, String jobTypeName, String submitter, Integer priority, Map<String, String> jobParameters )
+	throws
+	JobcenterSubmissionServerErrorException
+	{
 
 		if ( connectionURL == null ) {
 
@@ -157,7 +161,10 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 			log.error( msg );
 
-			throw new Exception( msg );
+			throw new JobcenterSubmissionServerErrorException( submitJobResponse.getErrorCode(),
+					submitJobResponse.getErrorCodeDescription(),
+					submitJobResponse.getClientIPAddressAtServer(),
+					msg );
 		}
 
 

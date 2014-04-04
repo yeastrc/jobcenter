@@ -31,5 +31,6 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.persistence.core-2.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.persistence.moxy-2.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/validation-api-1.1.0.Final.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_base"/>
 	<classpathentry kind="output" path="Eclipsebin"/>
 </classpath>
