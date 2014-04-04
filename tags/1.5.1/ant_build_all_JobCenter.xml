@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="US-ASCII" ?>
+<project name="JobCenter_Root_Build_All_JobCenter" default="createInstallables" basedir=".">
+
+	<!--
+
+	  Ant build to build everything for Jobcenter/JobCenter.
+
+	  Run the default target to build everything.
+
+	  If ant is installed and on the PATH,
+	  enter on the command line   "ant -f  build_all_JobCenter.xml"
+	  in the base directory to build everything.
+
+	  -->
+
+
+	<!-- init depends on nothing -->
+	<target name="init">
+		<tstamp />
+
+		<!-- name of jar or whatever that is copied to deploy -->
+		<property name="installationJarName" value="jobcenter_client_installation.jar" />
+		<property name="installationQuickJarName" value="jobcenter_client_quick_install_installation.jar" />
+		<property name="installationQuickZipName" value="jobcenter_client_quick_install_installation.zip" />
+		<property name="module_run_shell_commandJarName" value="module_run_shell_command.jar" />
+		<property name="module_blast_submitter" value="jobcenter_blast_module.jar" />
+
+		<!-- Properties -->
+		<property name="src" value="src" />
+		<property name="build" value="build" />
+		<property name="classes" value="classes" />
+		<property name="deploy" value="deploy" />
+		<property name="config" value="resources" />
+		<property name="runDir" value="." />
+		<property name="local" value="local" />
+		<property name="remote" value="remote" />
+		<property name="lib" value="lib" />
+	</target>
+
+	<!-- Clean depends on init -->
+	<target name="clean" depends="init">
+		<delete dir="${deploy}" />
+		<delete dir="generated_jars" />
+		<delete dir="create_installables_work_dir" />
+
+		<ant dir="JobCenter_Client_Module_Interface" antfile="build.xml" target="clean" />
+
+		<ant dir="JobCenter_Client_Module_Interface" antfile="build.xml" target="clean" />
+		<ant dir="JobCenter_Client_Root" antfile="build.xml" target="clean" />
+		<ant dir="JobCenter_base" antfile="build.xml" target="clean" />
+		<ant dir="JobCenter_Client_Main" antfile="build.xml" target="clean" />
+		<ant dir="JobCenter_Client_Jersey_1.3" antfile="build.xml" target="clean" />
+
+		<ant dir="JobCenter_JobSubmissionClient_Interface" antfile="build.xml" target="clean" />
+		<ant dir="JobCenter_JobSubmissionClient_Default__Plain_Java" antfile="build.xml" target="clean" />
+		<ant dir="JobCenter_Server_Core" antfile="build.xml" target="clean" />
+
+		<ant dir="JobCenter_Server_Jersey" antfile="build.xml" target="clean" />
+
+		<!-- build module for running GUIClient-->
+		<ant dir="JobCenter_GUIClient" antfile="build.xml" target="clean" />
+
+		<!-- build module for running GUI_Web_App-->
+		<ant dir="JobCenter_GUI_Web_App" antfile="build.xml" target="clean" />
+
+		<!-- build module that does nothing, supports testing of the client  -->
+		<ant dir="JobCenter_DoNothingTestOnlyModule" antfile="build.xml" target="clean" />
+
+		<!-- build jar that submits jobs to JobCenter_DoNothingTestOnlyModule  -->
+		<ant dir="JobCenter_Submit_Job_To_DoNothingTestOnlyModule_Default__Plain_Java" antfile="build.xml" target="clean" />
+		          
+
+		<!-- build module for running shell commands  -->
+		<ant dir="Module_RunShellCommand" antfile="build.xml" target="clean" />
+
+		<!-- build module for running blast's -->
+		<ant dir="JobCenter_Blast_Module" antfile="build.xml" target="clean" />
+
+		<!-- build module for running JobCenter_Blast_Submitter-->
+		<ant dir="JobCenter_Blast_Submitter" antfile="build.xml" target="clean" />
+
+	</target>
+
+	<!-- Prepare depends on clean -->
+	<target name="prepare" depends="clean">
+		<mkdir dir="${deploy}" />
+		<mkdir dir="${deploy}/provided_modules" />
+		<mkdir dir="generated_jars" />
+		<mkdir dir="create_installables_work_dir" />
+	</target>
+
+	<!--
+		compileAllSubmodules depends on prepare
+		executes external builds for each sub project
+	 -->
+	<target name="compileAllSubmodules" depends="prepare">
+
+		<ant dir="JobCenter_Client_Module_Interface" antfile="build.xml" />
+		<ant dir="JobCenter_Client_Root" antfile="build.xml" />
+		<ant dir="JobCenter_base" antfile="build.xml" />
+		<ant dir="JobCenter_Client_Main" antfile="build.xml" />
+		<ant dir="JobCenter_Client_Jersey_1.3" antfile="build.xml" />
+
+		<ant dir="JobCenter_JobSubmissionClient_Interface" antfile="build.xml" />
+		<ant dir="JobCenter_JobSubmissionClient_Default__Plain_Java" antfile="build.xml" />
+		<ant dir="JobCenter_Server_Core" antfile="build.xml" />
+
+		<ant dir="JobCenter_Server_Jersey" antfile="build.xml" />
+
+		<!-- build module for running GUIClient-->
+		<ant dir="JobCenter_GUIClient" antfile="build.xml" />
+
+		<!-- build module for running GUI_Web_App-->
+		<ant dir="JobCenter_GUI_Web_App" antfile="build.xml" />
+
+		<!-- build module that does nothing, supports testing of the client  -->
+		<ant dir="JobCenter_DoNothingTestOnlyModule" antfile="build.xml" />
+
+		<!-- build jar that submits jobs to JobCenter_DoNothingTestOnlyModule  -->
+		<ant dir="JobCenter_Submit_Job_To_DoNothingTestOnlyModule_Default__Plain_Java" antfile="build.xml" />
+
+		<!-- build module for running shell commands  -->
+		<ant dir="Module_RunShellCommand" antfile="build.xml" />
+
+		<!-- build module for running blast's -->
+		<ant dir="JobCenter_Blast_Module" antfile="build.xml" />
+
+		<!-- build module for running JobCenter_Blast_Submitter-->
+		<ant dir="JobCenter_Blast_Submitter" antfile="build.xml" />
+
+
+	</target>
+
+	<!--
+		createInstallables depends on compileAllSubmodules
+	-->
+	<target name="createInstallables" depends="compileAllSubmodules">
+
+		<!-- Clean out the old create_installables_work_dir -->
+		<delete dir="create_installables_work_dir" />
+
+		<!-- Make create_installables_work_dir directories for each of the modules you want -->
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation" />
+		<mkdir dir="create_installables_work_dir/module_run_shell_command" />
+		<mkdir dir="create_installables_work_dir/blast_module" />
+
+		<!-- Copy over the client install shell scripts -->
+		<copy file="general_files_for_client/README_General_Overview.txt" todir="create_installables_work_dir/jobcenter_client_installation" />
+		<copy file="shell_scripts/runJobCenterClient.bat" todir="create_installables_work_dir/jobcenter_client_installation" />
+		<copy file="shell_scripts/runJobCenterClient.sh" todir="create_installables_work_dir/jobcenter_client_installation" />
+
+		<!-- make new directories for the job center module and client code -->
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_modules" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_root" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_root/config" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_root/lib" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_root/main_jar" />
+
+
+
+
+		<!-- Copy the jobcenter_client.. root/interface and mail jars -->
+		<copy file="generated_jars/jobcenter_client_root.jar"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_root/main_jar" />
+		<copy file="generated_jars/jobcenter_client_module_interface.jar"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_root/main_jar" />
+		<copy file="JobCenter_Client_Root/lib/mail.jar"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_root/main_jar" />
+
+		<!-- Make directories for client code main -->
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main/config" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main/lib" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main/main_jar" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main/config_sample_files" />
+
+		<!-- Copy the client jars -->
+		<copy
+			file="JobCenter_Client_Main/readme/README_client_main_configuration.txt"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3" />
+
+		<copy file="JobCenter_Client_Main/readme/README_client_main_configuration.txt"
+			todir="create_installables_work_dir/jobcenter_client_installation" />
+
+		<copy todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main/lib">
+			<fileset dir="JobCenter_Client_Main/lib" />
+		</copy>
+
+		<copy file="generated_jars/jobcenter_base.jar"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main/lib" />
+
+		<copy file="generated_jars/jobcenter_client_main.jar"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main/main_jar" />
+
+		<copy
+			file="general_files_for_client/config_sample_files_directory_explanation.txt"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main/config_sample_files" />
+
+		<copy
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_main/config_sample_files">
+			<fileset dir="JobCenter_Client_Main/config_sample_files" />
+		</copy>
+
+		<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+		<!-- Building the client deployable jar -->
+
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3/config" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3/lib" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3/main_jar" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3/config_sample_files" />
+
+		<copy
+			file="JobCenter_Client_Jersey_1.3/readme/README_ConnectionToJobCenterServer.txt"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3" />
+
+		<copy
+			file="JobCenter_Client_Jersey_1.3/readme/README_ConnectionToJobCenterServer.txt"
+			todir="create_installables_work_dir/jobcenter_client_installation" />
+
+		<copy
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3/lib">
+			<fileset dir="JobCenter_Client_Jersey_1.3/lib" />
+		</copy>
+
+		<copy
+			file="general_files_for_client/config_sample_files_directory_explanation.txt"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3/config_sample_files" />
+
+		<copy
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3/config_sample_files">
+			<fileset dir="JobCenter_Client_Jersey_1.3/config_sample_files" />
+		</copy>
+
+		<copy file="generated_jars/jobcenter_client_jersey_1.3.jar"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code/client_server_interface_jersey_1.3/main_jar" />
+
+
+		<!-- job center module DoNothingTestModule -->
+
+		<!-- make new directories for the job center module DoNothingTestModule -->
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_modules/DoNothingTestModule" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_modules/DoNothingTestModule/config" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_modules/DoNothingTestModule/lib" />
+		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_modules/DoNothingTestModule/main_jar" />
+
+
+		<copy todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_modules/DoNothingTestModule/lib">
+			<fileset dir="JobCenter_DoNothingTestOnlyModule/lib" />
+		</copy>
+
+		<copy file="generated_jars/jobcenter_DoNothingTestModule.jar"
+			todir="create_installables_work_dir/jobcenter_client_installation/jobcenter_modules/DoNothingTestModule/main_jar" />
+
+
+
+		<!--  Jar up Main JobCenter Client deployable  -->
+		<jar jarfile="${deploy}/${installationJarName}" basedir="create_installables_work_dir/jobcenter_client_installation" />
+
+		<!-- Make copy of client directory for version with quick install settings  -->
+
+		<copy todir="create_installables_work_dir/jobcenter_client_quick_installation" >
+		    <fileset dir="create_installables_work_dir/jobcenter_client_installation">
+		        <include name="**"/>
+		    </fileset>
+		</copy>
+
+		<copy file="JobCenter_Client_Main/config_quick_install/config_client_main.properties"
+			todir="create_installables_work_dir/jobcenter_client_quick_installation/jobcenter_client_code/client_main/config" />
+
+		<copy file="JobCenter_Client_Main/config_quick_install/time_control_settings.txt"
+			todir="create_installables_work_dir/jobcenter_client_quick_installation/jobcenter_client_code/client_main/config" />
+
+
+		<copy file="JobCenter_Client_Jersey_1.3/config_quick_install/config_server_connection.properties"
+			todir="create_installables_work_dir/jobcenter_client_quick_installation/jobcenter_client_code/client_server_interface_jersey_1.3/config" />
+
+
+		<!--  Jar up Main JobCenter client  deployable  Quick Install version  -->
+		<jar jarfile="${deploy}/${installationQuickJarName}" basedir="create_installables_work_dir/jobcenter_client_quick_installation" />
+
+		<copy file="${deploy}/${installationQuickJarName}"
+			tofile="${deploy}/${installationQuickZipName}" />
+
+
+		<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+		<!-- Put the jobcenter_Submit_Job_To_DoNothingTestModule.jar in a folder under create_installables_work_dir    -->
+
+		<mkdir dir="${deploy}/submit_job_to_DoNothingTestModule_Test_Jar" />
+
+		<copy file="generated_jars/jobcenter_Submit_Job_To_DoNothingTestModule_Plain_Java.jar"
+			todir="${deploy}/submit_job_to_DoNothingTestModule_Test_Jar" />
+
+
+
+		<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+		<!--
+			Create module for running shell commands
+			Note: Optional Block. Use if deploying this module.
+		-->
+		<mkdir dir="create_installables_work_dir/module_run_shell_command/module_run_shell_command" />
+		<mkdir dir="create_installables_work_dir/module_run_shell_command/module_run_shell_command/config" />
+		<mkdir dir="create_installables_work_dir/module_run_shell_command/module_run_shell_command/lib" />
+		<mkdir dir="create_installables_work_dir/module_run_shell_command/module_run_shell_command/main_jar" />
+		<mkdir dir="create_installables_work_dir/module_run_shell_command/module_run_shell_command/config_sample_files" />
+
+		<copy todir="create_installables_work_dir/module_run_shell_command/module_run_shell_command/lib">
+			<fileset dir="Module_RunShellCommand/lib" />
+		</copy>
+
+		<copy file="general_files_for_client/config_sample_files_directory_explanation.txt"
+			todir="create_installables_work_dir/module_run_shell_command/module_run_shell_command/config_sample_files" />
+
+
+		<copy todir="create_installables_work_dir/module_run_shell_command/module_run_shell_command/config_sample_files">
+			<fileset dir="Module_RunShellCommand/config_sample_files" />
+		</copy>
+
+		<copy file="generated_jars/module_run_shell_command.jar"
+			todir="create_installables_work_dir/module_run_shell_command/module_run_shell_command/main_jar" />
+
+		<jar jarfile="${deploy}/provided_modules/${module_run_shell_commandJarName}"
+			basedir="create_installables_work_dir/module_run_shell_command" />
+
+
+		<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+		<!--
+			Create directory structure for blast module
+			Note: Optional Block. Use if deploying this module.
+		-->
+		<mkdir dir="create_installables_work_dir/blast_module/blast_module/" />
+		<mkdir dir="create_installables_work_dir/blast_module/blast_module/config" />
+		<mkdir dir="create_installables_work_dir/blast_module/blast_module/lib" />
+		<mkdir dir="create_installables_work_dir/blast_module/blast_module/main_jar" />
+		<mkdir dir="create_installables_work_dir/blast_module/blast_module/config_sample_files" />
+
+		<!-- copy contents of project lib to create_installables_work_dir lib -->
+		<copy todir="create_installables_work_dir/blast_module/blast_module/lib">
+			<fileset dir="JobCenter_Blast_Module/lib" />
+		</copy>
+
+		<!-- copy contents of project config_sample_files to create_installables_work_dir config_sample_files -->
+		<copy todir="create_installables_work_dir/blast_module/blast_module/config_sample_files">
+			<fileset dir="JobCenter_Blast_Module/config_sample_files" />
+		</copy>
+
+		<!-- copy jar to create_installables_work_dir main_jar -->
+		<copy file="generated_jars/jobcenter_blast_module.jar" todir="create_installables_work_dir/blast_module/blast_module/main_jar" />
+
+		<!-- jar the module -->
+		<jar jarfile="${deploy}/provided_modules/${module_blast_submitter}" basedir="create_installables_work_dir/blast_module" />
+
+	</target>
+</project>
