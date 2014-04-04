@@ -13,7 +13,8 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/asm-3.3.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Interface"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Jersey_1.3"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_base"/>
 	<classpathentry kind="output" path="Eclipsebin"/>
 </classpath>

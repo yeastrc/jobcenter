@@ -4,7 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.j2eedt.core.MYECLIPSE_JAVAEE_5_CONTAINER"/>
 	<classpathentry kind="src" path="resources"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Interface"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/apache-log4j-extras-1.0.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/asm-3.3.jar"/>
@@ -30,5 +29,6 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/struts-el-1.2.9.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/struts.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Default__Plain_Java"/>
 	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
 </classpath>

@@ -10,6 +10,7 @@ import org.jobcenter.managerthread.ManagerThread;
 
 import org.jobcenter.serverinterface.ClientStartupServerConnection;
 import org.jobcenter.util.BuildURLClassLoader;
+import org.jobcenter.util.JobToFile;
 
 
 public class ClientMain implements ClientMainIF {
@@ -45,6 +46,9 @@ public class ClientMain implements ClientMainIF {
 		try {
 
 			BuildURLClassLoader.setRootClassLoader( rootClassLoader );
+			
+			//  Create the jobs directories JobCenter will write to and test write a file in it.
+			JobToFile.createJobsDirectoryiesAndTestFiles();
 
 
 			RetrieveClientConfiguration retrieveClientConfiguration = new RetrieveClientConfiguration();

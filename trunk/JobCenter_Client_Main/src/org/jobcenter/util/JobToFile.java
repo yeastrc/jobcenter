@@ -1,11 +1,12 @@
 package org.jobcenter.util;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -34,11 +35,117 @@ public class JobToFile {
 	private static final int JOBS_RECEIVED_COUNT_MAX = 60;
 
 	private static final int JOBS_RECEIVED_TO_REMOVE = 20;
+	
+	private static final String TEST_FILENAME = "TEST_FILENAME.txt";
 
 	private static ClassLoader thisClassLoader = JobToFile.class.getClassLoader();
 
 	private static MutableInt jobsReceivedCounter = new MutableInt( 0 );
 
+	
+	
+	/**
+	 * if needed, create all the directories that jobs will be written to and test write a file in each directory
+	 */
+	public static void createJobsDirectoryiesAndTestFiles( ) throws Throwable {
+		
+		testCreateJobsFilesPerDirectory( ClientConstants.JOBS_IN_PROGRESS_DIRECTORY );
+		testCreateJobsFilesPerDirectory( ClientConstants.JOBS_FAILED_DIRECTORY );
+		testCreateJobsFilesPerDirectory( ClientConstants.JOBS_RECEIVED_DIRECTORY );
+		
+	}
+	
+	private static void testCreateJobsFilesPerDirectory( String directoryString ) throws Throwable {
+		
+		String outputFileString = TEST_FILENAME;
+
+		File outputFile = null;
+
+		try {
+
+			try {
+
+				File outputDirectory = new File( directoryString );
+
+				if ( ! outputDirectory.exists() ) {
+
+					if ( ! outputDirectory.mkdir() ) {
+
+						throw new Exception( "Unable to create directory for Jobcenter use.  directory = " + outputDirectory.getAbsolutePath() );
+					}
+				}
+				if ( ! outputDirectory.isDirectory() ) {
+
+					throw new Exception( "Directory for Jobcenter use is not a directory.  Directory for Jobcenter use = " + outputDirectory.getAbsolutePath() );
+				}
+
+
+				outputFile = new File( outputDirectory, outputFileString );
+
+				
+				BufferedWriter writer = null;
+
+				try {
+					
+					writer = new BufferedWriter( new FileWriter( outputFile ) );
+					
+					writer.write( "Test File Contents" );
+
+				} catch (Throwable t) {
+
+					throw t;
+
+				} finally {
+
+					if ( writer != null ) {
+						
+						writer.close();
+					}
+
+				}				
+				
+				if ( ! outputFile.exists() ) {
+					
+					throw new Exception("Unable to create Test file " + outputFile.getAbsolutePath() );
+				}
+				
+				if ( ! outputFile.delete() ) {
+					
+					throw new Exception("Unable to delete Test file " + outputFile.getAbsolutePath() );
+				}
+				
+				if ( log.isDebugEnabled() ) {
+
+					log.debug( "testCreateJobsFilesPerDirectory(...):  successfully created test file," 
+							+ " filename = " + outputFile.getAbsolutePath() );
+				}
+
+			} catch (Throwable t) {
+
+				throw t;
+
+			} finally {
+
+
+			}
+
+		} catch ( Throwable  t) {
+
+			String filename = outputFileString;
+
+			if ( outputFile != null ) {
+
+				filename = "Filename trying to save to = " + outputFile.getAbsolutePath();
+			}
+
+			log.error( "Exception in creating file to test writing in directory for Jobcenter use '" + directoryString + "'.  File = " + filename, t );
+
+			throw t;
+		}
+		
+	}
+	
+	
 
 	/**
 	 *

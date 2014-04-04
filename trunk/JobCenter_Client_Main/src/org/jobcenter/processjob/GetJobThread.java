@@ -305,8 +305,19 @@ public class GetJobThread extends Thread  {
 
 			//  if found job, put job on thread and awaken thread to process it.
 
-			JobToFile.saveJobToJobsInProgressDirectory( job );
+			try {
 
+				JobToFile.saveJobToJobsInProgressDirectory( job );
+
+			} catch ( Throwable t ) {
+
+
+				log.error( "Exception in saving job to Jobs In Progress Directory error: " + t.toString(), t );
+
+				sendJobResponseOnError( job, "", t );
+				
+				throw t;
+			}
 
 			String moduleName = "";
 
@@ -338,8 +349,10 @@ public class GetJobThread extends Thread  {
 				} catch ( Throwable t ) {
 
 
-					log.error( "Exception in processJobResponse(), trying to get moduleHolder: moduleName on job = " + moduleName, t );
+					log.error( "Exception in processJob(), trying to get moduleHolder: moduleName on job = " + moduleName, t );
 
+
+					sendJobResponseOnError( job, moduleName, t );
 
 
 					//			throw t;

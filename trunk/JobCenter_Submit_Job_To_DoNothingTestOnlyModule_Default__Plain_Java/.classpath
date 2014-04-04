@@ -6,7 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Interface"/>
 	<classpathentry kind="lib" path="lib/apache-log4j-extras-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Default__Plain_Java"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_base"/>
 	<classpathentry kind="output" path="Eclipsebin"/>

@@ -52,7 +52,7 @@
 		<ant dir="JobCenter_Client_Jersey_1.3" antfile="build.xml" target="clean" />
 
 		<ant dir="JobCenter_JobSubmissionClient_Interface" antfile="build.xml" target="clean" />
-		<ant dir="JobCenter_JobSubmissionClient" antfile="build.xml" target="clean" />
+		<ant dir="JobCenter_JobSubmissionClient_Default__Plain_Java" antfile="build.xml" target="clean" />
 		<ant dir="JobCenter_Server_Core" antfile="build.xml" target="clean" />
 
 		<ant dir="JobCenter_Server_Jersey" antfile="build.xml" target="clean" />
@@ -67,7 +67,8 @@
 		<ant dir="JobCenter_DoNothingTestOnlyModule" antfile="build.xml" target="clean" />
 
 		<!-- build jar that submits jobs to JobCenter_DoNothingTestOnlyModule  -->
-		<ant dir="JobCenter_Submit_Job_To_DoNothingTestOnlyModule" antfile="build.xml" target="clean" />
+		<ant dir="JobCenter_Submit_Job_To_DoNothingTestOnlyModule_Default__Plain_Java" antfile="build.xml" target="clean" />
+		          
 
 		<!-- build module for running shell commands  -->
 		<ant dir="Module_RunShellCommand" antfile="build.xml" target="clean" />
@@ -101,7 +102,7 @@
 		<ant dir="JobCenter_Client_Jersey_1.3" antfile="build.xml" />
 
 		<ant dir="JobCenter_JobSubmissionClient_Interface" antfile="build.xml" />
-		<ant dir="JobCenter_JobSubmissionClient" antfile="build.xml" />
+		<ant dir="JobCenter_JobSubmissionClient_Default__Plain_Java" antfile="build.xml" />
 		<ant dir="JobCenter_Server_Core" antfile="build.xml" />
 
 		<ant dir="JobCenter_Server_Jersey" antfile="build.xml" />
@@ -116,7 +117,7 @@
 		<ant dir="JobCenter_DoNothingTestOnlyModule" antfile="build.xml" />
 
 		<!-- build jar that submits jobs to JobCenter_DoNothingTestOnlyModule  -->
-		<ant dir="JobCenter_Submit_Job_To_DoNothingTestOnlyModule" antfile="build.xml" />
+		<ant dir="JobCenter_Submit_Job_To_DoNothingTestOnlyModule_Default__Plain_Java" antfile="build.xml" />
 
 		<!-- build module for running shell commands  -->
 		<ant dir="Module_RunShellCommand" antfile="build.xml" />
@@ -290,7 +291,7 @@
 
 		<mkdir dir="${deploy}/submit_job_to_DoNothingTestModule_Test_Jar" />
 
-		<copy file="generated_jars/jobcenter_Submit_Job_To_DoNothingTestModule.jar"
+		<copy file="generated_jars/jobcenter_Submit_Job_To_DoNothingTestModule_Plain_Java.jar"
 			todir="${deploy}/submit_job_to_DoNothingTestModule_Test_Jar" />
 
 

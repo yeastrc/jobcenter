@@ -48,7 +48,7 @@
 
 		<!--  Copy in the needed jar files generated from the source in the other projects -->
 		<copy file="../generated_jars/jobcenter_base.jar" todir="${libwebgui}" />
-		<copy file="../generated_jars/jobcenter_jobsubmission_client.jar" todir="${libwebgui}" />
+		<copy file="../generated_jars/jobcenter_jobsubmission_client_Default_Plain_Java.jar" todir="${libwebgui}" />
 		<copy file="../generated_jars/jobcenter_jobsubmissionclient_interface.jar" todir="${libwebgui}" />
 
 		<!--  Build the Java code   -->
