@@ -245,10 +245,6 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 				marshaller.marshal( submitJobRequest, bufferedOutputStream ) ;
 
-
-
-				bufferedOutputStream.write( "ExtraStuff".getBytes() );
-
 			} catch ( JAXBException e ) {
 
 				JobcenterSubmissionXML_JAXBErrorException exc = new JobcenterSubmissionXML_JAXBErrorException( "JAXBException creating XML to send to server at URL: " + fullConnectionURL, e );
