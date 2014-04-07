@@ -1,0 +1,142 @@
+
+
+How to build a module:
+
+
+The class that serves as the module starting point must implement the interface "ModuleInterfaceClientMainInterface".
+
+This interface is in the package "org.jobcenter.job_client_module_interface"
+in the project "JobCenter_Client_Module_Interface".
+
+The class loader for the module will have the following in the class path, in the order listed ( beyond the root class loader )
+
+1) the "config" directory under the module directory
+2) all the jars in the "main_jar" directory under the module directory
+3) all the jars in the "lib" directory under the module directory
+
+
+The module will not load if there is not at least one jar under the "main_jar" directory.
+
+---------------------
+
+**  Module configuration - files the JobCenter Client reads to get information about the module.
+
+  **  Please do not place properties in these files that the module will read.
+
+  Configuring the module is done by setting 2 properties files that are read using the class loader for the module
+  so the directories and jars will be searched in the order described above
+
+  1)  jobcenter_module_config_per_module.properties
+  2)  jobcenter_module_config_per_client.properties
+
+  
+  1)  The file "jobcenter_module_config_per_module.properties" is used for configuration that does not change between client installations
+      and to provide defaults for other properties.
+
+  2)  The file "jobcenter_module_config_per_client.properties" is used for configuration that specific to a client installation.
+      It provides overrides to the defaults and other client specific settings. 
+
+  The file "jobcenter_module_config_per_client.properties" is usually copied to the "config" directory to provide installation specific values.
+
+  See the project "JobCenter_Sample_Module" for examples.
+
+  -------------
+
+  **  Module configuration - utilization of threads
+
+   Some modules or external programs that the module may execute are able to utilize multiple threads.
+   To support this, the JobCenter client has a configuration entry for the total number of threads that all modules can be using at the same time.
+   
+   The module configuration files listed above ("jobcenter_module_config_per_module.properties" and "jobcenter_module_config_per_client.properties")
+   contain properties that provide this configuration.
+
+   When the JobCenter client passes a job to the module, it passes the number of threads that the module is allowed to use to process
+   that job.  The module is responsible for either creating the additional threads or passing along the number of threads to
+   external programs like BLAST.
+
+   - Default values
+
+      "jobcenter_module_config_per_module.properties" contains Default values for the maximum and minimum number of threads for the module.
+
+      The property "module.default.max.threads.per.job" specifies the maximum number of threads that the module or it's external program can use.
+      If there really isn't a maximum, set a value of "u" (for "unlimited") so that the maximum available threads 
+      within the JobCenter Client configuration will always be used.  
+
+      The property "module.default.min.threads.per.job" specifies the minimum number of threads that the module or it's external program requires.
+
+
+   - Client installation specific values - these override the Default values
+
+      "jobcenter_module_config_per_client.properties" contains Client installation specific values for 
+      the maximum and minimum number of threads for the module.
+
+      The property "module.max.threads.per.job" specifies the maximum number of threads that the module or it's external program can use.
+      If there really isn't a maximum, set a value of "u" (for "unlimited") so that the maximum available threads 
+      within the JobCenter Client configuration will always be used.  
+
+      The property "module.min.threads.per.job" specifies the minimum number of threads that the module or it's external program requires.
+
+
+---------------------
+
+**  Class loader info and what classes are available to the module:
+
+The module will be loaded in it's own Classloader.
+The parent class loader to the module class loader is the root class loader.
+The only classes in the root class loader are loaded in the Client_Root.
+Client root loads the classes from the JobCenter_Client_Module_Interface project and the mail.jar classes.
+
+Nothing in Client_main and Client_Jersey_1.3 are in the class loader hierarchy for the module
+so they are not visible to the module.  This includes the main_jar, lib, and config directories
+
+
+---------------------
+
+Module loading into memory
+
+The module may be loaded more than once into memory.
+Each new instance of the module is loaded in it's own class loader and the new job is passed to that module.
+Even static variables are not shared between instances of a module.
+If all instances of the module are processing jobs and configuration allows another job to be processed for that module, 
+a new instance of the module is loaded in it's own class loader and the new job is passed to that instance of the module.
+Instances of the module are only removed from memory at client shutdown.
+
+---------------------
+
+Module loading and threading
+
+A given instance of the module will only process one job at a given time.
+A given instance of the module will only have one thread processing in it at any given time.
+The module does not need to be thread safe.
+
+
+---------------------
+
+Client Shutdown support
+
+When the client receives the "kill" signal from the operating system,
+it will call "shutdown()" on all modules actively processing jobs.
+If the modules actively processing jobs do not return from the "processRequest" method,
+the client process may be killed by the operating system after some time has passed
+( controlled by the operating system ) and the job will be left in the state of "Running".
+The next time that client starts up, it will detect all jobs left in the running state and
+update them to failed on the server.
+
+The client utilizes the Java registration of shutdown hook:	    Runtime.getRuntime().addShutdownHook( xxxxxxxxx );
+
+
+---------------------
+
+Logging support
+
+If the module does logging, it must initialize it's own logger, as shown in the project "JobCenter_Sample_Module".
+It must also have it's own log4j.jar and apache-log4j-extras-1.0.jar jars and own log4j.xml config file.
+It does not need mail.jar since that is in the root class loader.
+The logging for the module will go into a separate log file.
+Putting "${module.instance.count}" in the filename in the log4j.xml config file will cause a different file to be
+created for each instantiation of the module.
+
+
+The code in the project "JobCenter_Sample_Module" can be a starting point for how to write a module.
+
+
