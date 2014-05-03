@@ -1,5 +1,6 @@
 package org.jobcenter.coreinterfaces;
 
+import java.util.List;
 import java.util.Map;
 
 import org.jobcenter.client_exceptions.JobcenterSubmissionGeneralErrorException;
@@ -53,6 +54,37 @@ public interface JobSubmissionInterface {
 	 * @throws JobcenterSubmissionXML_JAXBErrorException - A JAXB Exception was thrown marshalling or unmarshalling the XML to/from Java object
 	 */
 	public int submitJob( String requestTypeName, Integer requestId, String jobTypeName, String submitter, Integer priority, Map<String, String> jobParameters )
+	throws
+	JobcenterSubmissionGeneralErrorException,
+	JobcenterSubmissionServerErrorException,
+	JobcenterSubmissionHTTPErrorException,
+	JobcenterSubmissionMalformedURLErrorException,
+	JobcenterSubmissionIOErrorException,
+	JobcenterSubmissionXML_JAXBErrorException;
+
+	
+
+	/**
+	 * @param requestTypeName - the name of the request type
+	 * @param requestId - Pass in to relate the submitted job to an existing requestId.  Pass in null otherwise
+	 * @param submitter
+	 * @param jobSubmissionJobsList - list of jobs with intermingling dependencies 
+	 *
+	 * @return requestId - the next assigned id related to the particular requestTypeName.  Will return the passed in requestId if one is provided ( not null )
+	 *
+	 * @throws IllegalStateException - The connectionURL to the server is not configured
+	 * @throws IllegalArgumentException - jobTypeName cannot be null
+	 *
+	 * These Exceptions are only thrown from JobCenter_JobSubmissionClient_Plain_Java
+	 *
+	 * @throws JobcenterSubmissionGeneralErrorException - An error condition not covered by any of the other exceptions thrown by this method
+	 * @throws JobcenterSubmissionServerErrorException - The Jobcenter code on the server has refused this submit request or has experienced an error
+	 * @throws JobcenterSubmissionHTTPErrorException - HTTP response code returned as a result of sending this request to the server
+	 * @throws JobcenterSubmissionMalformedURLErrorException - The connection URL cannot be processed into a URL object
+	 * @throws JobcenterSubmissionIOErrorException - An IOException was thrown
+	 * @throws JobcenterSubmissionXML_JAXBErrorException - A JAXB Exception was thrown marshalling or unmarshalling the XML to/from Java object
+	 */
+	public int submitJobsWithDependencies( String requestTypeName, Integer requestId, String submitter, List<JobSubmissionJobInterface> jobSubmissionJobsList )
 	throws
 	JobcenterSubmissionGeneralErrorException,
 	JobcenterSubmissionServerErrorException,

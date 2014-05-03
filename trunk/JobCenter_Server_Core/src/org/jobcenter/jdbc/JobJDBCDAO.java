@@ -39,6 +39,8 @@ public interface JobJDBCDAO {
 	public  void markJobInsertComplete ( Job job );
 
 	public  void insertJobParameter ( String key, String value, int jobId );
+	
+	public  void insertJobDependcy( int jobId, int jobDependency );
 
 	public  void healthCheck ( );
 

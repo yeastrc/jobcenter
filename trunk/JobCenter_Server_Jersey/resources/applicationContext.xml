@@ -245,20 +245,24 @@
 			<ref bean="clientNodeNameCheck" />
 		</property>
 
-		<property name="jobJDBCDAO">
-			<ref bean="jobJDBCDAO" />
+		<property name="submitJobInternalService">
+			<ref bean="submitJobInternalService" />
 		</property>
 
 
-		<!-- Hibernate DAO -->
+	</bean>
 
-		<property name="jobTypeDAO">
-			<ref bean="jobTypeDAO" />
+
+	<bean id="SubmitJobsListWithDependenciesService" class="org.jobcenter.service.SubmitJobsListWithDependenciesServiceImpl">
+
+		<property name="clientNodeNameCheck">
+			<ref bean="clientNodeNameCheck" />
 		</property>
 
-		<property name="requestTypeDAO">
-			<ref bean="requestTypeDAO" />
+		<property name="submitJobInternalService">
+			<ref bean="submitJobInternalService" />
 		</property>
+
 
 	</bean>
 
@@ -572,6 +576,25 @@
 
 
 <!--   Internal services -->
+
+
+
+	<bean id="submitJobInternalService" class="org.jobcenter.internalservice.SubmitJobInternalServiceImpl">
+
+		<property name="jobJDBCDAO">
+			<ref bean="jobJDBCDAO" />
+		</property>
+
+		<property name="jobTypeDAO">
+			<ref bean="jobTypeDAO" />
+		</property>
+
+		<property name="requestTypeDAO">
+			<ref bean="requestTypeDAO" />
+		</property>
+		
+	</bean>
+
 
 	<bean id="clientsStatusRetrieveAndSendEmailService" class="org.jobcenter.internalservice.ClientsStatusRetrieveAndSendEmailServiceImpl">
 

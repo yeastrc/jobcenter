@@ -17,7 +17,9 @@ public interface WebServiceURLConstants {
 	public static final String CLIENT_UPDATE_STATUS = "clientUpdateStatus";
 
 	public static final String GET_NEXT_JOB_FOR_CLIENT_TO_PROCESS = "getNextJobForClient";
+	
 	public static final String SUBMIT_JOB = "submitJob";
+	public static final String SUBMIT_JOBS_LIST_WITH_DEPENDENCIES = "submitJobsListWithDependencies";
 
 	//  GUI
 

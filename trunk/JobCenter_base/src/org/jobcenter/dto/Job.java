@@ -4,9 +4,11 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.jobcenter.constants.JobConstants;
 import org.jobcenter.util.JobUtilities;
@@ -19,6 +21,7 @@ import org.jobcenter.util.JobUtilities;
  */
 
 @XmlRootElement(name = "job")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Job {
 
 	private int id;
@@ -74,6 +77,12 @@ public class Job {
 
 
 	private Map<String, String> jobParameters;
+	
+	@XmlTransient //  Do not send to client
+	private List<Integer> jobDependencies;
+	
+	
+
 
 	private int jobParameterCountWhenRetrievedByGetJob = -1;
 
@@ -379,6 +388,16 @@ public class Job {
 
 	public void setSoftErrorRetryCount(int softErrorRetryCount) {
 		this.softErrorRetryCount = softErrorRetryCount;
+	}
+	
+
+	public List<Integer> getJobDependencies() {
+		return jobDependencies;
+	}
+
+
+	public void setJobDependencies(List<Integer> jobDependencies) {
+		this.jobDependencies = jobDependencies;
 	}
 
 }

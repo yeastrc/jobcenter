@@ -155,6 +155,11 @@ public class ClientStatusDBUpdateServiceImpl implements ClientStatusDBUpdateServ
 					nodeClientStatusDTO.setNodeId( nodeId );
 
 					updateDBRecordWithStatus( nodeClientStatusDTO, updateType, timeUntilNextClientStatusUpdate );
+					
+					if ( log.isDebugEnabled() ) {
+						
+						log.debug( "nodeClientStatusDTO to save: " + nodeClientStatusDTO );
+					}
 
 					nodeClientStatusDAO.save( nodeClientStatusDTO );
 

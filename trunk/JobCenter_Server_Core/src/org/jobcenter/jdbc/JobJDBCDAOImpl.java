@@ -18,10 +18,8 @@ import org.jobcenter.constants.DBConstantsServerCore;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.ServerCoreConstants;
 import org.jobcenter.dto.Job;
-import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RunDTO;
 import org.jobcenter.dto.RunMessageDTO;
-import org.jobcenter.dto.StatusDTO;
 import org.jobcenter.exception.RecordNotUpdatedException;
 import org.jobcenter.request.ListJobsRequest;
 import org.springframework.context.ApplicationContext;
@@ -1191,10 +1189,6 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 				PreparedStatement pstmt = null;
 
-
-				ResultSet rsKeys = null;
-
-
 				int rowsUpdated = 0;
 
 				//		Connection connection = null;
@@ -1227,14 +1221,6 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 				} finally {
 
-					if (rsKeys != null) {
-						try {
-							rsKeys.close();
-						} catch (SQLException ex) {
-							// ignore
-						}
-					}
-
 
 					if (pstmt != null) {
 						try {
@@ -1250,6 +1236,80 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			}
 		} );
 	}
+	
+
+
+	/**
+	 *
+	 */
+	private static String
+	insertJobDependcySqlString
+	= "INSERT INTO job_dependencies ( dependent_job, dependee_job )  "
+		+ "  VALUES ( ?, ? ) " ;
+
+	/* (non-Javadoc)
+	 * @see org.jobcenter.jdbc.JobJDBCDAO#insertJobParameter(java.lang.String, java.lang.String, int)
+	 */
+	public  void insertJobDependcy( final int jobId, final int jobDependency )
+	{
+
+		super.doJDBCWork(  new JDBCBaseWorkIF() {
+			public void execute(Connection connection) throws SQLException {
+
+
+				final String method = "WORM-insertJobDependcy( final Integer jobId, final Integer jobDependency )";
+
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Entering " + method );
+				}
+
+				PreparedStatement pstmt = null;
+
+				int rowsUpdated = 0;
+
+				//		Connection connection = null;
+
+
+				try {
+
+					//			connection = getConnection( );
+
+
+					pstmt = connection.prepareStatement( insertJobDependcySqlString );
+
+					pstmt.setInt( 1, jobId );
+
+					pstmt.setInt( 2, jobDependency );
+
+					rowsUpdated = pstmt.executeUpdate();
+
+
+				} catch (Throwable sqlEx) {
+
+					log.error( method + ":Exception:  jobId = " + jobId + ", jobDependency = " + jobDependency
+							+ " \nSQL = '" + insertJobDependcySqlString
+							+ "\n Exception message: " + sqlEx.toString() + '.', sqlEx);
+
+					//  Wrap in RuntimeException for Spring Transactional rollback
+					throw new RuntimeException( sqlEx );
+
+				} finally {
+
+					if (pstmt != null) {
+						try {
+							pstmt.close();
+						} catch (SQLException ex) {
+							// ignore
+						}
+					}
+
+
+					//			releaseConnection( connection );
+				}
+			}
+		} );
+	}
+	
 
 
 	/**
