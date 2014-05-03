@@ -13,7 +13,7 @@ public class UpdateServerFromJobRunOnClientRequest extends BaseRequest {
 	public static final boolean IGNORE_JOB_DB_RECORD_VERSION_NUMBER_TRUE = true;
 	public static final boolean IGNORE_JOB_DB_RECORD_VERSION_NUMBER_FALSE = false;
 	
-	Job job;
+	private Job job;
 	
 	private boolean ignoreJobdbRecordVersionNumber = false;
 	

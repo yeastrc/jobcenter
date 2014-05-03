@@ -12,6 +12,7 @@ import org.jobcenter.dto.Job;
 import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RequestTypeDTO;
 import org.jobcenter.internalservice.ClientNodeNameCheck;
+import org.jobcenter.internalservice.SubmitJobInternalService;
 import org.jobcenter.jdbc.JobJDBCDAO;
 import org.jobcenter.request.SubmitJobRequest;
 import org.jobcenter.response.BaseResponse;
@@ -47,6 +48,7 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 	//  Service
 
 	private ClientNodeNameCheck clientNodeNameCheck;
+	private SubmitJobInternalService submitJobInternalService;
 
 	public ClientNodeNameCheck getClientNodeNameCheck() {
 		return clientNodeNameCheck;
@@ -55,37 +57,14 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 		this.clientNodeNameCheck = clientNodeNameCheck;
 	}
 
-
-
-	//  Hibernate DAO
-
-	private RequestTypeDAO requestTypeDAO;
-	private JobTypeDAO jobTypeDAO;
-
-	public JobTypeDAO getJobTypeDAO() {
-		return jobTypeDAO;
+	public SubmitJobInternalService getSubmitJobInternalService() {
+		return submitJobInternalService;
 	}
-	public void setJobTypeDAO(JobTypeDAO jobTypeDAO) {
-		this.jobTypeDAO = jobTypeDAO;
-	}
-	public RequestTypeDAO getRequestTypeDAO() {
-		return requestTypeDAO;
-	}
-	public void setRequestTypeDAO(RequestTypeDAO requestTypeDAO) {
-		this.requestTypeDAO = requestTypeDAO;
+	public void setSubmitJobInternalService(
+			SubmitJobInternalService submitJobInternalService) {
+		this.submitJobInternalService = submitJobInternalService;
 	}
 
-
-	//  JDBC DAO
-
-	private JobJDBCDAO jobJDBCDAO;
-
-	public JobJDBCDAO getJobJDBCDAO() {
-		return jobJDBCDAO;
-	}
-	public void setJobJDBCDAO(JobJDBCDAO jobJDBCDAO) {
-		this.jobJDBCDAO = jobJDBCDAO;
-	}
 
 	/**
 	 * @param jobRequest
@@ -120,156 +99,39 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 		///////////
 
 		//  validate request type name
+		
 
-		RequestTypeDTO requestTypeDTO = requestTypeDAO.findOneRecordByName( submitJobRequest.getRequestTypeName() );
-
+		RequestTypeDTO requestTypeDTO = submitJobInternalService.validateRequestTypeNameRequestId( submitJobRequest.getRequestTypeName(), submitJobRequest.getRequestId(), submitJobResponse );
+		
 		if ( requestTypeDTO == null ) {
-
-			//  record not found
-
-
-			if ( log.isInfoEnabled() ) {
-
-				log.info( "SubmitJobServiceImpl::submitJob: RequestTypeName not found:  submitJobRequest.getRequestTypeName() = |" + submitJobRequest.getRequestTypeName() + "|."  );
-			}
-
-			submitJobResponse.setErrorResponse( true );
-
-			submitJobResponse.setErrorCode( BaseResponse.ERROR_CODE_REQUEST_TYPE_NAME_NOT_FOUND );
-
+			
 			return submitJobResponse;
-
-		}
-
-		if ( submitJobRequest.getRequestId() != null ) {
-
-			// request id is supplied so confirm it is in the Db for the supplied request type
-
-			Integer requestIdSearchResult = jobJDBCDAO.getRequestFromIdAndRequestType( submitJobRequest.getRequestId(), requestTypeDTO.getId() );
-
-			if ( requestIdSearchResult == null ) {
-
-				//  record not found
-
-
-				if ( log.isInfoEnabled() ) {
-
-					log.info( "SubmitJobServiceImpl::submitJob: RequestTypeName not found:  submitJobRequest.getRequestTypeName() = |" + submitJobRequest.getRequestTypeName() + "|."  );
-				}
-
-				submitJobResponse.setErrorResponse( true );
-
-				submitJobResponse.setErrorCode( BaseResponse.ERROR_CODE_REQUEST_ID_NOT_FOUND_FOR_GIVEN_REQUEST_TYPE_NAME );
-
-				return submitJobResponse;
-			}
 		}
 
 
 		//////////////
-
-//		JobType jobType = jobJDBCDAO.getJobTypeFromName( submitJobRequest.getJobTypeName() );
-
-		JobType jobType = jobTypeDAO.findOneRecordByName( submitJobRequest.getJobTypeName() );
-
+		
+		JobType jobType = submitJobInternalService.validateJobTypeName( submitJobRequest.getJobTypeName(), submitJobRequest.getRequestId(), submitJobResponse );
+		
 		if ( jobType == null ) {
-
-			//  record not found
-
-
-			if ( log.isInfoEnabled() ) {
-
-				log.info( "SubmitJobServiceImpl::submitJob: JobTypeName not found:  submitJobRequest.getJobTypeName() = |" + submitJobRequest.getJobTypeName() + "|."  );
-			}
-
-			submitJobResponse.setErrorResponse( true );
-
-			submitJobResponse.setErrorCode( BaseResponse.ERROR_CODE_JOB_TYPE_NAME_NOT_FOUND );
-
+			
 			return submitJobResponse;
 		}
 
-
-		if ( jobType.getEnabled() == null || ( ! jobType.getEnabled() ) ) {
-
-			//  record disabled
-
-
-			if ( log.isInfoEnabled() ) {
-
-				log.info( "SubmitJobServiceImpl::submitJob: JobType record disabled :  submitJobRequest.getName() = |" + submitJobRequest.getJobTypeName() + "|."  );
-			}
-
-			submitJobResponse.setErrorResponse( true );
-
-			submitJobResponse.setErrorCode( BaseResponse.ERROR_CODE_JOB_TYPE_NAME_DISABLED );
-
-			return submitJobResponse;
-
-		}
-
-
-		Job job = new Job();
-
-		job.setInsertComplete( DBConstantsServerCore.JobTableInsertCompleteF );
-
-		job.setJobTypeId( jobType.getId() );
-		job.setJobParameters( submitJobRequest.getJobParameters() );
-		job.setSubmitter( submitJobRequest.getSubmitter() );
-
-		job.setStatusId( JobStatusValuesConstants.JOB_STATUS_SUBMITTED );
-
-		Integer submittedPriority = submitJobRequest.getPriority();
-
-		if ( submittedPriority == null ) {
-
-			job.setPriority( jobType.getPriority() );
-
-		} else {
-
-			job.setPriority( submittedPriority );
-		}
-
-
+		
 		Integer requestId = submitJobRequest.getRequestId();
 
 		if ( requestId == null ) {
 
-			requestId = jobJDBCDAO.insertRequest( requestTypeDTO.getId() );
+			requestId = submitJobInternalService.insertRequest( requestTypeDTO );
 		}
 
-		job.setRequestId( requestId );
 		
-		
-		int jobParameterCount = -1;
-		
-		Map<String, String> jobParameters = job.getJobParameters();
-		
-		if ( jobParameters != null ) {
+		Job job = submitJobInternalService.createJobFromSubmitJobRequest( submitJobRequest, jobType, requestId );
 
-			jobParameterCount = jobParameters.size();
-		}
-		
-		job.setJobParameterCount( jobParameterCount );
+		submitJobInternalService.insertJob( job );
 
-		jobJDBCDAO.insertJob( job );
-
-		if ( jobParameters != null && ( ! jobParameters.isEmpty() ) ) {
-
-			for ( Map.Entry<String, String> entry : jobParameters.entrySet() ) {
-
-				jobJDBCDAO.insertJobParameter( entry.getKey(), entry.getValue(), job.getId() );
-
-			}
-		}
-
-		//  set field "insert_complete" to "T" so that the job can be sent to the client
-
-		job.setInsertComplete( DBConstantsServerCore.JobTableInsertCompleteT );
-
-		jobJDBCDAO.markJobInsertComplete( job );
-
-		submitJobResponse.setRequestId( job.getRequestId() );
+		submitJobResponse.setRequestId( requestId );
 
 		return submitJobResponse;
 	}

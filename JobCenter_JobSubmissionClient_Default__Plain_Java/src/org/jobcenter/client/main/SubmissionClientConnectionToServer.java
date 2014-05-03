@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
@@ -20,6 +21,13 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //import org.apache.log4j.Logger;
+
+
+
+
+
+
+
 
 import org.jobcenter.client_exceptions.JobcenterSubmissionGeneralErrorException;
 import org.jobcenter.client_exceptions.JobcenterSubmissionHTTPErrorException;
@@ -30,8 +38,13 @@ import org.jobcenter.client_exceptions.JobcenterSubmissionXML_JAXBErrorException
 import org.jobcenter.constants.Constants;
 import org.jobcenter.constants.WebServiceURLConstants;
 import org.jobcenter.coreinterfaces.JobSubmissionInterface;
+import org.jobcenter.coreinterfaces.JobSubmissionJobInterface;
 import org.jobcenter.request.SubmitJobRequest;
+import org.jobcenter.request.SubmitJobsListWithDependenciesRequest;
+import org.jobcenter.response.BaseResponse;
 import org.jobcenter.response.SubmitJobResponse;
+import org.jobcenter.response.SubmitJobsListWithDependenciesResponse;
+import org.jobcenter.submission.internal.utils.JobSubmissionTransforms;
 
 
 /**
@@ -45,9 +58,13 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 	private static final int SUCCESS_HTTP_RETURN_CODE = 200;
 
-	private static final String CONNECTION_URL_EXTENSION
+	private static final String SUBMIT_JOB_CONNECTION_URL_EXTENSION
 
 			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.SUBMIT_JOB;
+
+	private static final String SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION
+
+			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.SUBMIT_JOBS_LIST_WITH_DEPENDENCIES;
 
 
 	private static final String CONTENT_TYPE_SEND_RECEIVE = "application/xml";
@@ -57,6 +74,8 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 
 	private String submissionNodeName = Constants.SUBMISSION_CLIENT_NODE_NAME_DEFAULT;
+	
+	private JAXBContext jaxbContext;
 
 
 
@@ -76,9 +95,20 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 			throw new IllegalArgumentException( "connectionURL cannot be null or empty" );
 		}
 
-
-
 		this.connectionURL = connectionURL;
+		
+
+		try { 
+			jaxbContext = JAXBContext.newInstance( SubmitJobResponse.class, SubmitJobRequest.class, SubmitJobsListWithDependenciesResponse.class, SubmitJobsListWithDependenciesRequest.class );
+		} catch (JAXBException e) {
+
+			JobcenterSubmissionXML_JAXBErrorException exc = new JobcenterSubmissionXML_JAXBErrorException( "JAXBException Setting up JAXBContext for sending XML to server at URL: " + connectionURL, e );
+
+			exc.setFullConnectionURL( connectionURL );
+
+			throw exc;
+
+		}
 
 	}
 
@@ -140,45 +170,79 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 			throw new IllegalStateException( "The connectionURL to the server is not configured." );
 		}
 
-		if ( jobTypeName == null ) {
 
-			throw new IllegalArgumentException( "jobTypeName cannot be null" );
+
+		SubmitJobRequest submitJobRequest = JobSubmissionTransforms.createSubmitJobRequest( requestTypeName, requestId, jobTypeName, submitter, priority, jobParameters, submissionNodeName );
+
+		
+		String fullConnectionURL = connectionURL + SUBMIT_JOB_CONNECTION_URL_EXTENSION;
+
+		BaseResponse baseResponse = sendRequestToServerGetRequestId(requestTypeName, requestId, fullConnectionURL, submitJobRequest, jobTypeName );
+
+		if ( ! ( baseResponse instanceof SubmitJobResponse ) ) {
+			
+			throw new JobcenterSubmissionGeneralErrorException("Processing Error: Server returned XML that deserialed to unexpected type");
 		}
+		
+		SubmitJobResponse submitJobResponse = (SubmitJobResponse) baseResponse;
+		
+		return submitJobResponse.getRequestId();
 
+	}
+	
+	
+	
+	
 
-		String fullConnectionURL = connectionURL + CONNECTION_URL_EXTENSION;
+	@Override
+	public int submitJobsWithDependencies(String requestTypeName,
+			Integer requestId, 
+			String submitter, 
+			List<JobSubmissionJobInterface> jobSubmissionJobsList )
 
+					throws JobcenterSubmissionGeneralErrorException,
+					JobcenterSubmissionServerErrorException,
+					JobcenterSubmissionHTTPErrorException,
+					JobcenterSubmissionMalformedURLErrorException,
+					JobcenterSubmissionIOErrorException,
+					JobcenterSubmissionXML_JAXBErrorException {
+		
+		
+		String fullConnectionURL = connectionURL + SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION;
 
-		SubmitJobRequest submitJobRequest = new SubmitJobRequest();
+		SubmitJobsListWithDependenciesRequest submitJobsListWithDependenciesRequest = JobSubmissionTransforms.createSubmitJobsListWithDependenciesRequest( requestTypeName, requestId, submitter, jobSubmissionJobsList, submissionNodeName );
 
-		submitJobRequest.setNodeName( submissionNodeName );
+		
+		BaseResponse baseResponse = sendRequestToServerGetRequestId(requestTypeName, requestId, fullConnectionURL, submitJobsListWithDependenciesRequest, null /* jobTypeName */ );
 
-		submitJobRequest.setRequestTypeName( requestTypeName );
-		submitJobRequest.setRequestId( requestId );
-
-		submitJobRequest.setJobTypeName( jobTypeName );
-
-		submitJobRequest.setPriority (priority );
-		submitJobRequest.setSubmitter( submitter );
-		submitJobRequest.setJobParameters( jobParameters );
-
-
-
-		JAXBContext jaxbContext;
-		try {
-			jaxbContext = JAXBContext.newInstance( SubmitJobResponse.class, SubmitJobRequest.class );
-		} catch (JAXBException e) {
-
-			JobcenterSubmissionXML_JAXBErrorException exc = new JobcenterSubmissionXML_JAXBErrorException( "JAXBException Setting up JAXBContext for sending XML to server at URL: " + fullConnectionURL, e );
-
-			exc.setFullConnectionURL( fullConnectionURL );
-
-			throw exc;
-
+		if ( ! ( baseResponse instanceof SubmitJobsListWithDependenciesResponse ) ) {
+			
+			throw new JobcenterSubmissionGeneralErrorException("Processing Error: Server returned XML that deserialed to unexpected type");
 		}
+		
+		SubmitJobsListWithDependenciesResponse submitJobsListWithDependenciesResponse = (SubmitJobsListWithDependenciesResponse) baseResponse;
+		
+		return submitJobsListWithDependenciesResponse.getRequestId();
+
+	}
 
 
 
+	/**
+	 * @param requestTypeName
+	 * @param requestId
+	 * @param fullConnectionURL
+	 * @param requestObject - submitJobRequest or 
+	 * @param jobTypeName - for error message
+	 * @param firstJobTypeName
+	 * @return
+	 */
+	private BaseResponse sendRequestToServerGetRequestId(String requestTypeName,
+			Integer requestId, 
+			String fullConnectionURL,
+			Object requestObject, 
+			String jobTypeName ) {
+		
 		URL urlObject;
 		try {
 			urlObject = new URL( fullConnectionURL );
@@ -243,7 +307,7 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 				marshaller.setProperty( Marshaller.JAXB_ENCODING, "UTF-8" );
 
-				marshaller.marshal( submitJobRequest, bufferedOutputStream ) ;
+				marshaller.marshal( requestObject, bufferedOutputStream ) ;
 
 			} catch ( JAXBException e ) {
 
@@ -341,7 +405,7 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 			}
 
-			SubmitJobResponse submitJobResponse = null;
+			BaseResponse baseResponse = null;
 
 			BufferedInputStream bufferedInputStream = null;
 
@@ -353,7 +417,7 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 				Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-				submitJobResponse = (SubmitJobResponse) unmarshaller.unmarshal( bufferedInputStream );
+				baseResponse = (BaseResponse) unmarshaller.unmarshal( bufferedInputStream );
 
 			} catch ( JAXBException e ) {
 
@@ -450,25 +514,48 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 			}
 
 
-			if ( submitJobResponse.isErrorResponse() ) {
+			if ( baseResponse.isErrorResponse() ) {
+				
+				StringBuilder msgSB = new StringBuilder( 1000 );
 
-				String msg = "Submission of job failed.  Error code = " + submitJobResponse.getErrorCode() + ", error code desc = " + submitJobResponse.getErrorCodeDescription()
-				+ ", the client's IP address as seen by the server = " + submitJobResponse.getClientIPAddressAtServer()
-				+ "\n  requestTypeName = |" + requestTypeName + "|, requestId = " + requestId + ", jobTypeName = |" + jobTypeName + "|.";
+				msgSB.append( "Submission of job failed.  Error code = " ); 
+				msgSB.append( baseResponse.getErrorCode()  ); 
+				msgSB.append(  ", error code desc = "  ); 
+				msgSB.append( baseResponse.getErrorCodeDescription() ); 
+				msgSB.append(  ", the client's IP address as seen by the server = "  ); 
+				msgSB.append( baseResponse.getClientIPAddressAtServer() ); 
+				msgSB.append( "\n  requestTypeName = |"  );  
+				msgSB.append( requestTypeName  ); 
+				msgSB.append( "|, requestId = "  ); 
+				msgSB.append( requestId );  
+				
+				if ( jobTypeName != null ) {
+					
+					msgSB.append( ", jobTypeName = |"  ); 
+					msgSB.append( jobTypeName ); 
+					msgSB.append( "|" );
+				}
+				
 
-				throw new JobcenterSubmissionServerErrorException( submitJobResponse.getErrorCode(), submitJobResponse.getErrorCodeDescription(), submitJobResponse.getClientIPAddressAtServer(), msg );
+				msgSB.append( "." );
+				
+				String msg = msgSB.toString();
+
+				throw new JobcenterSubmissionServerErrorException( baseResponse.getErrorCode(), baseResponse.getErrorCodeDescription(), baseResponse.getClientIPAddressAtServer(), msg );
 			}
 
 
-			return submitJobResponse.getRequestId();
+			return baseResponse; 
 
 		} finally {
 
 //			httpURLConnection.disconnect();
 		}
-
-
 	}
+	
+
+	
+	
 
 
 	/**
@@ -507,6 +594,7 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 		return baos.toByteArray();
 	}
+
 
 
 

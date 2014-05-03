@@ -19,26 +19,80 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 
 	private static final Logger log = Logger.getLogger(GetNextJobForClientJDBCDAOImpl.class);
 
+	private static String
+	GET_JOB_FOR_JOB_REQUEST_QUERY_SUB_SELECT 
+	=  "              AND ( job.status_id = " + JobStatusValuesConstants.JOB_STATUS_SUBMITTED 
+	+                    " OR  job.status_id = " + JobStatusValuesConstants.JOB_STATUS_SOFT_ERROR 
+	+                    " OR  job.status_id = " + JobStatusValuesConstants.JOB_STATUS_REQUEUED + " )  \n"
+	
+	+     "         AND ( job.delay_job_until IS NULL OR job.delay_job_until < NOW()  ) \n" //  delay_job_until is not set or is in the past
+	
+	+     "        AND job.insert_complete = 'T'  \n";
+	
+
+	
 
 	private static String
 	getJobForJobRequestQuerySqlString
-	= "SELECT job.*, job.id AS job_id, job.priority AS job_priority, "
-		+ " jt.id AS jt_id, jt.name, jt.description, jt.priority AS jt_priority, jt.module_name, jt.minimum_module_version "
-		+ "   FROM job INNER JOIN job_type AS jt ON job.job_type_id = jt.id"
+	= "SELECT job.*, job.id AS job_id, job.priority AS job_priority, \n"
+		+ " jt.id AS jt_id, jt.name, jt.description, jt.priority AS jt_priority, jt.module_name, jt.minimum_module_version \n"
+		+ " FROM \n"
+		+ "  ( \n"
 		
-		+ " WHERE ( status_id = " + JobStatusValuesConstants.JOB_STATUS_SUBMITTED
-		+ "           OR  status_id = "  + JobStatusValuesConstants.JOB_STATUS_SOFT_ERROR
-		+ "           OR  status_id = "  + JobStatusValuesConstants.JOB_STATUS_REQUEUED + " )  "
 		
-		+     " AND ( delay_job_until IS NULL OR delay_job_until < NOW()  ) " //  delay_job_until is not set or is in the past
+		//   select jobs that are dependent on other jobs
+		+ "     SELECT job.*  \n" 
+		+ "     FROM job   \n" 
+		+ "     LEFT OUTER JOIN \n" 
+		+ "     ( \n" 
+
+		+ "      		SELECT dependent_jobs.id  \n" 
+		+ "      		FROM job AS dependent_jobs  \n" 
+		+ "      		    INNER JOIN job_dependencies AS jd ON dependent_jobs.id = jd.dependent_job \n" 
+		+ "      		    INNER JOIN job AS dependencee_jobs ON jd.dependee_job = dependencee_jobs.id \n" 
+		+ "      		WHERE  \n" 
+		+ "      		    ( dependencee_jobs.status_id != " + JobStatusValuesConstants.JOB_STATUS_FINISHED 
+		+                   " AND dependencee_jobs.status_id != " + JobStatusValuesConstants.JOB_STATUS_FINISHED_WITH_WARNINGS 
+		+                 " ) \n"
 		
-		+     " AND insert_complete = 'T' AND enabled = 1 "
-		+     " AND ( ";
+		+ "     ) AS jobs_with_dependencies_not_finished  \n" 
+		+ "             ON job.id = jobs_with_dependencies_not_finished.id  \n" 
+		+ "     WHERE  \n" 
+		+ "       jobs_with_dependencies_not_finished.id IS NULL   \n" // exclude all the job ids found in the subquery result jobs_with_dependencies_not_finished
+		
+		
+		
+		
+		+     				GET_JOB_FOR_JOB_REQUEST_QUERY_SUB_SELECT
+		
+		 
+		+ "      		UNION \n" 
+
+		//   select jobs that are NOT dependent on other jobs
+		
+		+ "      		SELECT job.*  \n" 
+		+ "      		FROM job   \n" 
+		+ "      		    LEFT OUTER JOIN job_dependencies AS jd ON job.id = jd.dependent_job \n" 
+		+ "      		WHERE  \n" 
+		+ "      		    jd.dependee_job IS NULL \n" 
+
+		+					GET_JOB_FOR_JOB_REQUEST_QUERY_SUB_SELECT
+		 
+		+ "      ) AS job \n" 
+
+		+ " INNER JOIN job_type AS jt ON job.job_type_id = jt.id \n"
+		
+		
+		+ " WHERE  jt.enabled = 1 \n"
+		
+		+     " AND ( \n";
 
 
 	private static String
 	getJobForJobRequestQuerySqlStringOrderBy
-		= " ) ORDER BY job.priority , job.submit_date  LIMIT 1 FOR UPDATE" ;
+		= "  ) \n "
+		+ " ORDER BY job.priority , job.submit_date  \n"
+		+ " LIMIT 1 FOR UPDATE  \n" ;
 
 
 
@@ -111,10 +165,10 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        			first = false;
 	        		} else {
 
-	        			sql.append( " OR ");
+	        			sql.append( "\n OR ");
 	        		}
 
-	        		sql.append( " ( jt.module_name = ? AND jt.minimum_module_version <= ? ) " );
+	        		sql.append( "\n ( jt.module_name = ? AND jt.minimum_module_version <= ? ) " );
 	        	}
 
 	        	sql.append( getJobForJobRequestQuerySqlStringOrderBy );
@@ -125,6 +179,11 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        	try {
 
 	        		pstmt = connection.prepareStatement( sqlString );
+	        		
+
+		        	if ( log.isDebugEnabled() ) {
+		        		log.debug( "In " + method +": sqlString: " + sqlString );
+		        	}
 
 	        		int paramIndex = 0;
 
@@ -137,6 +196,12 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        			paramIndex++;
 
 	        			pstmt.setInt( paramIndex, moduleInfo.getModuleVersion() );
+	        			
+
+	    	        	if ( log.isDebugEnabled() ) {
+			        		log.debug( "In " + method +": moduleInfo.getModuleName(): " + moduleInfo.getModuleName() 
+			        				+ ", moduleInfo.getModuleVersion(): " + moduleInfo.getModuleVersion() );
+	    	        	}
 	        		}
 
 

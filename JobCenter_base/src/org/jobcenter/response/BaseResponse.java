@@ -26,6 +26,8 @@ public abstract class BaseResponse {
 
 	public static final int ERROR_CODE_REQUEST_ID_NOT_FOUND_FOR_GIVEN_REQUEST_TYPE_NAME = 7;
 
+	public static final int ERROR_CODE_JOB_DEPENDENCY_REFERENCES_INVALID_INDEX_POSITION = 8;
+
 
 
 	private boolean errorResponse;
@@ -94,6 +96,9 @@ public abstract class BaseResponse {
 		case ERROR_CODE_REQUEST_ID_NOT_FOUND_FOR_GIVEN_REQUEST_TYPE_NAME:
 			return "\"request id not found for given request type name\"";
 
+		case ERROR_CODE_JOB_DEPENDENCY_REFERENCES_INVALID_INDEX_POSITION:
+			return "\"job dependency references invalid index position.  Must reference only previos jobs in the submission request\"";
+					
 		default:
 			return "UNKNOWN ERROR";
 

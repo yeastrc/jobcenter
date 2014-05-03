@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Default__Plain_Java"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Base"/>
 	<classpathentry kind="output" path="Eclipsebin"/>
 </classpath>

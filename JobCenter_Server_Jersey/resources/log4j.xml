@@ -83,6 +83,9 @@
 -->
 
         <!-- Loggers to filter out various class paths -->
+        
+        
+        <!--   Logging of frameworks -->
 
         <logger name="org.springframework" additivity="false">
                 <level value="warn"/>
@@ -99,12 +102,6 @@
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
 
-        <logger name="org.jobcenter" additivity="false">
-                <level value="warn"/>
-                <appender-ref ref="ROLL" />
-                <appender-ref ref="ROLL_ERROR" />
-        </logger>
-
 
         <logger name="com.sun.jersey" additivity="false">
                 <level value="WARN"/>
@@ -114,26 +111,34 @@
 
 
 
+		<!--  Logging of Jobcenter  -->
+
+		<!--  
+        <logger name="org.jobcenter" additivity="false">
+                <level value="debug"/>
+                <appender-ref ref="ROLL" />
+                <appender-ref ref="ROLL_ERROR" />
+        </logger>
+		-->
+
         <!-- set debugging at info level to display jobs returned to clients -->
 
+		<!--  
         <logger name="org.jobcenter.service.GetNextJobForClientServiceImpl" additivity="false">
-                <level value="warn"/>
+                <level value="debug"/>
+                <appender-ref ref="ROLL" />
+                <appender-ref ref="ROLL_ERROR" />
+        </logger>
+		-->
+
+        <logger name="org.jobcenter.jdbc.GetNextJobForClientJDBCDAOImpl" additivity="false">
+                <level value="debug"/>
                 <appender-ref ref="ROLL" />
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
 
 
-        <!-- Debugging loggers -->
-
-        <!-- Uncomment to enable debug on org.jobcenter code only -->
-        <!--
-        <logger name="org.jobcenter">
-                <level value="debug"/>
-                <appender-ref ref="ROLL" />
-                <appender-ref ref="EMAIL" />
-        </logger>
-        -->
-
+		
 
     <!--                           -->
     <!-- setup log4j's root logger -->

@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class NodeClientStatusDTO implements Cloneable {
 
 
+
 	private Integer id;
 
 	private Integer nodeId;
@@ -53,6 +54,22 @@ public class NodeClientStatusDTO implements Cloneable {
 		return clone;
 	}
 	
+	
+
+	@Override
+	public String toString() {
+		return "NodeClientStatusDTO [id=" + id + ", nodeId=" + nodeId
+				+ ", node=" + node + ", clientStarted=" + clientStarted
+				+ ", lastCheckinTime=" + lastCheckinTime + ", nextCheckinTime="
+				+ nextCheckinTime + ", lateForNextCheckinTime="
+				+ lateForNextCheckinTime + ", secondsUntilNextCheckin="
+				+ secondsUntilNextCheckin + ", notificationSentThatClientLate="
+				+ notificationSentThatClientLate + ", dbRecordVersionNumber="
+				+ dbRecordVersionNumber + ", checkinIsLate=" + checkinIsLate
+				+ ", runningJobs=" + runningJobs + "]";
+	}
+
+
 
 
 	/**

@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Interface"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Jersey_1.3"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Base"/>
 	<classpathentry kind="output" path="Eclipsebin"/>
 </classpath>

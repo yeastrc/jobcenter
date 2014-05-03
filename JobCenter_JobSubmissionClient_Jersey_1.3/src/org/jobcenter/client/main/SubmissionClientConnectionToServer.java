@@ -2,18 +2,27 @@ package org.jobcenter.client.main;
 
 
 
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
-
+import org.jobcenter.client_exceptions.JobcenterSubmissionGeneralErrorException;
+import org.jobcenter.client_exceptions.JobcenterSubmissionHTTPErrorException;
+import org.jobcenter.client_exceptions.JobcenterSubmissionIOErrorException;
+import org.jobcenter.client_exceptions.JobcenterSubmissionMalformedURLErrorException;
 import org.jobcenter.client_exceptions.JobcenterSubmissionServerErrorException;
+import org.jobcenter.client_exceptions.JobcenterSubmissionXML_JAXBErrorException;
 import org.jobcenter.constants.Constants;
 import org.jobcenter.constants.WebServiceURLConstants;
 import org.jobcenter.coreinterfaces.JobSubmissionInterface;
+import org.jobcenter.coreinterfaces.JobSubmissionJobInterface;
 import org.jobcenter.request.SubmitJobRequest;
+import org.jobcenter.request.SubmitJobsListWithDependenciesRequest;
 import org.jobcenter.response.SubmitJobResponse;
+import org.jobcenter.response.SubmitJobsListWithDependenciesResponse;
+import org.jobcenter.submission.internal.utils.JobSubmissionTransforms;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
@@ -33,6 +42,11 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.SUBMIT_JOB;
 
 
+	private static final String SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION
+
+			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.SUBMIT_JOBS_LIST_WITH_DEPENDENCIES;
+
+	
 	private String connectionURL = null;
 
 
@@ -86,6 +100,21 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 		this.submissionNodeName = nodeName;
 	}
+
+
+//	@Override
+//	public int submitJobsWithDependencies(String requestTypeName,
+//			Integer requestId, String jobTypeName, String submitter,
+//			Integer priority, Map<String, String> jobParameters)
+//			throws JobcenterSubmissionGeneralErrorException,
+//			JobcenterSubmissionServerErrorException,
+//			JobcenterSubmissionHTTPErrorException,
+//			JobcenterSubmissionMalformedURLErrorException,
+//			JobcenterSubmissionIOErrorException,
+//			JobcenterSubmissionXML_JAXBErrorException {
+//		
+//		throw new UnsupportedOperationException("Not supported for this interface type");
+//	}
 
 
 //	  @see org.jobcenter.coreinterfaces.JobCenterJobSubmissionInterface#submitJob(java.lang.String, java.lang.String, int, java.util.Map)
@@ -171,6 +200,63 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 		return submitJobResponse.getRequestId();
 	}
 
+
+
+	/* (non-Javadoc)
+	 * @see org.jobcenter.coreinterfaces.JobSubmissionInterface#submitJobsWithDependencies(java.lang.String, java.lang.Integer, java.lang.String, java.util.List)
+	 */
+	@Override
+	public int submitJobsWithDependencies(String requestTypeName,
+			Integer requestId, 
+			String submitter, 
+			List<JobSubmissionJobInterface> jobSubmissionJobsList )
+
+					throws JobcenterSubmissionGeneralErrorException,
+					JobcenterSubmissionServerErrorException,
+					JobcenterSubmissionHTTPErrorException,
+					JobcenterSubmissionMalformedURLErrorException,
+					JobcenterSubmissionIOErrorException,
+					JobcenterSubmissionXML_JAXBErrorException {
+		
+		
+		String fullConnectionURL = connectionURL + SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION;
+
+		SubmitJobsListWithDependenciesRequest submitJobsListWithDependenciesRequest = JobSubmissionTransforms.createSubmitJobsListWithDependenciesRequest( requestTypeName, requestId, submitter, jobSubmissionJobsList, submissionNodeName );
+
+
+		WebResource r = jersey_JAX_RS_Client.resource( fullConnectionURL );
+
+		SubmitJobsListWithDependenciesResponse submitJobsListWithDependenciesResponse = r.type(MediaType.APPLICATION_XML)
+					.accept(MediaType.APPLICATION_XML)
+					.post( SubmitJobsListWithDependenciesResponse.class, submitJobsListWithDependenciesRequest );
+
+		if ( log.isInfoEnabled() ) {
+
+
+			log.info( "JobCenter_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobsListWithDependenciesResponse.isErrorResponse() = " + submitJobsListWithDependenciesResponse.isErrorResponse() );
+
+			log.info( "JobCenter_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobsListWithDependenciesResponse.getErrorCode() = " + submitJobsListWithDependenciesResponse.getErrorCode() );
+		}
+
+		if ( submitJobsListWithDependenciesResponse.isErrorResponse() ) {
+
+			String msg = "Submission of jobs failed.  Error code = " + submitJobsListWithDependenciesResponse.getErrorCode() + ", error code desc = " + submitJobsListWithDependenciesResponse.getErrorCodeDescription()
+				+ ", the client's IP address as seen by the server = " + submitJobsListWithDependenciesResponse.getClientIPAddressAtServer()
+				+ "\n  requestTypeName = |" + requestTypeName + "|, requestId = " + requestId + ".";
+
+			log.error( msg );
+
+			throw new JobcenterSubmissionServerErrorException( submitJobsListWithDependenciesResponse.getErrorCode(),
+					submitJobsListWithDependenciesResponse.getErrorCodeDescription(),
+					submitJobsListWithDependenciesResponse.getClientIPAddressAtServer(),
+					msg );
+		}
+
+
+		return submitJobsListWithDependenciesResponse.getRequestId();
+		
+
+	}
 
 
 
