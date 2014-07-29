@@ -4,7 +4,7 @@
 -- -----------------------------------------------------
 -- Data for table jobcenter.config_system
 -- -----------------------------------------------------
-SET AUTOCOMMIT=0;
+
 
 USE jobcenter;
 
