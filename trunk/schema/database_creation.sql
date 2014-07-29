@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS `job` (
   `submitter` VARCHAR(200) NULL,
   `priority` INT NOT NULL,
   `status_id` INT NOT NULL,
+  `insert_complete` ENUM('T','F') NOT NULL DEFAULT 'F',
   `job_parameter_count` INT NULL DEFAULT -1,
   `delay_job_until` DATETIME NULL,
   `param_error_retry_count` INT NOT NULL DEFAULT 0,
@@ -353,4 +354,3 @@ ENGINE = InnoDB;
 CREATE INDEX `dependent_job_fk_idx` ON `job_dependencies` (`dependent_job` ASC);
 
 CREATE INDEX `dependee_job_fk_idx` ON `job_dependencies` (`dependee_job` ASC);
-
