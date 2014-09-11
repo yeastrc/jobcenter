@@ -20,6 +20,11 @@
 	     and configure the module with the location of Blast
 
 
+    See the document on character encoding for limitations on what values can be passed through 
+    the Jobcenter framework.
+    
+    
+
 Options for installation
 
 1)  Jobcenter is normally installed on more than one computer with the server installed on one
