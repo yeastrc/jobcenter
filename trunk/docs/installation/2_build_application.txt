@@ -9,6 +9,10 @@ Important:   Building the system is only required if you have checked out the co
 
 Check out the project into a directory.
 
+
+Follow README.txt in 'aa_SVN_Info_Resources' directory
+
+
 The application is built with "ant"
 
 Ensure "ant" is installed and on the PATH or prepend the command with the path to "ant".
