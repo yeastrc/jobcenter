@@ -84,6 +84,8 @@ public class SubmitJobWebService {
 		submitJobResponse.setErrorResponse( true );
 
 		submitJobResponse.setErrorCode( errorCode );
+		
+		submitJobResponse.setClientIPAddressAtServer( remoteHost );
 
 		return submitJobResponse;
 	}

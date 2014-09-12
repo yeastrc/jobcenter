@@ -74,6 +74,8 @@ public class ClientStartupWebService {
 		response.setErrorResponse( true );
 
 		response.setErrorCode( errorCode );
+		
+		response.setClientIPAddressAtServer( remoteHost );
 
 		return response;
 	}
