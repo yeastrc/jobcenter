@@ -12,6 +12,7 @@ public class JobType {
 
 	private String description;
 	private int priority;
+	private Integer requiredExecutionThreads;
 	private Boolean enabled;
 	private String moduleName;
 	private int minimumModuleVersion;
@@ -41,6 +42,12 @@ public class JobType {
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
+	public Integer getRequiredExecutionThreads() {
+		return requiredExecutionThreads;
+	}
+	public void setRequiredExecutionThreads(Integer requiredExecutionThreads) {
+		this.requiredExecutionThreads = requiredExecutionThreads;
+	}	
 	public Boolean getEnabled() {
 		return enabled;
 	}

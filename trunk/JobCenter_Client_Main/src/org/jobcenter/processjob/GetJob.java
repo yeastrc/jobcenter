@@ -50,7 +50,7 @@ public class GetJob {
 	 * @return
 	 * @throws Throwable
 	 */
-	public JobResponse getNextJob( int availableThreadCount )  throws Throwable {
+	public JobResponse getNextJob( int availableThreadCount, int availableJobCount )  throws Throwable {
 
 		log.debug( "getNextJob( ) called." );
 
@@ -115,7 +115,7 @@ public class GetJob {
 		}
 
 
-		return getNextJobInternal( modulesInUse, availableThreadCount );
+		return getNextJobInternal( modulesInUse, availableThreadCount, availableJobCount );
 	}
 
 	/**
@@ -124,13 +124,26 @@ public class GetJob {
 	 * @return
 	 * @throws Throwable
 	 */
-	private JobResponse getNextJobInternal( Map<String, ModuleTracker> modulesInUse, int availableThreadCount )
+	private JobResponse getNextJobInternal( Map<String, ModuleTracker> modulesInUse, int availableThreadCount, int availableJobCount )
 	throws Throwable {
 
 
 		JobRequest jobRequest = new JobRequest();
 
-		jobRequest.setNodeName( ClientConfigDTO.getSingletonInstance().getClientNodeName() );
+		String nodeName = ClientConfigDTO.getSingletonInstance().getClientNodeName();
+		int totalNumberThreadsConfiguredOnClient = ClientConfigDTO.getSingletonInstance().getMaxThreadsForModules();
+		int totalNumberJobsConfiguredOnClient =ClientConfigDTO.getSingletonInstance().getMaxConcurrentJobs(); 
+		
+		jobRequest.setNodeName( nodeName );
+		
+		jobRequest.setNumberThreadsAvailableOnClient( availableThreadCount );
+		jobRequest.setNumberJobsAvailableOnClient( availableJobCount );
+		
+		jobRequest.setTotalNumberJobsConfiguredOnClient( totalNumberJobsConfiguredOnClient );
+		jobRequest.setTotalNumberThreadsConfiguredOnClient( totalNumberThreadsConfiguredOnClient );
+		
+		
+		
 
 		List<JobRequestModuleInfo> clientModules = new ArrayList<JobRequestModuleInfo>();
 
@@ -148,19 +161,19 @@ public class GetJob {
 
 			ModuleConfigDTO moduleConfigDTO =  moduleTracker.getModuleConfigDTO();
 
-			boolean notIsModuleFailedToLoadOrInit = ! moduleConfigDTO.isModuleFailedToLoadOrInit();
-
-			boolean notIsMaxNumberConcurrentJobsSet = ! moduleConfigDTO.isMaxNumberConcurrentJobsSet();
-
-			boolean concurrentJobsAvailableCountGTZero = moduleTracker.concurrentJobsAvailableCount > 0;
-
-			boolean conCurrTest = ( ( ! moduleConfigDTO.isMaxNumberConcurrentJobsSet() ) || moduleTracker.concurrentJobsAvailableCount > 0 );
-
-			boolean isMinNumberThreadsPerJobSet = moduleConfigDTO.isMinNumberThreadsPerJobSet();
-
-			boolean MinNumberThreadsPerJobLEAvTC = moduleConfigDTO.getMinNumberThreadsPerJob() <= availableThreadCount;
-
-			boolean MinTtoAvTCtest = ! moduleConfigDTO.isMinNumberThreadsPerJobSet() || moduleConfigDTO.getMinNumberThreadsPerJob() <= availableThreadCount;
+//			boolean notIsModuleFailedToLoadOrInit = ! moduleConfigDTO.isModuleFailedToLoadOrInit();
+//
+//			boolean notIsMaxNumberConcurrentJobsSet = ! moduleConfigDTO.isMaxNumberConcurrentJobsSet();
+//
+//			boolean concurrentJobsAvailableCountGTZero = moduleTracker.concurrentJobsAvailableCount > 0;
+//
+//			boolean conCurrTest = ( ( ! moduleConfigDTO.isMaxNumberConcurrentJobsSet() ) || moduleTracker.concurrentJobsAvailableCount > 0 );
+//
+//			boolean isMinNumberThreadsPerJobSet = moduleConfigDTO.isMinNumberThreadsPerJobSet();
+//
+//			boolean MinNumberThreadsPerJobLEAvTC = moduleConfigDTO.getMinNumberThreadsPerJob() <= availableThreadCount;
+//
+//			boolean MinTtoAvTCtest = ! moduleConfigDTO.isMinNumberThreadsPerJobSet() || moduleConfigDTO.getMinNumberThreadsPerJob() <= availableThreadCount;
 
 			if ( ( ! moduleConfigDTO.isModuleFailedToLoadOrInit() ) // bypass modules that failed to load or init()
 					//              if the max number of concurrent jobs is set on the module, the available count must be > zero

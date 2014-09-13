@@ -11,6 +11,11 @@
         <property name="priority" type="java.lang.Integer">
             <column name="priority" not-null="true" />
         </property>
+        <property name="requiredExecutionThreads" type="java.lang.Integer">
+            <column name="required_execution_threads" not-null="false" />
+        </property>
+        
+        
         <property name="name" type="java.lang.String">
             <column name="name" length="45" not-null="true" />
         </property>

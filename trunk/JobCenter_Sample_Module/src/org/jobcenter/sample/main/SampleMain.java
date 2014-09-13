@@ -18,6 +18,8 @@ import org.jobcenter.job_client_module_interface.ModuleInterfaceResponse;
 public class SampleMain implements ModuleInterfaceClientMainInterface {
 
 	private static Logger log = Logger.getLogger(SampleMain.class);
+	
+	private static final int  SLEEP_SECONDS = 6;
 
 	//  must be volatile since shutdown() is called on a different thread
 	private volatile boolean keepRunning = true;
@@ -279,9 +281,9 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 
 		int jobStatus = JobStatusValuesConstants.JOB_STATUS_RUNNING;
 
-		log.info( "SampleMain.processRequest(), next sleeping 5 seconds to simulate time to do work." );
+		log.info( "SampleMain.processRequest(), next sleeping " + SLEEP_SECONDS + " seconds to simulate time to do work." );
 
-		System.out.println( "SampleMain.processRequest(), next sleeping 5 seconds to simulate time to do work." );
+		System.out.println( "SampleMain.processRequest(), next sleeping  " + SLEEP_SECONDS + "  seconds to simulate time to do work." );
 
 		try {
 
@@ -308,7 +310,7 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 //			}
 
 			synchronized (this) {
-				wait( 5 * 1000 );
+				wait(  SLEEP_SECONDS * 1000 );
 			}
 
 //			if ( keepRunning ) {

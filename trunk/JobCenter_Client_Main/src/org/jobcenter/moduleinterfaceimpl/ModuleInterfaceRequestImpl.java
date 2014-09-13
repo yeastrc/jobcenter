@@ -15,6 +15,11 @@ public class ModuleInterfaceRequestImpl implements ModuleInterfaceRequest {
 	private Map<String, String> jobParameters;
 
 	private int numberOfThreadsForRunningJob;
+	
+	/**
+	 * required_execution_threads in job_type table
+	 */
+	private Integer jobTypeRequiredExecutionThreads;
 
 
 	//  get methods visible to the module through interface ModuleInterfaceRequest
@@ -29,6 +34,17 @@ public class ModuleInterfaceRequestImpl implements ModuleInterfaceRequest {
 	public Map<String, String> getJobParameters() {
 
 		return jobParameters;
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see org.jobcenter.job_client_module_interface.ModuleInterfaceRequest#getJobTypeRequiredExecutionThreads()
+	 * 
+	 * the value from required_execution_threads field in job_type table
+	 */
+	@Override
+	public Integer getJobTypeRequiredExecutionThreads() {
+		return jobTypeRequiredExecutionThreads;
 	}
 
 
@@ -54,4 +70,9 @@ public class ModuleInterfaceRequestImpl implements ModuleInterfaceRequest {
 		this.numberOfThreadsForRunningJob = numberOfThreadsForRunningJob;
 	}
 
+	
+	public void setJobTypeRequiredExecutionThreads(
+			Integer jobTypeRequiredExecutionThreads) {
+		this.jobTypeRequiredExecutionThreads = jobTypeRequiredExecutionThreads;
+	}
 }

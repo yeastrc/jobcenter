@@ -236,7 +236,9 @@
 			<ref bean="jobJDBCDAO" />
 		</property>
 		
-
+		<property name="jobTypeDAO">
+			<ref bean="jobTypeDAO" />
+		</property>
 	</bean>
 
 	<bean id="SubmitJobService" class="org.jobcenter.service.SubmitJobServiceImpl">
