@@ -2,7 +2,6 @@ package org.jobcenter.service;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,9 @@ import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.RunMessageTypesConstants;
 import org.jobcenter.constants.ServerConfigKeyValues;
 import org.jobcenter.constants.ServerCoreConstants;
+import org.jobcenter.dao.JobTypeDAO;
 import org.jobcenter.dto.Job;
+import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RunDTO;
 import org.jobcenter.dto.RunMessageDTO;
 import org.jobcenter.internalservice.ClientNodeNameCheck;
@@ -97,8 +98,19 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 		this.getValueFromConfigService = getValueFromConfigService;
 	}
 	
+	//  Hibernate DAO
+	
+	private JobTypeDAO jobTypeDAO;
+
+	public JobTypeDAO getJobTypeDAO() {
+		return jobTypeDAO;
+	}
+	public void setJobTypeDAO(JobTypeDAO jobTypeDAO) {
+		this.jobTypeDAO = jobTypeDAO;
+	}
 	
 	// JDBC DAO
+
 
 	private GetNextJobForClientJDBCDAO getNextJobForClientJDBCDAO;
 	private JobJDBCDAO jobJDBCDAO;
@@ -208,73 +220,66 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 		getJobServiceResponse.setJobResponse( jobResponse );
 
 
+		jobResponse.setJobFound( false );
+
+
 		Job job = null;
 
-		RunDTO currentRun = null;
 
 		try {
 
 			job = getNextJobForClientJDBCDAO.retrieveNextJobRecordForJobRequest( jobRequest );
 
 			if ( job == null ) {
-
-				jobResponse.setJobFound( false );
+				
+				//  No job retrieved so return nothing
+				
 			} else {
-
-				jobResponse.setJobFound( true );
-
-
-				jobJDBCDAO.retrieveJobParameters( job );
-
-				int jobParameterCount = 0;
-
-				Map<String, String> jobParameters = job.getJobParameters();
-
-				if ( jobParameters != null ) {
-
-					jobParameterCount = jobParameters.size();
-				}
-
-				if ( job.getJobParameterCount() != JobConstants.JOB_PARAMETER_COUNT_NOT_SET && jobParameterCount != job.getJobParameterCount() ) {
-
-					String msg = "Resetting job to 'Submitted' and delaying job.  job.getJobParameterCount() does not match number of parameters retrieved from the job parameters table."
-						+ "  job.getJobParameterCount() = " + job.getJobParameterCount() 
-						+ ", number of parameters retrieved from the job parameters table = " + jobParameterCount
-						+ ", job id = " + job.getId()
-						+ ", job.getCurrentRunId() = " + job.getCurrentRunId();
-
+				
+				JobType jobTypeForThisJob = jobTypeDAO.findById( job.getJobTypeId() );
+				
+				if ( jobTypeForThisJob == null ) {
+					
+					String msg = "jobType record not found for job type id: " + job.getJobTypeId()
+							+ ", job id: " + job.getId();
+					
 					log.error( msg );
-
-					delayJob( job, nodeId );
 					
-					getJobServiceResponse.setTryAgain( true );
+					throw new RuntimeException( msg );
+				}
+				
+				if ( jobTypeForThisJob.getRequiredExecutionThreads() != null && 
+						jobTypeForThisJob.getRequiredExecutionThreads() > jobRequest.getTotalNumberThreadsConfiguredOnClient() )
+				{
+					
+					//  TODO  Fail the job since the threads available 
+					//          will never be >= the required number of threads
+					
+					//   	Use jobRequest.getNodeName() in error message put on job
 
+					//  These are already being populated in the client
+					// jobRequest.totalNumberThreadsConfiguredOnClient
+					// jobRequest.totalNumberJobsConfiguredOnClient;				
+				
+				}
+				
+				
+				if ( jobTypeForThisJob.getRequiredExecutionThreads() != null && 
+						jobTypeForThisJob.getRequiredExecutionThreads() > jobRequest.getNumberThreadsAvailableOnClient() )
+				{
+					
+					//  Not enough threads on client so return nothing
+					
+					//   This is done to ensure the next job is held until the number of threads is available
+					
+					jobResponse.setNextJobRequiresMoreThreads( true );
+					
+					
 				} else {
-
-					jobJDBCDAO.updateJobStatusOnIdAndDbRecordVersionNumber( job, JobStatusValuesConstants.JOB_STATUS_RUNNING );
-
-					currentRun = jobJDBCDAO.insertRunTableRecord( nodeId, job);
-
-					currentRun.setJob( job );
-
-					job.setCurrentRun( currentRun );
-
-					job.setCurrentRunId( currentRun.getId() );
-
-					job.setJobParameterCountWhenRetrievedByGetJob( jobParameterCount );
-
-					Boolean saveJobSentToClientForDebugging = getValueFromConfigService.getConfigValueAsBoolean( ServerConfigKeyValues.SAVE_JOB_SENT_TO_CLIENT_FOR_DEBUGGING );
 					
-					if ( saveJobSentToClientForDebugging != null && saveJobSentToClientForDebugging == true ) {
-					
-						saveJobSentToClientService.saveJobSentToClient( job  );
-					}
-					
-					
-					jobResponse.setJob( job );
+					job.setJobType( jobTypeForThisJob );
 
-
-					logRetrievedJob(jobRequest, remoteHost, job);
+					processJobRetrievedFromDB(jobRequest, nodeId, remoteHost, getJobServiceResponse, jobResponse, job);
 				}
 			}
 
@@ -293,6 +298,83 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 
 		return getJobServiceResponse;
 
+	}
+	
+	
+	
+	/**
+	 * @param jobRequest
+	 * @param nodeId
+	 * @param remoteHost
+	 * @param getJobServiceResponse
+	 * @param jobResponse
+	 * @param job
+	 */
+	private void processJobRetrievedFromDB(JobRequest jobRequest,
+			Integer nodeId, 
+			String remoteHost,
+			GetJobServiceResponse getJobServiceResponse,
+			JobResponse jobResponse, 
+			Job job) 
+	{
+		
+		jobJDBCDAO.retrieveJobParameters( job );
+
+		int jobParameterCount = 0;
+
+		Map<String, String> jobParameters = job.getJobParameters();
+
+		if ( jobParameters != null ) {
+
+			jobParameterCount = jobParameters.size();
+		}
+
+		if ( job.getJobParameterCount() != JobConstants.JOB_PARAMETER_COUNT_NOT_SET && jobParameterCount != job.getJobParameterCount() ) {
+
+			String msg = "Resetting job to 'Submitted' and delaying job.  job.getJobParameterCount() does not match number of parameters retrieved from the job parameters table."
+				+ "  job.getJobParameterCount() = " + job.getJobParameterCount() 
+				+ ", number of parameters retrieved from the job parameters table = " + jobParameterCount
+				+ ", job id = " + job.getId()
+				+ ", job.getCurrentRunId() = " + job.getCurrentRunId();
+
+			log.error( msg );
+
+			delayJob( job, nodeId );
+			
+			getJobServiceResponse.setTryAgain( true );
+
+		} else {
+
+
+			jobJDBCDAO.updateJobStatusOnIdAndDbRecordVersionNumber( job, JobStatusValuesConstants.JOB_STATUS_RUNNING );
+
+			RunDTO currentRun = jobJDBCDAO.insertRunTableRecord( nodeId, job);
+
+			currentRun.setJob( job );
+
+			job.setCurrentRun( currentRun );
+
+			job.setCurrentRunId( currentRun.getId() );
+
+			job.setJobParameterCountWhenRetrievedByGetJob( jobParameterCount );
+
+			Boolean saveJobSentToClientForDebugging = getValueFromConfigService.getConfigValueAsBoolean( ServerConfigKeyValues.SAVE_JOB_SENT_TO_CLIENT_FOR_DEBUGGING );
+			
+			if ( saveJobSentToClientForDebugging != null && saveJobSentToClientForDebugging == true ) {
+			
+				saveJobSentToClientService.saveJobSentToClient( job  );
+			}
+			
+			
+			jobResponse.setJob( job );
+
+
+			logRetrievedJob(jobRequest, remoteHost, job);
+			
+			
+			jobResponse.setJobFound( true );
+
+		}
 	}
 
 

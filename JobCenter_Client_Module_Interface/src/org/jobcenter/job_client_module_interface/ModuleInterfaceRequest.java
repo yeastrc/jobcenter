@@ -21,7 +21,17 @@ public interface ModuleInterfaceRequest {
 	 * @return  the number of threads for running this job.
 	 *
 	 * The module is allowed to use up to this number of threads.
+	 * 
+	 * If this number is driven by the required_execution_threads field in job_type table
+	 * it will be that number
 	 */
 	public int getNumberOfThreadsForRunningJob(  );
+
+
+	/**
+	 * @return  the value from required_execution_threads field in job_type table
+	 *
+	 */
+	public Integer getJobTypeRequiredExecutionThreads(  );
 
 }

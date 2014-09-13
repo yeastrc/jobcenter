@@ -16,6 +16,21 @@ public class JobResponse extends BaseResponse {
 	
 	private Job job;
 	
+	
+	/**
+	 *  true if the next job found requires more threads to run than available on client 
+	 */
+	private boolean nextJobRequiresMoreThreads;
+	
+
+	public boolean isNextJobRequiresMoreThreads() {
+		return nextJobRequiresMoreThreads;
+	}
+
+	public void setNextJobRequiresMoreThreads(boolean nextJobRequiresMoreThreads) {
+		this.nextJobRequiresMoreThreads = nextJobRequiresMoreThreads;
+	}
+
 	public boolean isJobFound() {
 		return jobFound;
 	}

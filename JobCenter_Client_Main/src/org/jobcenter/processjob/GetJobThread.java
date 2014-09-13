@@ -5,12 +5,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.jobcenter.client.timecontrol.TimeControl;
 import org.jobcenter.config.ClientConfigDTO;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.RunMessageTypesConstants;
 import org.jobcenter.dto.Job;
+import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RunDTO;
 import org.jobcenter.dto.RunMessageDTO;
 import org.jobcenter.managerthread.ManagerThread;
@@ -25,7 +25,6 @@ import org.jobcenter.serverinterface.ServerConnection;
 import org.jobcenter.util.JobToFile;
 import org.jobcenter.util.LogOpenFiles;
 import org.jobcenter.util.MarkJobsInProgressAsFailed;
-import org.jobcenter.util.SendJobStatusToServer;
 
 /**
  *  Thread for getting jobs.  Only one thread per client
@@ -191,8 +190,10 @@ public class GetJobThread extends Thread  {
 
 
 					} else {
+						
+						int availableJobCount = getAvailableJobCount();
 
-						getJob( availableThreadCount );
+						getJob( availableThreadCount, availableJobCount );
 					}
 				}
 
@@ -237,13 +238,40 @@ public class GetJobThread extends Thread  {
 
 		return availableThreadCount;
 	}
+	
+	
+	/**
+	 * @return
+	 */
+	private int getAvailableJobCount( ) {
 
+		int jobsInUseCount = 0;
+
+		List<JobRunnerThread> jobRunnerThreads = ThreadsHolderSingleton.getInstance().getJobRunnerThreads();
+
+		for ( JobRunnerThread jobRunnerThread : jobRunnerThreads ) {
+
+			Job job = jobRunnerThread.getJob();
+
+			if ( job != null ) {
+				jobsInUseCount += 1;
+			}
+		}
+
+		ClientConfigDTO clientConfigDTO = ClientConfigDTO.getSingletonInstance();  //  retrieve singleton
+
+		int maxJobsForModules = clientConfigDTO.getMaxConcurrentJobs();
+
+		int availableJobsCount = maxJobsForModules - jobsInUseCount;
+
+		return availableJobsCount;
+	}
 
 
 	/**
 	 *
 	 */
-	private void getJob( int availableThreadCount ) throws Throwable {
+	private void getJob( int availableThreadCount, int availableJobCount ) throws Throwable {
 
 		log.info( "getJob(): getting a job" );
 
@@ -253,7 +281,7 @@ public class GetJobThread extends Thread  {
 		JobResponse jobResponse = null;
 
 		try {
-			jobResponse = GetJob.getInstance().getNextJob( availableThreadCount );
+			jobResponse = GetJob.getInstance().getNextJob( availableThreadCount, availableJobCount );
 
 		} catch ( Throwable t ) {
 
@@ -388,32 +416,60 @@ public class GetJobThread extends Thread  {
 
 			throw new Exception( msg );
 		}
+		
+		
+		JobType jobTypeForThisJob = job.getJobType();
+		
+		if ( jobTypeForThisJob.getRequiredExecutionThreads() != null && 
+				jobTypeForThisJob.getRequiredExecutionThreads() > availableThreadCount ) {
+			
 
-		ModuleConfigDTO moduleConfigDTO = moduleHolder.getModuleConfigDTO();
+			String msg = "processJob( ... ):  jobTypeForThisJob.getRequiredExecutionThreads() > availableThreadCount."
+					+ "  job id: " + job.getId() + ", job type id: " + jobTypeForThisJob.getId() ;
 
-		boolean moduleMaxNumberThreadsPerJobSet = moduleConfigDTO.isMaxNumberThreadsPerJobSet();
+			log.error( msg );
 
-		int moduleMaxNumberThreadsPerJob = moduleConfigDTO.getMaxNumberThreadsPerJob();
+			throw new Exception( msg );
+		}
+		
 
-		int maxNumberThreadsToUseToProcessJob = availableThreadCount;
+		int maxNumberThreadsToUseToProcessJob = -1;
+		
+		if ( jobTypeForThisJob.getRequiredExecutionThreads() != null ) {
 
-		if ( moduleMaxNumberThreadsPerJobSet && moduleMaxNumberThreadsPerJob < maxNumberThreadsToUseToProcessJob ) {
+			//  If required Execution threads is provided, use that
+			
+			maxNumberThreadsToUseToProcessJob = jobTypeForThisJob.getRequiredExecutionThreads();
+			
+		} else {
+			
+			maxNumberThreadsToUseToProcessJob = availableThreadCount;			
 
-			maxNumberThreadsToUseToProcessJob = moduleMaxNumberThreadsPerJob;
+			ModuleConfigDTO moduleConfigDTO = moduleHolder.getModuleConfigDTO();
+
+			boolean moduleMaxNumberThreadsPerJobSet = moduleConfigDTO.isMaxNumberThreadsPerJobSet();
+
+			int moduleMaxNumberThreadsPerJob = moduleConfigDTO.getMaxNumberThreadsPerJob();
+
+			if ( moduleMaxNumberThreadsPerJobSet && moduleMaxNumberThreadsPerJob < maxNumberThreadsToUseToProcessJob ) {
+
+				maxNumberThreadsToUseToProcessJob = moduleMaxNumberThreadsPerJob;
+
+				if ( log.isDebugEnabled() ) {
+
+					log.debug( "Using max number of threads per job from the module, = " + moduleMaxNumberThreadsPerJob );
+				}
+			}
 
 			if ( log.isDebugEnabled() ) {
 
-				log.debug( "Using max number of threads per job from the module, = " + moduleMaxNumberThreadsPerJob );
+				log.debug( "maxNumberThreadsToUseToProcessJob = " + maxNumberThreadsToUseToProcessJob );
 			}
-		}
-
-		if ( log.isDebugEnabled() ) {
-
-			log.debug( "maxNumberThreadsToUseToProcessJob = " + maxNumberThreadsToUseToProcessJob );
+			
 		}
 
 		jobRunnerThread.setMaxNumberThreadsToUseToProcessJob( maxNumberThreadsToUseToProcessJob );
-
+		
 		jobRunnerThread.setModuleHolder( moduleHolder );
 
 		try {
