@@ -45,6 +45,7 @@ DROP TABLE IF EXISTS `job_type` ;
 CREATE TABLE IF NOT EXISTS `job_type` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `priority` INT NOT NULL,
+  `required_execution_threads` INT UNSIGNED NULL,
   `name` VARCHAR(45) NOT NULL,
   `description` VARCHAR(2000) NULL,
   `enabled` BIT(1) NOT NULL,
@@ -354,3 +355,4 @@ ENGINE = InnoDB;
 CREATE INDEX `dependent_job_fk_idx` ON `job_dependencies` (`dependent_job` ASC);
 
 CREATE INDEX `dependee_job_fk_idx` ON `job_dependencies` (`dependee_job` ASC);
+
