@@ -63,6 +63,11 @@ public interface JobSubmissionInterface {
 	JobcenterSubmissionXML_JAXBErrorException;
 
 	
+	
+	//////////////////////////////////////////////
+	
+	//////////   Comment out submitJobsWithDependencies(...) since job dependencies is not completely implemented
+	
 
 	/**
 	 * @param requestTypeName - the name of the request type
@@ -84,13 +89,13 @@ public interface JobSubmissionInterface {
 	 * @throws JobcenterSubmissionIOErrorException - An IOException was thrown
 	 * @throws JobcenterSubmissionXML_JAXBErrorException - A JAXB Exception was thrown marshalling or unmarshalling the XML to/from Java object
 	 */
-	public int submitJobsWithDependencies( String requestTypeName, Integer requestId, String submitter, List<JobSubmissionJobInterface> jobSubmissionJobsList )
-	throws
-	JobcenterSubmissionGeneralErrorException,
-	JobcenterSubmissionServerErrorException,
-	JobcenterSubmissionHTTPErrorException,
-	JobcenterSubmissionMalformedURLErrorException,
-	JobcenterSubmissionIOErrorException,
-	JobcenterSubmissionXML_JAXBErrorException;
+//	public int submitJobsWithDependencies( String requestTypeName, Integer requestId, String submitter, List<JobSubmissionJobInterface> jobSubmissionJobsList )
+//	throws
+//	JobcenterSubmissionGeneralErrorException,
+//	JobcenterSubmissionServerErrorException,
+//	JobcenterSubmissionHTTPErrorException,
+//	JobcenterSubmissionMalformedURLErrorException,
+//	JobcenterSubmissionIOErrorException,
+//	JobcenterSubmissionXML_JAXBErrorException;
 
 }
