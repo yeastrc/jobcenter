@@ -195,71 +195,68 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	}
 
 
-
-	/* (non-Javadoc)
-	 * @see org.jobcenter.coreinterfaces.JobSubmissionInterface#submitJobsWithDependencies(java.lang.String, java.lang.Integer, java.lang.String, java.util.List)
-	 */
-	@Override
-	public int submitJobsWithDependencies(String requestTypeName,
-			Integer requestId, 
-			String submitter, 
-			List<JobSubmissionJobInterface> jobSubmissionJobsList )
-
-					throws JobcenterSubmissionGeneralErrorException,
-					JobcenterSubmissionServerErrorException,
-					JobcenterSubmissionHTTPErrorException,
-					JobcenterSubmissionMalformedURLErrorException,
-					JobcenterSubmissionIOErrorException,
-					JobcenterSubmissionXML_JAXBErrorException {
-		
-		
-		String fullConnectionURL = connectionURL + SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION;
-
-		SubmitJobsListWithDependenciesRequest submitJobsListWithDependenciesRequest = JobSubmissionTransforms.createSubmitJobsListWithDependenciesRequest( requestTypeName, requestId, submitter, jobSubmissionJobsList, submissionNodeName );
-
-
-//		WebResource r = jersey_JAX_RS_Client.resource( fullConnectionURL );
+	
+	//////////////////////////////////////////////
+	
+	//////////   Comment out submitJobsWithDependencies(...) since job dependencies is not completely implemented
+	
+	
+//	/* (non-Javadoc)
+//	 * @see org.jobcenter.coreinterfaces.JobSubmissionInterface#submitJobsWithDependencies(java.lang.String, java.lang.Integer, java.lang.String, java.util.List)
+//	 */
+//	@Override
+//	public int submitJobsWithDependencies(String requestTypeName,
+//			Integer requestId, 
+//			String submitter, 
+//			List<JobSubmissionJobInterface> jobSubmissionJobsList )
 //
-//		SubmitJobsListWithDependenciesResponse submitJobsListWithDependenciesResponse = r.type(MediaType.APPLICATION_XML)
-//					.accept(MediaType.APPLICATION_XML)
-//					.post( SubmitJobsListWithDependenciesResponse.class, submitJobsListWithDependenciesRequest );
-
-
-		WebTarget target = jersey_JAX_RS_Client.target(connectionURL).path(CONNECTION_URL_EXTENSION);
-
-		SubmitJobsListWithDependenciesResponse submitJobsListWithDependenciesResponse =
-			target.request(MediaType.APPLICATION_XML)
-			    .post( Entity.entity( submitJobsListWithDependenciesRequest, MediaType.APPLICATION_XML ),
-			    		SubmitJobsListWithDependenciesResponse.class);
-
-		
-		if ( log.isInfoEnabled() ) {
-
-
-			log.info( "JobCenter_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobsListWithDependenciesResponse.isErrorResponse() = " + submitJobsListWithDependenciesResponse.isErrorResponse() );
-
-			log.info( "JobCenter_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobsListWithDependenciesResponse.getErrorCode() = " + submitJobsListWithDependenciesResponse.getErrorCode() );
-		}
-
-		if ( submitJobsListWithDependenciesResponse.isErrorResponse() ) {
-
-			String msg = "Submission of jobs failed.  Error code = " + submitJobsListWithDependenciesResponse.getErrorCode() + ", error code desc = " + submitJobsListWithDependenciesResponse.getErrorCodeDescription()
-				+ ", the client's IP address as seen by the server = " + submitJobsListWithDependenciesResponse.getClientIPAddressAtServer()
-				+ "\n  requestTypeName = |" + requestTypeName + "|, requestId = " + requestId + ".";
-
-			log.error( msg );
-
-			throw new JobcenterSubmissionServerErrorException( submitJobsListWithDependenciesResponse.getErrorCode(),
-					submitJobsListWithDependenciesResponse.getErrorCodeDescription(),
-					submitJobsListWithDependenciesResponse.getClientIPAddressAtServer(),
-					msg );
-		}
-
-
-		return submitJobsListWithDependenciesResponse.getRequestId();
-		
-
-	}
+//					throws JobcenterSubmissionGeneralErrorException,
+//					JobcenterSubmissionServerErrorException,
+//					JobcenterSubmissionHTTPErrorException,
+//					JobcenterSubmissionMalformedURLErrorException,
+//					JobcenterSubmissionIOErrorException,
+//					JobcenterSubmissionXML_JAXBErrorException {
+//		
+//		
+//		String fullConnectionURL = connectionURL + SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION;
+//
+//		SubmitJobsListWithDependenciesRequest submitJobsListWithDependenciesRequest = JobSubmissionTransforms.createSubmitJobsListWithDependenciesRequest( requestTypeName, requestId, submitter, jobSubmissionJobsList, submissionNodeName );
+//
+//		WebTarget target = jersey_JAX_RS_Client.target(connectionURL).path(CONNECTION_URL_EXTENSION);
+//
+//		SubmitJobsListWithDependenciesResponse submitJobsListWithDependenciesResponse =
+//			target.request(MediaType.APPLICATION_XML)
+//			    .post( Entity.entity( submitJobsListWithDependenciesRequest, MediaType.APPLICATION_XML ),
+//			    		SubmitJobsListWithDependenciesResponse.class);
+//
+//		
+//		if ( log.isInfoEnabled() ) {
+//
+//
+//			log.info( "JobCenter_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobsListWithDependenciesResponse.isErrorResponse() = " + submitJobsListWithDependenciesResponse.isErrorResponse() );
+//
+//			log.info( "JobCenter_JobSubmissionClient:  SubmissionClientConnectionToServer:  submitJobsListWithDependenciesResponse.getErrorCode() = " + submitJobsListWithDependenciesResponse.getErrorCode() );
+//		}
+//
+//		if ( submitJobsListWithDependenciesResponse.isErrorResponse() ) {
+//
+//			String msg = "Submission of jobs failed.  Error code = " + submitJobsListWithDependenciesResponse.getErrorCode() + ", error code desc = " + submitJobsListWithDependenciesResponse.getErrorCodeDescription()
+//				+ ", the client's IP address as seen by the server = " + submitJobsListWithDependenciesResponse.getClientIPAddressAtServer()
+//				+ "\n  requestTypeName = |" + requestTypeName + "|, requestId = " + requestId + ".";
+//
+//			log.error( msg );
+//
+//			throw new JobcenterSubmissionServerErrorException( submitJobsListWithDependenciesResponse.getErrorCode(),
+//					submitJobsListWithDependenciesResponse.getErrorCodeDescription(),
+//					submitJobsListWithDependenciesResponse.getClientIPAddressAtServer(),
+//					msg );
+//		}
+//
+//
+//		return submitJobsListWithDependenciesResponse.getRequestId();
+//		
+//
+//	}
 
 
 

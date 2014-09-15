@@ -76,21 +76,27 @@ public class JobCenter_Submit_JobDependencies_To_DoNothingTestOnlyModule {
 			
 			
 			
+			
+			//////////////////////////////////////////////
+			
+			//////////   Comment out submitJobsWithDependencies(...) since job dependencies is not completely implemented
+			
+			
 			///  Job 3
 
-			jobSubmissionJobInterface = JobSubmissionJobFactory.buildJobSubmissionJobInterface();
-			jobSubmissionJobsList.add( jobSubmissionJobInterface );
-			
-			jobSubmissionJobInterface.setJobParameters( jobParameters );
-			jobSubmissionJobInterface.setJobTypeName( "DoNothingTestOnlyModule" );
-			jobSubmissionJobInterface.setPriority( 2 );
-			jobSubmissionJobInterface.addToDependencyJobsListPositions( 0 ); //  add dependency on first job, this is zero based indexing
-			jobSubmissionJobInterface.addToDependencyJobsListPositions( 1 ); //  add dependency on second job, this is zero based indexing
-						
-			
-			int requestId = jobSubmissionClient.submitJobsWithDependencies( "DoNothingTestOnlyModule", null /* requestId */, "my submitter", jobSubmissionJobsList );
-
-			System.out.println( "generated requestId = " + requestId );
+//			jobSubmissionJobInterface = JobSubmissionJobFactory.buildJobSubmissionJobInterface();
+//			jobSubmissionJobsList.add( jobSubmissionJobInterface );
+//			
+//			jobSubmissionJobInterface.setJobParameters( jobParameters );
+//			jobSubmissionJobInterface.setJobTypeName( "DoNothingTestOnlyModule" );
+//			jobSubmissionJobInterface.setPriority( 2 );
+//			jobSubmissionJobInterface.addToDependencyJobsListPositions( 0 ); //  add dependency on first job, this is zero based indexing
+//			jobSubmissionJobInterface.addToDependencyJobsListPositions( 1 ); //  add dependency on second job, this is zero based indexing
+//						
+//			
+//			int requestId = jobSubmissionClient.submitJobsWithDependencies( "DoNothingTestOnlyModule", null /* requestId */, "my submitter", jobSubmissionJobsList );
+//
+//			System.out.println( "generated requestId = " + requestId );
 
 			
 			

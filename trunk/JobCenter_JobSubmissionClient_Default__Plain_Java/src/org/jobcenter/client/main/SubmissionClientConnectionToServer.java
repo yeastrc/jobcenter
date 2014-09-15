@@ -193,38 +193,42 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	
 	
 	
-
-	@Override
-	public int submitJobsWithDependencies(String requestTypeName,
-			Integer requestId, 
-			String submitter, 
-			List<JobSubmissionJobInterface> jobSubmissionJobsList )
-
-					throws JobcenterSubmissionGeneralErrorException,
-					JobcenterSubmissionServerErrorException,
-					JobcenterSubmissionHTTPErrorException,
-					JobcenterSubmissionMalformedURLErrorException,
-					JobcenterSubmissionIOErrorException,
-					JobcenterSubmissionXML_JAXBErrorException {
-		
-		
-		String fullConnectionURL = connectionURL + SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION;
-
-		SubmitJobsListWithDependenciesRequest submitJobsListWithDependenciesRequest = JobSubmissionTransforms.createSubmitJobsListWithDependenciesRequest( requestTypeName, requestId, submitter, jobSubmissionJobsList, submissionNodeName );
-
-		
-		BaseResponse baseResponse = sendRequestToServerGetRequestId(requestTypeName, requestId, fullConnectionURL, submitJobsListWithDependenciesRequest, null /* jobTypeName */ );
-
-		if ( ! ( baseResponse instanceof SubmitJobsListWithDependenciesResponse ) ) {
-			
-			throw new JobcenterSubmissionGeneralErrorException("Processing Error: Server returned XML that deserialed to unexpected type");
-		}
-		
-		SubmitJobsListWithDependenciesResponse submitJobsListWithDependenciesResponse = (SubmitJobsListWithDependenciesResponse) baseResponse;
-		
-		return submitJobsListWithDependenciesResponse.getRequestId();
-
-	}
+	
+	//////////////////////////////////////////////
+	
+	//////////   Comment out submitJobsWithDependencies(...) since job dependencies is not completely implemented
+	
+//	@Override
+//	public int submitJobsWithDependencies(String requestTypeName,
+//			Integer requestId, 
+//			String submitter, 
+//			List<JobSubmissionJobInterface> jobSubmissionJobsList )
+//
+//					throws JobcenterSubmissionGeneralErrorException,
+//					JobcenterSubmissionServerErrorException,
+//					JobcenterSubmissionHTTPErrorException,
+//					JobcenterSubmissionMalformedURLErrorException,
+//					JobcenterSubmissionIOErrorException,
+//					JobcenterSubmissionXML_JAXBErrorException {
+//		
+//		
+//		String fullConnectionURL = connectionURL + SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION;
+//
+//		SubmitJobsListWithDependenciesRequest submitJobsListWithDependenciesRequest = JobSubmissionTransforms.createSubmitJobsListWithDependenciesRequest( requestTypeName, requestId, submitter, jobSubmissionJobsList, submissionNodeName );
+//
+//		
+//		BaseResponse baseResponse = sendRequestToServerGetRequestId(requestTypeName, requestId, fullConnectionURL, submitJobsListWithDependenciesRequest, null /* jobTypeName */ );
+//
+//		if ( ! ( baseResponse instanceof SubmitJobsListWithDependenciesResponse ) ) {
+//			
+//			throw new JobcenterSubmissionGeneralErrorException("Processing Error: Server returned XML that deserialed to unexpected type");
+//		}
+//		
+//		SubmitJobsListWithDependenciesResponse submitJobsListWithDependenciesResponse = (SubmitJobsListWithDependenciesResponse) baseResponse;
+//		
+//		return submitJobsListWithDependenciesResponse.getRequestId();
+//
+//	}
 
 
 
