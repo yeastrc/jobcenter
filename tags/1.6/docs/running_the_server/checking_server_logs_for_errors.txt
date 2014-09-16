@@ -1,0 +1,6 @@
+
+The server produces log files to help with tracking what is happening with the client and diagnosing problems.
+
+If the server is installed in Tomcat, the server will write the log files to the same log directory as the rest of the tomcat logs.
+
+The files with "errors" in the filenames contain only errors which usually need to be addressed.

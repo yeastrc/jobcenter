@@ -1,0 +1,185 @@
+body {
+	background-color:#0f486d;
+	font-family: serif;
+}
+
+.error {
+	width: 895px;
+	margin-left: auto;
+	margin-right: auto;	
+}
+
+.errors {
+	background-color:#f09086;
+	border: 4px solid red;
+
+}
+
+.container {
+	background-color:#abd4e5;
+	border: 2px solid black;
+	width: 895px;
+	height: 1048px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.header {
+	border: 1px solid black;
+	height: 50px;
+	width: 873px;
+	padding-left: 20px;
+	text-align: center;
+	line-height: 50px;
+	font-size: 30px;
+	background-color:#999999;
+}
+
+.query {
+	border: 1px solid black;
+	height: 340px;
+	width: 873px;
+	padding-left: 20px;
+}
+
+.query_label {
+	position: relative;
+	z-index: 1;
+	line-height: 30px;
+	border: 1px solid black;
+	top: 20px;
+	left: 15px;
+	width: 340px;
+	height: 30px;
+	background-color:#006699;
+	font-size: 20px;
+	color: white;
+}
+
+.query_content {
+	background-color:#999999;
+	border: 1px solid black;
+	width: 800px;
+	height: 220px;
+	padding: 25px;
+}
+
+.parameter {
+	border: 1px solid black;
+	height: 340px;
+	width: 873px;
+	padding-left: 20px;
+}
+
+.parameter_label {
+	position: relative;
+	line-height: 30px;
+	border: 1px solid black;
+	z-index: 1;
+	top: 20px;
+	left: 15px;
+	width: 340px;
+	height: 30px;
+	background-color:#006699;
+	font-size: 20px;
+	color: white;
+}
+
+.parameter_content {
+	background-color:#999999;
+	border: 1px solid black;
+	width: 800px;
+	height: 225px;
+	padding: 25px;
+}
+
+.task {
+	position: relative;
+	height: 25px;
+	top: 15px;
+}
+
+.outfmt {
+	position: relative;
+	height: 25px;
+	top: 35px;
+}
+
+.alignments {
+	position: relative;
+	height: 25px;
+	top: 55px;
+}
+
+.descriptions {
+	position: relative;
+	height: 25px;
+	top: 75px;
+}
+
+.database {
+	position: relative;
+	height: 25px;
+	top: 95px;
+}
+
+
+.results {
+	border: 1px solid black;
+	height: 255px;
+	width: 873px;
+	padding-left: 20px;
+}
+
+.results_label {
+	position: relative;
+	z-index: 1;
+	line-height: 30px;
+	border: 1px solid black;
+	top: 20px;
+	left: 15px;
+	width: 340px;
+	height: 30px;
+	background-color:#006699;
+	font-size: 20px;
+	color: white;
+}
+
+.results_content {
+	background-color:#999999;
+	border: 1px solid black;
+	width: 800px;
+	height: 140px;
+	padding: 25px;
+}
+
+.footer {
+	background-color:#999999;
+	border: 1px solid black;
+	height: 53px;
+	width: 873px;
+	padding-left: 20px;
+}
+
+.submit {
+	width: 500px;
+	border: 1px solid black;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	color: #006699;
+	background-color:#006699;
+}
+
+.field {
+	font-size: 18px;
+}
+
+.short {
+	font-size: 12px;
+}
+
+.req {
+	color: red;
+}
+
