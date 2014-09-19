@@ -148,6 +148,7 @@
 		<copy file="general_files_for_client/README_General_Overview.txt" todir="create_installables_work_dir/jobcenter_client_installation" />
 		<copy file="shell_scripts/runJobCenterClient.bat" todir="create_installables_work_dir/jobcenter_client_installation" />
 		<copy file="shell_scripts/runJobCenterClient.sh" todir="create_installables_work_dir/jobcenter_client_installation" />
+		<copy file="shell_scripts/z_Start_Client_as_user_jobcenter.sh" todir="create_installables_work_dir/jobcenter_client_installation" />
 
 		<!-- make new directories for the job center module and client code -->
 		<mkdir dir="create_installables_work_dir/jobcenter_client_installation/jobcenter_client_code" />

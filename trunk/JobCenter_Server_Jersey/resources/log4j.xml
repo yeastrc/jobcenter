@@ -131,11 +131,13 @@
         </logger>
 		-->
 
+		<!--  
         <logger name="org.jobcenter.jdbc.GetNextJobForClientJDBCDAOImpl" additivity="false">
                 <level value="debug"/>
                 <appender-ref ref="ROLL" />
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
+		-->
 
 
 		
