@@ -248,20 +248,24 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 					throw new RuntimeException( msg );
 				}
 				
-				if ( jobTypeForThisJob.getRequiredExecutionThreads() != null && 
-						jobTypeForThisJob.getRequiredExecutionThreads() > jobRequest.getTotalNumberThreadsConfiguredOnClient() )
-				{
-					
-					//  TODO  Fail the job since the threads available 
-					//          will never be >= the required number of threads
-					
-					//   	Use jobRequest.getNodeName() in error message put on job
-
-					//  These are already being populated in the client
-					// jobRequest.totalNumberThreadsConfiguredOnClient
-					// jobRequest.totalNumberJobsConfiguredOnClient;				
 				
-				}
+				//  Query to get next job references jobRequest.getTotalNumberThreadsConfiguredOnClient()
+				//    so this error should not happen anymore
+				
+//				if ( jobTypeForThisJob.getRequiredExecutionThreads() != null && 
+//						jobTypeForThisJob.getRequiredExecutionThreads() > jobRequest.getTotalNumberThreadsConfiguredOnClient() )
+//				{
+//					
+//					//  TODO  Fail the job since the threads available 
+//					//          will never be >= the required number of threads
+//					
+//					//   	Use jobRequest.getNodeName() in error message put on job
+//
+//					//  These are already being populated in the client
+//					// jobRequest.totalNumberThreadsConfiguredOnClient
+//					// jobRequest.totalNumberJobsConfiguredOnClient;				
+//				
+//				}
 				
 				
 				if ( jobTypeForThisJob.getRequiredExecutionThreads() != null && 

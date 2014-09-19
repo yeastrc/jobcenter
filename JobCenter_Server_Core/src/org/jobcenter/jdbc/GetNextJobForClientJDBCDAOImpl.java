@@ -113,7 +113,7 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 
 	private static String
 	getJobForJobRequestQuerySqlStringOrderBy
-		= "  ) \n "
+		= " \n ) \n "
 		+ " ORDER BY job.priority , job.submit_date  \n"
 		+ " LIMIT 1 FOR UPDATE  \n" ;
 
@@ -191,9 +191,10 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        			sql.append( "\n OR ");
 	        		}
 
-	        		sql.append( "\n ( jt.module_name = ? AND jt.minimum_module_version <= ? ) " );
+	        		sql.append( "\n ( jt.module_name = ? AND jt.minimum_module_version <= ?  " );
+	        		sql.append     ( "AND ( jt.required_execution_threads IS NULL OR jt.required_execution_threads <= ? ) ) " );
 	        	}
-
+	        	
 	        	sql.append( getJobForJobRequestQuerySqlStringOrderBy );
 
 	        	String sqlString = sql.toString();
@@ -219,7 +220,9 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        			paramIndex++;
 
 	        			pstmt.setInt( paramIndex, moduleInfo.getModuleVersion() );
-	        			
+
+	        			paramIndex++;    //  comparison to jt.required_execution_threads
+	        			pstmt.setInt( paramIndex, jobRequest.getTotalNumberThreadsConfiguredOnClient() );
 
 	    	        	if ( log.isDebugEnabled() ) {
 			        		log.debug( "In " + method +": moduleInfo.getModuleName(): " + moduleInfo.getModuleName() 

@@ -21,7 +21,7 @@
 #fi
 
 
-java  -Xmx128m -Dbase_dir=`pwd`    -jar jobcenter_client_code/client_root/main_jar/jobcenter_client_root.jar  > out.txt
+java  -Xmx128m -Dbase_dir=`pwd`    -jar jobcenter_client_code/client_root/main_jar/jobcenter_client_root.jar  > sysout.txt 2> syserr.txt &
 
 #  default -Xmx64m
 
