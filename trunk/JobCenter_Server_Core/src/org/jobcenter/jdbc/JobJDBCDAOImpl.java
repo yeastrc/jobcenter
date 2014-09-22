@@ -960,13 +960,11 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 	}
 
 
-	/**
-	 *
-	 */
+
 	private static String
 	insertJobSqlString
-	= "INSERT INTO job ( request_id, job_type_id, submitter, priority,  status_id, job_parameter_count, insert_complete, submit_date  )  "
-		+ "  VALUES ( ?, ?, ?, ?, ?, ?, ?, NOW() ) " ;
+	= "INSERT INTO job ( request_id, job_type_id, submitter, priority, required_execution_threads, status_id, job_parameter_count, insert_complete, submit_date  )  "
+		+ "  VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, NOW() ) " ;
 
 	/**
 	 * @param job
@@ -1008,18 +1006,38 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 
 	        		pstmt = connection.prepareStatement( insertJobSqlString, Statement.RETURN_GENERATED_KEYS );
 
-	        		pstmt.setInt( 1, job.getRequestId() );
+	        		int paramIndex = 0;
+	        		
+        			paramIndex++;    
+	        		pstmt.setInt( paramIndex, job.getRequestId() );
 
-	        		pstmt.setInt( 2, job.getJobTypeId() );
+        			paramIndex++;    
+	        		pstmt.setInt( paramIndex, job.getJobTypeId() );
 
-	        		pstmt.setString( 3, job.getSubmitter() );
+        			paramIndex++;    
+	        		pstmt.setString( paramIndex, job.getSubmitter() );
 
-	        		pstmt.setInt( 4, job.getPriority() );
+        			paramIndex++;    
+	        		pstmt.setInt( paramIndex, job.getPriority() );
+	        		
+        			paramIndex++;    
+        			
+        			if ( job.getRequiredExecutionThreads() == null ) {
+        				
+        				pstmt.setNull( paramIndex,  java.sql.Types.INTEGER );
+        			} else {
+        				pstmt.setInt( paramIndex, job.getRequiredExecutionThreads() );
+        			}
 
-	        		pstmt.setInt( 5, job.getStatusId() );
-	        		pstmt.setInt( 6, job.getJobParameterCount() );
 
-	        		pstmt.setString( 7, job.getInsertComplete() );
+        			paramIndex++;    
+	        		pstmt.setInt( paramIndex, job.getStatusId() );
+	        		
+        			paramIndex++;    
+	        		pstmt.setInt( paramIndex, job.getJobParameterCount() );
+
+        			paramIndex++;    
+	        		pstmt.setString( paramIndex, job.getInsertComplete() );
 
 	        		rowsUpdated = pstmt.executeUpdate();
 

@@ -1,5 +1,6 @@
 package org.jobcenter.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,10 +10,7 @@ import org.jobcenter.internalservice.ClientNodeNameCheck;
 import org.jobcenter.jdbc.*;
 import org.jobcenter.request.*;
 import org.jobcenter.response.*;
-
-
 import org.apache.log4j.Logger;
-
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,7 +99,26 @@ public class GetJobTypesServiceImpl implements GetJobTypesService {
 
 //		List<JobType> jobTypes = jobTypeJDBCDAO.getJobTypes();
 		
-		List<JobType> jobTypes = jobTypeDAO.findAllOrderedByName();
+		List<String> jobTypeNames = listJobTypesRequest.getJobTypeNames();
+		
+		List<JobType> jobTypes = null;
+		
+		if ( jobTypeNames == null || jobTypeNames.isEmpty() ) {
+		
+			jobTypes = jobTypeDAO.findAllOrderedByName();
+			
+		} else {
+
+			jobTypes = new ArrayList<JobType>();
+			
+			for ( String jobTypeName : jobTypeNames ) {
+			
+				JobType jobType = jobTypeDAO.findOneRecordByName( jobTypeName );
+				
+				jobTypes.add( jobType );
+			}
+			
+		}
 
 		listJobTypesResponse.setJobTypes( jobTypes );
 

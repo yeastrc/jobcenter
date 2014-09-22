@@ -292,7 +292,7 @@ public class GetJobThread extends Thread  {
 
 		if ( jobResponse == null ) {
 
-			log.error( "GetJobThread : run() Error:  'jobResponse == null'." );
+			log.error( "GetJobThread : getJob() Error:  'jobResponse == null'." );
 
 			waitForSleepTime( WAIT_BECAUSE_NO_WORKER_THREADS_FALSE );
 
@@ -304,8 +304,15 @@ public class GetJobThread extends Thread  {
 			waitForSleepTime( WAIT_BECAUSE_NO_WORKER_THREADS_FALSE );
 
 		} else if ( ! jobResponse.isJobFound() ) {
+			
+			if ( jobResponse.isNextJobRequiresMoreThreads() ) {
+				
+				log.info( "getJob(): no job found. Next job requires more threads than what is available.  Go to sleep." );
+				
+			} else {
 
-			log.info( "getJob(): no job found go to sleep" );
+				log.info( "getJob(): no job found. Go to sleep." );
+			}
 
 			waitForSleepTime( WAIT_BECAUSE_NO_WORKER_THREADS_FALSE );
 
@@ -420,8 +427,8 @@ public class GetJobThread extends Thread  {
 		
 		JobType jobTypeForThisJob = job.getJobType();
 		
-		if ( jobTypeForThisJob.getRequiredExecutionThreads() != null && 
-				jobTypeForThisJob.getRequiredExecutionThreads() > availableThreadCount ) {
+		if ( job.getRequiredExecutionThreads() != null && 
+				job.getRequiredExecutionThreads() > availableThreadCount ) {
 			
 
 			String msg = "processJob( ... ):  jobTypeForThisJob.getRequiredExecutionThreads() > availableThreadCount."
@@ -435,11 +442,11 @@ public class GetJobThread extends Thread  {
 
 		int maxNumberThreadsToUseToProcessJob = -1;
 		
-		if ( jobTypeForThisJob.getRequiredExecutionThreads() != null ) {
+		if ( job.getRequiredExecutionThreads() != null ) {
 
 			//  If required Execution threads is provided, use that
 			
-			maxNumberThreadsToUseToProcessJob = jobTypeForThisJob.getRequiredExecutionThreads();
+			maxNumberThreadsToUseToProcessJob = job.getRequiredExecutionThreads();
 			
 		} else {
 			

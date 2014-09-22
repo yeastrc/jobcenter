@@ -12,7 +12,6 @@ import org.jobcenter.dao.RequestTypeDAO;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RequestTypeDTO;
-import org.jobcenter.internalservice.ClientNodeNameCheck;
 import org.jobcenter.jdbc.JobJDBCDAO;
 import org.jobcenter.nondbdto.SubmittedJobAndDependencies;
 import org.jobcenter.request.SubmitJobRequest;
@@ -192,8 +191,56 @@ public class SubmitJobInternalServiceImpl implements SubmitJobInternalService  {
 		
 		return jobType;
 	}
+	
+	
+	
+
+	@Override
+	public boolean validateRequiredExecutionThreads( Integer submitJobRequestRequiredExecutionThreads, Integer jobTypeMaxRequiredExecutionThreads, BaseResponse baseResponse ) {
 
 
+		if ( submitJobRequestRequiredExecutionThreads != null ) {
+
+			//  RequiredExecutionThreads value specified on submitted job
+
+			if ( jobTypeMaxRequiredExecutionThreads == null ) {
+				
+				//  No max specified on job type so error
+				
+				if ( log.isInfoEnabled() ) {
+
+					log.info( ": error request: submitJobRequestRequiredExecutionThreads != null AND jobTypeMaxRequiredExecutionThreads == null."  );
+				}
+
+				baseResponse.setErrorResponse( true );
+
+				baseResponse.setErrorCode( BaseResponse.ERROR_CODE_JOB_SPECIFIES_REQUIRED_EXEC_THREADS_BUT_JOB_TYPE_DOES_NOT_HAVE_MAX );
+
+				return false;
+			}
+			
+
+			if ( submitJobRequestRequiredExecutionThreads.intValue() > jobTypeMaxRequiredExecutionThreads.intValue() ) {
+				
+				//  No max specified on job type so error
+				
+				if ( log.isInfoEnabled() ) {
+
+					log.info( ": error request: submitJobRequestRequiredExecutionThreads > jobTypeMaxRequiredExecutionThreads."  );
+				}
+
+				baseResponse.setErrorResponse( true );
+
+				baseResponse.setErrorCode( BaseResponse.ERROR_CODE_JOB_REQUIRED_EXEC_THREADS_EXCEEDS_JOB_TYPE_MAX );
+
+				return false;
+			}
+
+		}
+		
+		return true;
+	}
+		
 	/* (non-Javadoc)
 	 * @see org.jobcenter.internalservice.SubmitJobInternalService#insertRequest(org.jobcenter.dto.RequestTypeDTO)
 	 */
@@ -235,6 +282,10 @@ public class SubmitJobInternalServiceImpl implements SubmitJobInternalService  {
 
 			job.setPriority( submittedPriority );
 		}
+		
+		Integer submittedRequiredExecutionThreads = submitJobRequest.getRequiredExecutionThreads();
+		
+		job.setRequiredExecutionThreads( submittedRequiredExecutionThreads );
 
 
 		job.setRequestId( requestId );
@@ -332,4 +383,7 @@ public class SubmitJobInternalServiceImpl implements SubmitJobInternalService  {
 
 		return job.getId();
 	}
+	
+	
+	
 }
