@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="JobCenter_JobSubmissionClient_Default__Plain_Java">
+        <wb-resource deploy-path="/" source-path="/src" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/" source-path="/resources"/>
+    </wb-module>
+</project-modules>
