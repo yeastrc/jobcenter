@@ -33,7 +33,10 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 		+ "           OR  status_id = "  + JobStatusValuesConstants.JOB_STATUS_REQUEUED + " )  "
 		
 		+     " AND ( delay_job_until IS NULL OR delay_job_until < NOW()  ) " //  delay_job_until is not set or is in the past
-		
+
+						//  If required_execution_threads is set, it must be <= max threads on client
+		+     " AND ( required_execution_threads IS NULL OR required_execution_threads <= ?   ) " 
+
 		+     " AND insert_complete = 'T' AND enabled = 1 "
 		+     " AND ( ";
 
@@ -191,8 +194,11 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        			sql.append( "\n OR ");
 	        		}
 
-	        		sql.append( "\n ( jt.module_name = ? AND jt.minimum_module_version <= ?  " );
-	        		sql.append     ( "AND ( jt.required_execution_threads IS NULL OR jt.required_execution_threads <= ? ) ) " );
+	        		sql.append( "\n ( jt.module_name = ? AND jt.minimum_module_version <= ?  ) " );
+
+	        		//  was
+//	        		sql.append( "\n ( jt.module_name = ? AND jt.minimum_module_version <= ?  " );
+//	        		sql.append     ( "AND ( jt.required_execution_threads IS NULL OR jt.required_execution_threads <= ? ) ) " );
 	        	}
 	        	
 	        	sql.append( getJobForJobRequestQuerySqlStringOrderBy );
@@ -210,6 +216,11 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 		        	}
 
 	        		int paramIndex = 0;
+	        		
+        			paramIndex++;    //  comparison to job.required_execution_threads
+        			pstmt.setInt( paramIndex, jobRequest.getTotalNumberThreadsConfiguredOnClient() );
+
+
 
 	        		for ( JobRequestModuleInfo moduleInfo : clientModules ) {
 
@@ -220,9 +231,6 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        			paramIndex++;
 
 	        			pstmt.setInt( paramIndex, moduleInfo.getModuleVersion() );
-
-	        			paramIndex++;    //  comparison to jt.required_execution_threads
-	        			pstmt.setInt( paramIndex, jobRequest.getTotalNumberThreadsConfiguredOnClient() );
 
 	    	        	if ( log.isDebugEnabled() ) {
 			        		log.debug( "In " + method +": moduleInfo.getModuleName(): " + moduleInfo.getModuleName() 
@@ -243,6 +251,15 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        			int jobTypeId = rs.getInt( "job_type_id" );
 
 	        			int priority = rs.getInt( "job_priority" );
+	        			
+	        			Integer requiredExecutionThreadsInt = rs.getInt( "required_execution_threads" );;
+	        			
+	        			Integer requiredExecutionThreads = null;
+	        			
+	        			if ( ! rs.wasNull() ) {
+	        				
+	        				requiredExecutionThreads = requiredExecutionThreadsInt;
+	        			}
 
 	        			int statusId = rs.getInt( "status_id" );
 
@@ -258,6 +275,7 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        			job.setRequestId( requestId );
 	        			job.setJobTypeId( jobTypeId );
 	        			job.setPriority( priority );
+	        			job.setRequiredExecutionThreads( requiredExecutionThreads );
 	        			job.setStatusId( statusId );
 	        			job.setJobParameterCount( jobParameterCount );
 

@@ -11,8 +11,8 @@
         <property name="priority" type="java.lang.Integer">
             <column name="priority" not-null="true" />
         </property>
-        <property name="requiredExecutionThreads" type="java.lang.Integer">
-            <column name="required_execution_threads" not-null="false" />
+        <property name="maxRequiredExecutionThreads" type="java.lang.Integer">
+            <column name="max_required_execution_threads" not-null="false" />
         </property>
         
         

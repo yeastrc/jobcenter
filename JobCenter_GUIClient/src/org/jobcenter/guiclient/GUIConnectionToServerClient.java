@@ -796,6 +796,17 @@ public class GUIConnectionToServerClient {
 	 */
 	public List<JobType>  listJobTypes(  ) throws Throwable {
 
+		return listJobTypes( null );
+		
+	}
+	
+
+	/**
+	 * @return
+	 * @throws Throwable
+	 */
+	public List<JobType>  listJobTypes( List<String> jobTypeNames ) throws Throwable {
+
 		if ( ! initialized ) {
 
 			throw new IllegalStateException( "not initialized.  init() was never called." );
@@ -820,6 +831,8 @@ public class GUIConnectionToServerClient {
 		ListJobTypesRequest listJobTypesRequest = new ListJobTypesRequest();
 
 		listJobTypesRequest.setNodeName( guiNodeName );
+		
+		listJobTypesRequest.setJobTypeNames( jobTypeNames );
 
 
 		WebResource r = jersey_JAX_RS_Client.resource( fullConnectionURL );

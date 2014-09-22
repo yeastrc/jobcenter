@@ -13,6 +13,7 @@ public class SubmitJobRequest extends BaseRequest {
 	private String jobTypeName;
 	private String submitter;
 	private Integer priority;
+	private Integer requiredExecutionThreads;
 	private Map<String, String> jobParameters;
 
 
@@ -45,6 +46,12 @@ public class SubmitJobRequest extends BaseRequest {
 	}
 	public void setPriority(Integer priority) {
 		this.priority = priority;
+	}
+	public Integer getRequiredExecutionThreads() {
+		return requiredExecutionThreads;
+	}
+	public void setRequiredExecutionThreads(Integer requiredExecutionThreads) {
+		this.requiredExecutionThreads = requiredExecutionThreads;
 	}
 	public Map<String, String> getJobParameters() {
 		return jobParameters;

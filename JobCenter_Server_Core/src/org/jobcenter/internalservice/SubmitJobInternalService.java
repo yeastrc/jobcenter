@@ -29,6 +29,16 @@ public interface SubmitJobInternalService {
 			Integer requestId, BaseResponse baseResponse);
 
 	/**
+	 * @param submitJobRequestRequiredExecutionThreads
+	 * @param jobTypeMaxRequiredExecutionThreads
+	 * @param baseResponse
+	 * @return false if fails to validate
+	 */
+	public abstract boolean validateRequiredExecutionThreads( Integer submitJobRequestRequiredExecutionThreads, 
+			Integer jobTypeMaxRequiredExecutionThreads, BaseResponse baseResponse );
+
+	
+	/**
 	 * @param requestTypeDTO
 	 * @return
 	 */

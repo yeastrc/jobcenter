@@ -28,7 +28,9 @@ public abstract class BaseResponse {
 
 	public static final int ERROR_CODE_JOB_DEPENDENCY_REFERENCES_INVALID_INDEX_POSITION = 8;
 
+	public static final int ERROR_CODE_JOB_SPECIFIES_REQUIRED_EXEC_THREADS_BUT_JOB_TYPE_DOES_NOT_HAVE_MAX = 9;
 
+	public static final int ERROR_CODE_JOB_REQUIRED_EXEC_THREADS_EXCEEDS_JOB_TYPE_MAX = 10;
 
 	private boolean errorResponse;
 
@@ -98,7 +100,13 @@ public abstract class BaseResponse {
 
 		case ERROR_CODE_JOB_DEPENDENCY_REFERENCES_INVALID_INDEX_POSITION:
 			return "\"job dependency references invalid index position.  Must reference only previos jobs in the submission request\"";
-					
+
+		case ERROR_CODE_JOB_SPECIFIES_REQUIRED_EXEC_THREADS_BUT_JOB_TYPE_DOES_NOT_HAVE_MAX:
+			return "\"job specifies 'required execution threads' value but job type does not have max required execution threads specified\"";
+
+		case ERROR_CODE_JOB_REQUIRED_EXEC_THREADS_EXCEEDS_JOB_TYPE_MAX:
+			return "\"job 'required execution threads' value exceeds job type 'max required execution threads'\"";
+			
 		default:
 			return "UNKNOWN ERROR";
 

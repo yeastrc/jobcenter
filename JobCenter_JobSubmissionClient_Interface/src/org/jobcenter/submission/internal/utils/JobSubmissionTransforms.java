@@ -23,11 +23,12 @@ public class JobSubmissionTransforms {
 	 * @param jobTypeName
 	 * @param submitter
 	 * @param priority
+	 * @param requiredExecutionThreads
 	 * @param jobParameters
 	 * @param submissionNodeName
 	 * @return
 	 */
-	public static SubmitJobRequest createSubmitJobRequest( String requestTypeName, Integer requestId, String jobTypeName, String submitter, Integer priority, Map<String, String> jobParameters, String submissionNodeName ) {
+	public static SubmitJobRequest createSubmitJobRequest( String requestTypeName, Integer requestId, String jobTypeName, String submitter, Integer priority, Integer requiredExecutionThreads, Map<String, String> jobParameters, String submissionNodeName ) {
 		
 
 		if ( requestTypeName == null ) {
@@ -51,6 +52,7 @@ public class JobSubmissionTransforms {
 		submitJobRequest.setJobTypeName( jobTypeName );
 
 		submitJobRequest.setPriority (priority );
+		submitJobRequest.setRequiredExecutionThreads( requiredExecutionThreads );
 		submitJobRequest.setSubmitter( submitter );
 		submitJobRequest.setJobParameters( jobParameters );
 

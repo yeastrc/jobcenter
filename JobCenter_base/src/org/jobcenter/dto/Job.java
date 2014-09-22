@@ -40,6 +40,8 @@ public class Job {
 	private String submitter;
 
 	private int priority;
+	
+	private Integer requiredExecutionThreads;
 
 	private int statusId;
 
@@ -249,6 +251,13 @@ public class Job {
 	}
 
 
+	public Integer getRequiredExecutionThreads() {
+		return requiredExecutionThreads;
+	}
+
+	public void setRequiredExecutionThreads(Integer requiredExecutionThreads) {
+		this.requiredExecutionThreads = requiredExecutionThreads;
+	}
 
 
 

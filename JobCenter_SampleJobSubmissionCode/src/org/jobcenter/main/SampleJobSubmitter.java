@@ -26,8 +26,10 @@ public class SampleJobSubmitter {
 
 			jobSubmissionClient.init( connectionURL );
 
-			int requestId = jobSubmissionClient.submitJob("sampleModuleRT", null /* requestId */, "sampleModule", "Sample Module submitter", 1, jobParameters );
+//			int requestId = jobSubmissionClient.submitJob("sampleModuleRT", null /* requestId */, "sampleModule", "Sample Module submitter", 1 /* priority */, jobParameters );
 
+			int requestId = jobSubmissionClient.submitJob("sampleModuleRT", null /* requestId */, "sampleModule", "Sample Module submitter", 
+					1 /* priority */, 3 /* requiredExecutionThreads */, jobParameters );
 
 			System.out.println( "requestId = " + requestId );
 

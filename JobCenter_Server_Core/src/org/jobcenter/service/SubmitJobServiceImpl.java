@@ -117,6 +117,13 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 			
 			return submitJobResponse;
 		}
+		
+		
+		if ( ! submitJobInternalService.validateRequiredExecutionThreads( submitJobRequest.getRequiredExecutionThreads(), jobType.getMaxRequiredExecutionThreads(), submitJobResponse ) ) {
+			
+			return submitJobResponse;
+		}
+		
 
 		
 		Integer requestId = submitJobRequest.getRequestId();

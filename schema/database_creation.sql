@@ -1,3 +1,4 @@
+
 DROP SCHEMA IF EXISTS `jobcenter` ;
 CREATE SCHEMA IF NOT EXISTS `jobcenter` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
 USE `jobcenter` ;
@@ -45,7 +46,7 @@ DROP TABLE IF EXISTS `job_type` ;
 CREATE TABLE IF NOT EXISTS `job_type` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `priority` INT NOT NULL,
-  `required_execution_threads` INT UNSIGNED NULL,
+  `max_required_execution_threads` INT UNSIGNED NULL,
   `name` VARCHAR(45) NOT NULL,
   `description` VARCHAR(2000) NULL,
   `enabled` BIT(1) NOT NULL,
@@ -116,6 +117,7 @@ CREATE TABLE IF NOT EXISTS `job` (
   `submit_date` DATETIME NOT NULL,
   `submitter` VARCHAR(200) NULL,
   `priority` INT NOT NULL,
+  `required_execution_threads` INT UNSIGNED NULL,
   `status_id` INT NOT NULL,
   `insert_complete` ENUM('T','F') NOT NULL DEFAULT 'F',
   `job_parameter_count` INT NULL DEFAULT -1,

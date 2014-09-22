@@ -1,5 +1,7 @@
 package org.jobcenter.request;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -7,5 +9,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 public class ListJobTypesRequest extends BaseRequest {
 
+	private List<String> jobTypeNames;
 
+	public List<String> getJobTypeNames() {
+		return jobTypeNames;
+	}
+
+	public void setJobTypeNames(List<String> jobTypeNames) {
+		this.jobTypeNames = jobTypeNames;
+	}
 }
