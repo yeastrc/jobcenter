@@ -114,6 +114,10 @@ public class DoNothingTestModuleMain implements ModuleInterfaceClientMainInterfa
 				log.info("parameter: " + entry.getKey() + ", value = |" + entry.getValue() + "|." );
 			}
 		}
+		
+		log.info( "JobRequiredExecutionThreads:" + moduleRequest.getJobRequiredExecutionThreads() );
+		
+		log.info( "JobcenterClientNodeName:" + moduleRequest.getJobcenterClientNodeName() );
 
 		int jobStatus = JobStatusValuesConstants.JOB_STATUS_RUNNING;
 

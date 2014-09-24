@@ -17,13 +17,19 @@ public class ModuleInterfaceRequestImpl implements ModuleInterfaceRequest {
 	private int numberOfThreadsForRunningJob;
 	
 	/**
-	 * required_execution_threads in job_type table
+	 * required_execution_threads in job table
 	 */
-	private Integer jobTypeRequiredExecutionThreads;
+	private Integer jobRequiredExecutionThreads;
+	
+	/**
+	 * 
+	 */
+	private String jobcenterClientNodeName;
 
 
 	//  get methods visible to the module through interface ModuleInterfaceRequest
 
+	
 	@Override
 	public int getRequestId() {
 
@@ -38,13 +44,13 @@ public class ModuleInterfaceRequestImpl implements ModuleInterfaceRequest {
 	
 
 	/* (non-Javadoc)
-	 * @see org.jobcenter.job_client_module_interface.ModuleInterfaceRequest#getJobTypeRequiredExecutionThreads()
+	 * @see org.jobcenter.job_client_module_interface.ModuleInterfaceRequest#getJobRequiredExecutionThreads()
 	 * 
-	 * the value from required_execution_threads field in job_type table
+	 * the value from required_execution_threads field in job table
 	 */
 	@Override
-	public Integer getJobTypeRequiredExecutionThreads() {
-		return jobTypeRequiredExecutionThreads;
+	public Integer getJobRequiredExecutionThreads() {
+		return jobRequiredExecutionThreads;
 	}
 
 
@@ -54,6 +60,13 @@ public class ModuleInterfaceRequestImpl implements ModuleInterfaceRequest {
 		return numberOfThreadsForRunningJob;
 	}
 
+
+	@Override
+	public String getJobcenterClientNodeName() {
+
+		return jobcenterClientNodeName;
+	}
+	
 
 
 	//  setter methods not visible to the module
@@ -71,8 +84,15 @@ public class ModuleInterfaceRequestImpl implements ModuleInterfaceRequest {
 	}
 
 	
-	public void setJobTypeRequiredExecutionThreads(
-			Integer jobTypeRequiredExecutionThreads) {
-		this.jobTypeRequiredExecutionThreads = jobTypeRequiredExecutionThreads;
+	public void setJobRequiredExecutionThreads(
+			Integer jobRequiredExecutionThreads) {
+		this.jobRequiredExecutionThreads = jobRequiredExecutionThreads;
 	}
+	
+
+	public void setJobcenterClientNodeName(String jobcenterClientNodeName) {
+		this.jobcenterClientNodeName = jobcenterClientNodeName;
+	}
+
+
 }
