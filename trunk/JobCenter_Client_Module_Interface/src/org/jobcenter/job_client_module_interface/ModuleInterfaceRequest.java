@@ -29,9 +29,17 @@ public interface ModuleInterfaceRequest {
 
 
 	/**
-	 * @return  the value from required_execution_threads field in job_type table
+	 * @return  the value from required_execution_threads field in job table
 	 *
 	 */
-	public Integer getJobTypeRequiredExecutionThreads(  );
+	public Integer getJobRequiredExecutionThreads(  );
+
+
+
+	/**
+	 * @return  the value from "client.node.name" in the Jobcenter client main configuration
+	 *
+	 */
+	public String getJobcenterClientNodeName(  );
 
 }

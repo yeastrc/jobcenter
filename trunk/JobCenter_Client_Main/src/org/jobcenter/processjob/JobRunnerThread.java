@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jobcenter.config.ClientConfigDTO;
+import org.jobcenter.config.ConfigFromServer;
 import org.jobcenter.constants.JobConstants;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.RunMessageTypesConstants;
@@ -624,6 +626,8 @@ public class JobRunnerThread extends Thread  {
 	private int processJob( List<RunMessageDTO> runMessages, Map<String, String> runOutputParams ) {
 
 
+		
+		
 
 		//    process the job
 
@@ -648,6 +652,10 @@ public class JobRunnerThread extends Thread  {
 			moduleInterfaceRequestImpl.setJobParameters( parameters );
 
 			moduleInterfaceRequestImpl.setRequestId( job.getRequestId() );
+			
+			moduleInterfaceRequestImpl.setJobRequiredExecutionThreads( job.getRequiredExecutionThreads() );
+			
+			moduleInterfaceRequestImpl.setJobcenterClientNodeName( ClientConfigDTO.getSingletonInstance().getClientNodeName() );
 
 			moduleInterfaceModuleResponseImpl.setRunOutputParams( runOutputParams );
 			moduleInterfaceModuleResponseImpl.setRunMessages( runMessages );
