@@ -9,6 +9,8 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.RunMessageTypesConstants;
+import org.jobcenter.exceptions.JobcenterModuleInterfaceInvalidCharactersInStringException;
+import org.jobcenter.exceptions.JobcenterSystemErrorException;
 import org.jobcenter.job_client_module_interface.ModuleInterfaceClientMainInterface;
 import org.jobcenter.job_client_module_interface.ModuleInterfaceClientServices;
 import org.jobcenter.job_client_module_interface.ModuleInterfaceJobProgress;
@@ -375,12 +377,153 @@ public class SampleMain implements ModuleInterfaceClientMainInterface {
 
 		moduleResponse.setStatusCode( jobStatus );
 
-		moduleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_MSG, "Successful Completion Sample Main" );
 
-		moduleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_WARNING, "Second Message, warning" );
+		
+		String resultMessage = "Successful Completion Sample Main";
+		
 
 
-		moduleResponse.addRunOutputParam( "SampleModKeyV2", "SampleModValueV2" );
+		try {
+
+			//  Allow cleaning of invalid for XML Chars and to ASCII if needed
+			moduleResponse.addRunMessageAutoCleanStringToASCII( RunMessageTypesConstants.RUN_MESSAGE_TYPE_MSG, resultMessage, "?" );
+			
+		} catch ( JobcenterModuleInterfaceInvalidCharactersInStringException ex ) {
+			
+			//  The passed in string was still invalid after cleaning
+			
+			String msg = "ERROR:  Failed to add message to jobcenter job completion response due to invalid characters.";
+
+			log.error( msg + "  status message is: " + resultMessage, ex );
+
+			moduleResponse.addRunMessageAutoCleanStringToASCII( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR,
+					msg + "  Status message is written to log on machine where the job was run.", "?" );
+					
+		} catch ( JobcenterSystemErrorException ex ) {
+			
+			//  Jobcenter internals encountered an error while validating the data
+			
+			String msg = "ERROR:  Failed to add message to jobcenter job completion response due to JobcenterSystemErrorException.";
+
+			log.error( msg + "  status message is: " + resultMessage, ex );
+
+			moduleResponse.addRunMessageAutoCleanStringToASCII( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR,
+					msg + "  Status message is written to log on machine where the job was run.", "?" );
+		}
+				
+		
+
+		String resultWarning = "Second Message, warning";
+		
+		
+
+
+		try {
+
+			//  Allow cleaning of invalid for XML Chars and to ASCII if needed
+			moduleResponse.addRunMessageAutoCleanStringToASCII( RunMessageTypesConstants.RUN_MESSAGE_TYPE_WARNING, resultWarning, "?" );
+			
+		} catch ( JobcenterModuleInterfaceInvalidCharactersInStringException ex ) {
+			
+			//  The passed in string was still invalid after cleaning
+			
+			String msg = "ERROR:  Failed to add message to jobcenter job completion response due to invalid characters.";
+
+			log.error( msg + "  status message is: " + resultWarning, ex );
+
+			moduleResponse.addRunMessageAutoCleanStringToASCII( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR,
+					msg + "  Status message is written to log on machine where the job was run.", "?" );
+					
+		} catch ( JobcenterSystemErrorException ex ) {
+			
+			//  Jobcenter internals encountered an error while validating the data
+			
+			String msg = "ERROR:  Failed to add message to jobcenter job completion response due to JobcenterSystemErrorException.";
+
+			log.error( msg + "  status message is: " + resultWarning, ex );
+
+			moduleResponse.addRunMessageAutoCleanStringToASCII( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR,
+					msg + "  Status message is written to log on machine where the job was run.", "?" );
+		}
+		
+		
+		
+
+		String outputParamKey = "SampleModKeyV2";
+		
+		String outputParamValue = "SampleModValueV2";
+		
+
+
+		try {
+
+			//  Should not use allow cleaning of invalid for XML Chars and to ASCII if saving data for a retry 
+			//    that needs the data un-modified.
+			//  In that case, consider using base-64 encoding for the data to ensure it is not a problem,
+			//  Otherwise, fail the job since unable to pass data to a retry of the job,
+			//     and put a plain text string in RunOutputParam that such problem was encountered so that 
+			//     retry knows there is data missing from RunOutputParam
+			
+			moduleResponse.addRunOutputParam( outputParamKey, outputParamValue );
+			
+//			moduleResponse.addRunOutputParamAutoCleanStringToASCII( outputParamKey, outputParamValue, "?" );
+			
+		} catch ( JobcenterModuleInterfaceInvalidCharactersInStringException ex ) {
+			
+			//  The passed in string was still invalid after cleaning
+			
+			String msg = "ERROR:  Failed to add outputParamValue to jobcenter job completion response due to invalid characters.";
+
+			log.error( msg + "  outputParamValue is: " + outputParamValue, ex );
+
+			moduleResponse.addRunMessageAutoCleanStringToASCII( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR,
+					msg + "  Status message is written to log on machine where the job was run.", "?" );
+			
+			throw ex;
+					
+		} catch ( JobcenterSystemErrorException ex ) {
+			
+			//  Jobcenter internals encountered an error while validating the data
+			
+			String msg = "ERROR:  Failed to add message to jobcenter job completion response due to JobcenterSystemErrorException.";
+
+			log.error( msg + "  outputParamValue is: " + outputParamValue, ex );
+
+			moduleResponse.addRunMessageAutoCleanStringToASCII( RunMessageTypesConstants.RUN_MESSAGE_TYPE_ERROR,
+					msg + "  outputParamValue is written to log on machine where the job was run.", "?" );
+			
+			throw ex;
+		}
+		
+		
+//		try {
+//			
+//
+//			moduleResponse.addRunOutputParam( outputParamKey, outputParamValue );
+//			
+//		} catch ( JobcenterModuleInterfaceInvalidCharactersInStringException ex ) {
+//			
+//			outputParamValue = moduleInterfaceClientServices.replaceInvalidCharactersInXMLUTF8InString( outputParamValue, " " );
+//			
+//			try {
+//				
+//				moduleResponse.addRunOutputParam( outputParamKey, outputParamValue );
+//					
+//			} catch ( JobcenterModuleInterfaceInvalidCharactersInStringException ex2 ) {
+//				
+//				moduleResponse.addRunOutputParam( outputParamKey, "OutputValueFailedToEncodetoXML" );
+//				
+//			} catch ( JobcenterSystemErrorException ex2 ) {
+//
+//				throw ex;
+//			}
+//		
+//			
+//		} catch ( JobcenterSystemErrorException ex ) {
+//			
+//			throw ex;
+//		}
+
 
 
 		log.info( "Exiting: SampleMain.processRequest()" );

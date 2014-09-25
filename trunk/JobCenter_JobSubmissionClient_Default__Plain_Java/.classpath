@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="src" path="test_src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_base"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Interface"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Base"/>

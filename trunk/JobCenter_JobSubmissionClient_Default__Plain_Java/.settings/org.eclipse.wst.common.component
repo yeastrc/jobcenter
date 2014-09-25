@@ -2,5 +2,6 @@
     <wb-module deploy-name="JobCenter_JobSubmissionClient_Default__Plain_Java">
         <wb-resource deploy-path="/" source-path="/src" tag="defaultRootSource"/>
         <wb-resource deploy-path="/" source-path="/resources"/>
+        <wb-resource deploy-path="/" source-path="/test_src"/>
     </wb-module>
 </project-modules>
