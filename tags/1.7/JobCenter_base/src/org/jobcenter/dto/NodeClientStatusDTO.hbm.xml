@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+ <class name="org.jobcenter.dto.NodeClientStatusDTO" table="node_client_status">
+  <id name="id" type="java.lang.Integer">
+   <column name="id"/>
+   <generator class="native"/>
+  </id>
+  <!-- Using version number optimistic locking -->
+  <version column="db_record_version_number" generated="never"
+   name="dbRecordVersionNumber" type="java.lang.Integer"/>
+  <property generated="never" lazy="false" name="nodeId" type="java.lang.Integer">
+   <column name="node_id" not-null="true"/>
+  </property>
+  <many-to-one class="org.jobcenter.dto.Node" fetch="select"
+   insert="false" name="node" update="false">
+   <column name="node_id" not-null="true"/>
+  </many-to-one>
+  <property generated="never" lazy="false" name="clientStarted" type="java.lang.Boolean">
+   <column name="client_started" not-null="true"/>
+  </property>
+  <property generated="never" lazy="false" name="lastCheckinTime"
+   not-null="true" type="java.sql.Timestamp">
+   <column length="19" name="last_checkin_time" not-null="true"/>
+  </property>
+  <property generated="never" lazy="false" name="nextCheckinTime" type="java.sql.Timestamp">
+   <column length="19" name="next_checkin_time" not-null="false"/>
+  </property>
+  <property generated="never" lazy="false" name="lateForNextCheckinTime" type="java.sql.Timestamp">
+   <column length="19" name="late_for_next_checkin_time" not-null="false"/>
+  </property>
+  <property generated="never" lazy="false"
+   name="secondsUntilNextCheckin" type="java.lang.Integer">
+   <column name="seconds_until_next_checkin" not-null="false"/>
+  </property>
+  <property generated="never" lazy="false"
+   name="notificationSentThatClientLate" type="java.lang.Boolean">
+   <column name="notification_sent_that_client_late" not-null="true"/>
+  </property>
+ </class>
+</hibernate-mapping>

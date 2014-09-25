@@ -1,0 +1,107 @@
+The submitter is program that submits new jobs to the JobCenter Server.
+
+The submitter is generally unique to the jobs that it submits. The key:value pairs
+that the submitter passes to the JobCenter must match the key:value pairs that
+the module is expecting to receive.
+
+You will need to generate the following pieces of information before you begin writing.
+
+1.	Choose a job_type_name and request_type_name for the submitter. These names will be stored
+	in the database so that the JobCenter can reference them and find clients capable of running
+	this job type.
+
+2.	The attached code and appropriate comments will get you started and should provide everything you
+	need to write your own job submitter.
+
+
+package org.webblast.submit;
+
+// Needed for key value pairs
+import java.util.HashMap;
+import java.util.Map;
+
+// Needed for logging
+import org.apache.log4j.Logger;
+
+// Needed for any job submitter
+import org.jobcenter.client.main.SubmissionClientConnectionToServer;
+import org.jobcenter.coreinterfaces.JobSubmissionInterface;
+
+public class WebBlastSubmit {
+
+	//log4j logger
+	private static Logger log = Logger.getLogger(WebBlastSubmit.class);
+
+	// This is the job_type_name and request_type_name that will be referenced
+	// in the configuration of the JobCenter Server and will be stored in the database.
+	private static final String BLAST_REQUEST_TYPE_NAME = "blast";
+	private static final String BLAST_JOB_TYPE_NAME = "blast";
+	private static final int BLAST_JOB_PRIORITY = 4;
+	private static final String BLAST_NODE_NAME = "blast_submitter";
+
+
+	// These parameters are specific to the blast module
+	// You will place your own parameters here.
+	private static final String JOB_PARAM_QUERY = "query";
+	private static final String JOB_PARAM_TASK = "task";
+	private static final String JOB_PARAM_DATABASE = "database";
+	private static final String JOB_PARAM_OUTFMT = "outfmt";
+	private static final String JOB_PARAM_ALIGNMENTS = "alignments";
+	private static final String JOB_PARAM_DESCRIPTIONS = "descriptions";
+	private static final String JOB_PARAM_EMAIL = "email";
+
+
+
+	/**
+	 *
+	 */
+	public void main(String query, String task, String database, String outfmt, String alignments, String descriptions, String email) {
+
+		// This should be configurable, but is not. Please change this line according to where your JobCenterServer is located.
+		final String connectionURL = "http://localhost:8080/JobCenter_Server_Jersey/";
+
+
+		Map<String, String> jobParameters = new HashMap<String, String> ();
+
+		// This is how you will build the key:value map
+		// which is sent to the JobCenter Server and then passed to your module.
+		jobParameters.put( JOB_PARAM_QUERY, query );
+		jobParameters.put( JOB_PARAM_TASK, task );
+		jobParameters.put( JOB_PARAM_DATABASE, database );
+		jobParameters.put( JOB_PARAM_OUTFMT, outfmt );
+		jobParameters.put( JOB_PARAM_ALIGNMENTS, alignments );
+		jobParameters.put( JOB_PARAM_DESCRIPTIONS, descriptions);
+		jobParameters.put( JOB_PARAM_EMAIL, email );
+
+		try {
+
+			// Create new jobSubmissionClient
+			JobSubmissionInterface jobSubmissionClient = new SubmissionClientConnectionToServer();
+
+			// This is the node name you will use when are configuring the server for this submitter
+			jobSubmissionClient.setNodeName( BLAST_NODE_NAME );
+
+			// Initialize the connection object to the JobCenterServer
+			jobSubmissionClient.init( connectionURL );
+
+			// Send the job to the JobCenterServer and include all of your required parameters.
+			// Use the following format:
+			// BLAST_REQUEST_TYPE_NAME, null, BLAST_JOB_TYPE_NAME, email, BLAST_JOB_PRIORITY, jobParameters
+			// Note: If you are submitting the second part of a two part job, you must include the request ID
+			// when submitting part two if you want them to be tracked together as the same request.
+			int requestId = jobSubmissionClient.submitJob(BLAST_REQUEST_TYPE_NAME, null /* requestId */, BLAST_JOB_TYPE_NAME, email, BLAST_JOB_PRIORITY, jobParameters );
+
+			// Log the requestId
+			if (log.isInfoEnabled()){
+				log.info( "requestId = " + requestId );
+			}
+
+		} catch (Throwable t) {
+			// Throw an error and be verbose.
+			log.error("Error submitting JobCenter job from. ConnectionURL:" + connectionURL
+					+ " job_type_name: " + BLAST_JOB_TYPE_NAME + " request_type_name " + BLAST_REQUEST_TYPE_NAME, t);
+		}
+
+	}
+
+}

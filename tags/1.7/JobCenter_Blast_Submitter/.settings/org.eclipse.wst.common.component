@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="JobCenter_Blast_Submitter">
+        <wb-resource deploy-path="/" source-path="/WebRoot" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/resources"/>
+        <dependent-module archiveName="JobCenter_JobSubmissionClient_Interface.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_JobSubmissionClient_Interface/JobCenter_JobSubmissionClient_Interface">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="JobCenter_base.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_base/JobCenter_base">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="JobCenter_JobSubmissionClient_Default__Plain_Java.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_JobSubmissionClient_Default__Plain_Java/JobCenter_JobSubmissionClient_Default__Plain_Java">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="/blast"/>
+        <property name="java-output-path" value="/JobCenter_Blast_Submitter/WebRoot/WEB-INF/classes"/>
+        <property name="me-merge-utility-modules" value="true"/>
+        <property name="me-struts-base-pkg" value="com.webblast.struts"/>
+    </wb-module>
+</project-modules>
