@@ -1,0 +1,14 @@
+#
+#  This file is for JaxB usage.  All JaxB classes in this package must be declared here
+#
+Job
+JobType
+Node
+NodeAccessRule
+RequestDTO
+RequestTypeDTO
+RunDTO
+RunMessageDTO
+RunMsgTypeDTO
+StatusDTO
+NodeClientStatusDTO

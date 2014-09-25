@@ -1,0 +1,19 @@
+
+
+   Modules are added to the client by adding them under the sub folder path "jobcenter_client_installation/jobcenter_modules".
+
+   If the module has been jarred, the jar can be placed in the sub folder path "jobcenter_client_installation/jobcenter_modules"
+   and the "jar" command can be used to expand the module. Use jar xvf modulename.jar
+   The resulting "META-INF" folder in the sub folder path "jobcenter_client_installation/jobcenter_modules" is ignored.
+   
+1. Manually create the following directories under jobcenter_modules
+	a. config
+   	b. lib
+   	c. main_jar
+   	
+2. Place the jar for the module inside of main_jar
+   
+3. Place of copy of the jars from the module's lib direcotory into the lib directory you just created.
+	
+4. Copy the .properties files from config_sample_files in the project to the config directory.
+	a. Modify the .properties files appropriately. 

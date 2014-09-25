@@ -1,0 +1,52 @@
+#
+#   Client Time control file:   time_control_settings.txt
+
+
+##  !!!!!!!!  Special version for Quick install.  Time control is not active since all entries are commented out  !!!!!!!!
+
+
+
+#
+#    This file is used to control what blocks of time the client will request jobs from the server.
+#
+#    If no blocks of time are specified (all are commented out), or if this file is not in the config folder,
+#    the client will request jobs all the time.
+#
+#    The blocks of time specify when the client will request jobs.  Jobs that are running on the client when a block of time
+#    has ended will continue to run to completion.  If jobs need to be complete by a specific time, will
+#    need to take into account the longest running job when setting the end time for the block of time before that specific time.
+#
+#    A comment line has "#" as first position of the line
+#
+#    The format of a data line is:   dayOfWeek   start_time     end_time
+#
+#    The parameters are separated by white space ( space or tab ).
+#
+#    In specifying "dayOfWeek", enough of the name needs to be there to be unique(not match any other day of the week.  ie.  'SU' but not 'S'.
+#          Whether the letters are upper or lower case does not matter.
+#
+#    A special case for "dayOfWeek" is the value "*", which indicates that the times following it apply to every day of the week.
+#
+#    Time as HH:MM where HH is a 24 hour clock.  Midnight at the beginning is 0.  Midnight at the end is 24.
+#    if end time is before start time, it is assumed to be the next day
+#
+#    Overlapping day/time values are allowed.
+# 
+
+#    Some examples:
+
+#  set up to run 6pm to 6am every day
+
+# *  18:00  6:00
+
+#  set up to run all day Sunday
+
+# Sun   0      24
+
+#  set up to run all day Saturday
+
+# Sat   0      24
+
+#  set up to run 3am to 8am Tuesday
+
+# tue  3 8
