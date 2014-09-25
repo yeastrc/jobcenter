@@ -16,6 +16,12 @@ See the class
 /JobCenter_Client_Module_Interface/src/org/jobcenter/job_client_module_interface/ModuleInterfaceResponse.java
 for changes to the existing methods adding checked exceptions and the new methods.
 
+New methods for use in modules have been added to ModuleInterfaceClientServices.
+'replaceInvalidCharactersInXMLUTF8InString' and 'replaceNonAsciiCharactersInString'
+can be called to clean Strings.
+See the class 
+JobCenter_Client_Module_Interface/src/org/jobcenter/job_client_module_interface/ModuleInterfaceClientServices.java
+for these changes
 
 
 1.4
