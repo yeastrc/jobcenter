@@ -1,4 +1,23 @@
 
+
+1.7
+
+Breaking change.
+
+In the Jobcenter client, calls the module makes on the ModuleInterfaceResponse response object
+to add run messages and run output parameters will throw exceptions 
+if the Strings passed cannot be marshaled and unmarshaled as UTF-8 XML.
+
+The existing methods 'addRunMessage' and 'addRunOutputParam' remain on ModuleInterfaceResponse and throw checked exceptions.
+
+New methods have been added to ModuleInterfaceResponse to automatically change the strings 
+
+See the class 
+/JobCenter_Client_Module_Interface/src/org/jobcenter/job_client_module_interface/ModuleInterfaceResponse.java
+for changes to the existing methods adding checked exceptions and the new methods.
+
+
+
 1.4
 
 Important bug fix.
