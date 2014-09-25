@@ -1,6 +1,0 @@
-
-This file could contain directions for how to install the module on a client,
-including what settings need to be updated on a per client basis.
-
-
-This file would then need to be rolled up and deployed with the client.
