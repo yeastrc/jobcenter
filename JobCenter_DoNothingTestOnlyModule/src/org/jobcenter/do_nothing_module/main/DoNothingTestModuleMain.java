@@ -5,6 +5,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.RunMessageTypesConstants;
+import org.jobcenter.exceptions.JobcenterModuleInterfaceInvalidCharactersInStringException;
+import org.jobcenter.exceptions.JobcenterSystemErrorException;
 import org.jobcenter.job_client_module_interface.ModuleInterfaceClientMainInterface;
 import org.jobcenter.job_client_module_interface.ModuleInterfaceClientServices;
 import org.jobcenter.job_client_module_interface.ModuleInterfaceJobProgress;
@@ -143,7 +145,20 @@ public class DoNothingTestModuleMain implements ModuleInterfaceClientMainInterfa
 
 		moduleResponse.setStatusCode( jobStatus );
 
-		moduleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_MSG, "Successful Completion DoNothingTestModuleMain" );
+		String resultMessage = "Successful Completion DoNothingTestModuleMain";
+		
+		
+		try {
+			moduleResponse.addRunMessageAutoCleanString( RunMessageTypesConstants.RUN_MESSAGE_TYPE_MSG, resultMessage, " " /* replacementStringForInvalidXMLChars */ );
+			
+		} catch ( JobcenterModuleInterfaceInvalidCharactersInStringException ex ) {
+
+			String msg = "failed to save response message due to invalid XML characters";
+			
+			log.error( msg + ". original message: " + resultMessage );
+			
+			moduleResponse.addRunMessage( RunMessageTypesConstants.RUN_MESSAGE_TYPE_MSG, msg );
+		}
 
 
 		log.info( "Exiting: DoNothingTestModuleMain.processRequest()" );

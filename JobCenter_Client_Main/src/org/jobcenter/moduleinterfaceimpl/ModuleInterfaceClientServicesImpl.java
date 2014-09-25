@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jobcenter.base_exceptions.TestMarshalThenUnMarshalObjectException;
 import org.jobcenter.config.ClientConfigDTO;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.RunDTO;
+import org.jobcenter.exceptions.JobcenterModuleInterfaceInvalidCharactersInStringException;
+import org.jobcenter.exceptions.JobcenterSystemErrorException;
 import org.jobcenter.job_client_module_interface.ModuleInterfaceClientServices;
 import org.jobcenter.request.GetRunIdListRequest;
 import org.jobcenter.request.GetRunRequest;
@@ -15,6 +18,8 @@ import org.jobcenter.response.GetRunIdListResponse;
 import org.jobcenter.response.GetRunResponse;
 import org.jobcenter.response.SubmitJobResponse;
 import org.jobcenter.serverinterface.ServerConnection;
+import org.jobcenter.test_marshal_then_unmarshal_object.TestMarshalThenUnMarshalObject;
+import org.jobcenter.util.ReplaceInvalidCharactersInXMLUTF8InString;
 
 /**
  *   !!!!!!!!!!!!!!!!   Important:           Wrap every call from the module with saving the contextClassLoader and restoring it on exit  !!!!!!!!!!!!!!
@@ -56,6 +61,67 @@ public class ModuleInterfaceClientServicesImpl implements ModuleInterfaceClientS
 
 	}
 
+
+	/**
+	 * Using the regex in org.jobcenter.constants.InvalidCharactersInXMLUTF8Constants replace all with replacementString
+	 *  
+	 * @param input
+	 * @param replacementString
+	 * @return
+	 */
+	@Override
+	public String replaceInvalidCharactersInXMLUTF8InString( String input, String replacementString ) {
+
+		ClassLoader savedClassLoader = Thread.currentThread().getContextClassLoader();
+
+		try {
+			//  Set context class loader to class loader for module
+
+			log.info( "Setting current thread context class loader to class loader for current class" );
+
+	        Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
+
+	        return ReplaceInvalidCharactersInXMLUTF8InString.replaceInvalidCharactersInXMLUTF8InString( input, replacementString );
+
+		} finally {
+
+			log.info( "Setting current thread context class loader to saved class loader. savedClassLoader  = " + savedClassLoader );
+
+			Thread.currentThread().setContextClassLoader( savedClassLoader );
+		}
+
+	}
+	
+	
+	/**
+	 * Replace Non ASCII characters ( > x7F ) with replacementString  
+	 * 
+	 * @param input
+	 * @param replacementString
+	 * @return
+	 */
+	@Override
+	public String replaceNonAsciiCharactersInString( String input, String replacementString ) {
+		
+		ClassLoader savedClassLoader = Thread.currentThread().getContextClassLoader();
+
+		try {
+			//  Set context class loader to class loader for module
+
+			log.info( "Setting current thread context class loader to class loader for current class" );
+
+	        Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
+
+	        return ReplaceInvalidCharactersInXMLUTF8InString.replaceNonAsciiCharactersInString( input, replacementString );
+
+		} finally {
+
+			log.info( "Setting current thread context class loader to saved class loader. savedClassLoader  = " + savedClassLoader );
+
+	        Thread.currentThread().setContextClassLoader( savedClassLoader );
+		}
+
+	}
 
 
 	/**
@@ -415,11 +481,58 @@ public class ModuleInterfaceClientServicesImpl implements ModuleInterfaceClientS
 	 * @param priority - Pass null if want to use value from jobtype table
 	 * @param jobParameters
 	 * @return requestId - the next assigned id related to the particular requestTypeName.  Will return the passed in requestId if one is provided ( not null )
+	 * 
+	 * @throws JobcenterModuleInterfaceInvalidCharactersInStringException
+	 *             thrown if the message passed in cannot be marshaled and unmarshaled as XML UTF-8 
+	 *             
+	 * @throws JobcenterSystemErrorException - when general internal Jobcenter error
+	 * 
 	 * @throws Throwable - throws an error if any errors related to submitting the job
 	 */
 	@Override
-	public int submitJob( String requestTypeName, Integer requestId, String jobTypeName, String submitter, Integer priority, Map<String, String> jobParameters ) throws Throwable {
+	public int submitJob( String requestTypeName, Integer requestId, String jobTypeName, String submitter, Integer priority, Map<String, String> jobParameters ) 
+			throws JobcenterModuleInterfaceInvalidCharactersInStringException, JobcenterSystemErrorException ,Throwable {
+		
+		// calls method in this class so not save the class loader here
+		
+		return submitJob( requestTypeName, requestId, jobTypeName, submitter, priority, null /* requiredExecutionThreads */, jobParameters );
+	}
+	
 
+	/**
+	 * @param requestTypeName - the name of the request type
+	 * @param requestId - Pass in to relate the submitted job to an existing requestId.  Pass in null otherwise
+	 * @param jobTypeName - the name of the job type
+	 * @param submitter
+	 * 
+	 * @param priority - optional, if null, the priority on the job_type table is used
+	 * @param requiredExecutionThreads - optional, 
+	 *             if not null:
+	 *                if the client max threads >= requiredExecutionThreads
+	 *                the server will send no job until the client has available threads >= requiredExecutionThreads
+	 * 
+	 * @param jobParameters
+	 * 
+	 * @return requestId - the next assigned id related to the particular requestTypeName.  Will return the passed in requestId if one is provided ( not null )
+	 * 
+	 * 
+	 * @throws JobcenterModuleInterfaceInvalidCharactersInStringException
+	 *             thrown if the message passed in cannot be marshaled and unmarshaled as XML UTF-8 
+	 *             
+	 * @throws JobcenterSystemErrorException - when general internal Jobcenter error
+	 * 
+	 * @throws Throwable - throws an error if any errors related to submitting the job
+	 */
+	@Override
+	public int submitJob(String requestTypeName, Integer requestId,
+			String jobTypeName, String submitter, Integer priority,
+			Integer requiredExecutionThreads, Map<String, String> jobParameters)
+	
+			throws JobcenterModuleInterfaceInvalidCharactersInStringException, JobcenterSystemErrorException, Throwable {
+
+		
+		
+		
 		ClassLoader savedClassLoader = Thread.currentThread().getContextClassLoader();
 
 		try {
@@ -438,8 +551,24 @@ public class ModuleInterfaceClientServicesImpl implements ModuleInterfaceClientS
 			submitJobRequest.setJobTypeName( jobTypeName );
 
 			submitJobRequest.setPriority (priority );
+			submitJobRequest.setRequiredExecutionThreads( requiredExecutionThreads );
+			
 			submitJobRequest.setSubmitter( submitter );
 			submitJobRequest.setJobParameters( jobParameters );
+			
+			
+			
+			try {
+				TestMarshalThenUnMarshalObject.getInstance().testMarshalThenUnMarshalObject( submitJobRequest, SubmitJobRequest.class );
+				
+			} catch ( TestMarshalThenUnMarshalObjectException ex ) {
+
+				throw new JobcenterModuleInterfaceInvalidCharactersInStringException( ex.getCause() );
+				
+			} catch (Exception e) {
+
+				throw new JobcenterSystemErrorException( e );
+			}
 
 
 			SubmitJobResponse submitJobResponse = ServerConnection.getInstance().submitJob( submitJobRequest );
@@ -482,10 +611,17 @@ public class ModuleInterfaceClientServicesImpl implements ModuleInterfaceClientS
 
 	        return submitJobResponse.getRequestId();
 
+	        
+		} catch ( JobcenterModuleInterfaceInvalidCharactersInStringException ex ) {
+	        
+			
+			throw new JobcenterModuleInterfaceInvalidCharactersInStringException( ex );
 
 		} finally {
 
-			log.info( "Setting current thread context class loader to saved class loader. savedClassLoader  = " + savedClassLoader );
+			if ( log.isInfoEnabled() ) {
+				log.info( "Setting current thread context class loader to saved class loader. savedClassLoader  = " + savedClassLoader );
+			}
 
 	        Thread.currentThread().setContextClassLoader( savedClassLoader );
 		}
@@ -510,5 +646,6 @@ public class ModuleInterfaceClientServicesImpl implements ModuleInterfaceClientS
 	public void setCurrentRun(RunDTO currentRun) {
 		this.currentRun = currentRun;
 	}
+
 
 }

@@ -4,6 +4,7 @@ package org.jobcenter.client.main;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +13,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
@@ -21,14 +21,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //import org.apache.log4j.Logger;
-
-
-
-
-
-
-
-
 
 
 import org.jobcenter.client_exceptions.JobcenterSubmissionGeneralErrorException;
@@ -54,6 +46,8 @@ import org.jobcenter.submission.internal.utils.JobSubmissionTransforms;
  *
  */
 public class SubmissionClientConnectionToServer implements JobSubmissionInterface {
+	
+	private static final String XML_ENCODING_CHARACTER_SET = "UTF-8";
 
 
 //	private static Logger log = Logger.getLogger(SubmissionClientConnectionToServer.class);
@@ -70,6 +64,13 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 
 	private static final String CONTENT_TYPE_SEND_RECEIVE = "application/xml";
+	
+	
+	private boolean doNotSendToServer = false;
+	
+
+
+
 
 
 	private String connectionURL = null;
@@ -222,14 +223,59 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 			throw new IllegalStateException( "The connectionURL to the server is not configured." );
 		}
 
+		String fullConnectionURL = connectionURL + SUBMIT_JOB_CONNECTION_URL_EXTENSION;
+
 
 
 		SubmitJobRequest submitJobRequest = JobSubmissionTransforms.createSubmitJobRequest( requestTypeName, requestId, jobTypeName, submitter, priority, requiredExecutionThreads, jobParameters, submissionNodeName );
 
+		byte[] submitJobRequestMarshalled = null;
 		
-		String fullConnectionURL = connectionURL + SUBMIT_JOB_CONNECTION_URL_EXTENSION;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream( 1000 );
+		
+		Marshaller marshaller = null;
+		Unmarshaller unmarshaller = null;
+		
+		try {
+			
+			marshaller = jaxbContext.createMarshaller();
+			unmarshaller = jaxbContext.createUnmarshaller();
+			
+			marshaller.setProperty( Marshaller.JAXB_ENCODING, XML_ENCODING_CHARACTER_SET );
 
-		BaseResponse baseResponse = sendRequestToServerGetRequestId(requestTypeName, requestId, fullConnectionURL, submitJobRequest, jobTypeName );
+		} catch (JAXBException e) {
+			
+			JobcenterSubmissionXML_JAXBErrorException exc = new JobcenterSubmissionXML_JAXBErrorException( "JAXBException creating XML to send to server at URL: " + fullConnectionURL, e );
+
+			exc.setFullConnectionURL( fullConnectionURL );
+
+			throw exc;
+		}
+		
+		try {
+			marshaller.marshal( submitJobRequest, baos ) ;
+			
+			submitJobRequestMarshalled = baos.toByteArray();
+
+			ByteArrayInputStream bais = new ByteArrayInputStream( submitJobRequestMarshalled );
+
+			Object unmarshalledObject = unmarshaller.unmarshal( bais );
+
+		} catch (JAXBException e) {
+
+			JobcenterSubmissionXML_JAXBErrorException exc = new JobcenterSubmissionXML_JAXBErrorException( "JAXBException creating XML to send to server at URL: " + fullConnectionURL, e );
+
+			exc.setFullConnectionURL( fullConnectionURL );
+
+			throw exc;
+		}
+		
+		if ( doNotSendToServer ) {
+			
+			return -1;
+		}
+		
+		BaseResponse baseResponse = sendRequestToServerGetRequestId(requestTypeName, requestId, fullConnectionURL, submitJobRequestMarshalled, jobTypeName );
 
 		if ( ! ( baseResponse instanceof SubmitJobResponse ) ) {
 			
@@ -249,6 +295,8 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	//////////////////////////////////////////////
 	
 	//////////   Comment out submitJobsWithDependencies(...) since job dependencies is not completely implemented
+	
+	//   The method it calls has been modified so this will need modification if it is uncommented
 	
 //	@Override
 //	public int submitJobsWithDependencies(String requestTypeName,
@@ -296,7 +344,8 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	private BaseResponse sendRequestToServerGetRequestId(String requestTypeName,
 			Integer requestId, 
 			String fullConnectionURL,
-			Object requestObject, 
+//			Object requestObject, 
+			byte[] requestObjectMarshalled, 
 			String jobTypeName ) {
 		
 		URL urlObject;
@@ -357,21 +406,25 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 				OutputStream outputStream = httpURLConnection.getOutputStream();
 
 				bufferedOutputStream = new BufferedOutputStream( outputStream );
+				
+				//  instead of marshalling here, just send the byte array
+				
+				bufferedOutputStream.write( requestObjectMarshalled );
 
 
-				Marshaller marshaller = jaxbContext.createMarshaller();
-
-				marshaller.setProperty( Marshaller.JAXB_ENCODING, "UTF-8" );
-
-				marshaller.marshal( requestObject, bufferedOutputStream ) ;
-
-			} catch ( JAXBException e ) {
-
-				JobcenterSubmissionXML_JAXBErrorException exc = new JobcenterSubmissionXML_JAXBErrorException( "JAXBException creating XML to send to server at URL: " + fullConnectionURL, e );
-
-				exc.setFullConnectionURL( fullConnectionURL );
-
-				throw exc;
+//				Marshaller marshaller = jaxbContext.createMarshaller();
+//
+//				marshaller.setProperty( Marshaller.JAXB_ENCODING, "UTF-8" );
+//
+//				marshaller.marshal( requestObject, bufferedOutputStream ) ;
+//
+//			} catch ( JAXBException e ) {
+//
+//				JobcenterSubmissionXML_JAXBErrorException exc = new JobcenterSubmissionXML_JAXBErrorException( "JAXBException creating XML to send to server at URL: " + fullConnectionURL, e );
+//
+//				exc.setFullConnectionURL( fullConnectionURL );
+//
+//				throw exc;
 
 			} catch ( IOException e ) {
 
@@ -652,6 +705,17 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	}
 
 
+
+
+
+	/**
+	 * !!!!!!  Only set to true for unit testing
+	 * 
+	 * @param doNotSendToServer
+	 */
+	public void setDoNotSendToServer(boolean doNotSendToServer) {
+		this.doNotSendToServer = doNotSendToServer;
+	}
 
 
 

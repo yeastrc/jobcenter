@@ -27,6 +27,7 @@ import org.jobcenter.response.SubmitJobResponse;
 import org.jobcenter.response.UpdateServerFromJobRunOnClientResponse;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
 public class ClientConnectionToServer implements ClientConnectionToServerIF {
@@ -40,7 +41,7 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 	private static final int RETRY_COUNT_MAX = 5; // max retries before rethrow exception
 
-
+	
 	private static Logger log = Logger.getLogger(ClientConnectionToServer.class);
 
 
@@ -147,6 +148,8 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 		/////////////////////////////
 
+		//  TODO  TEMP only to force 400 HTTP error
+//		clientStartupRequest.setNodeName("\u0001");
 
 
 		WebResource r = jersey_JAX_RS_Client.resource( fullConnectionURL );
@@ -166,6 +169,47 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 					.post( ClientStartupResponse.class, clientStartupRequest );
 
 				successfulCallToServer = true;
+				
+				
+			} catch ( UniformInterfaceException t ) {
+				
+				
+				String tMsg = t.getMessage();
+				
+				//  tMsg for 400 error:  POST http://localhost:8080/JobCenter_Server_Jersey/services/clientStartup returned a response status of 400
+				
+				Throwable cause = t.getCause();
+				
+			//  cause for 400 error:  null
+				
+				if ( cause != null ) {
+					String causeMsg = cause.getMessage();
+					int z = 0;
+				}
+
+				log.warn( "Call to server from clientStartup() threw exception, retryCount = " + retryCount + ", RETRY_COUNT_MAX = " + RETRY_COUNT_MAX, t );
+
+
+				retryCount++;
+
+				if ( retryCount >= RETRY_COUNT_MAX ) {
+
+					String msg = "\n\n!!!!!!!!!!!   Exception connecting to the server for the first time.  \n\n"
+						+ "Trying to connect using the URL:  " + fullConnectionURL + "\n\n";
+
+					log.error( msg, t );
+
+					throw new Exception( msg, t );
+
+				}
+
+				try {
+					Thread.sleep( RETRY_SLEEP_TIME );
+
+				} catch (InterruptedException e) {
+
+					log.warn( "Sleep waiting for retry interrupted with InterruptedException", e );
+				}
 
 			} catch ( Throwable t ) {
 
