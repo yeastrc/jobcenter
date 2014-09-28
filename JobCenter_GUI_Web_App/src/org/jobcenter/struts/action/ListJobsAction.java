@@ -141,40 +141,7 @@ public class ListJobsAction extends  BaseAction  {
 			request.setAttribute("jobCount", jobCount);
 
 			List<Job> jobList = guiListJobsResponse.getJobs();
-			
-			//  Sort run data
-			
-			for ( Job job : jobList ) {
-				
-				List<RunDTO> allRuns = job.getAllRuns();
-				
-				if ( allRuns != null ) {
-					
-					//  Sort runs in reverse order so last run is first in the list
-					
-					Collections.sort( allRuns, new RunDTO.ReverseSortByStartDateComparator() );
-				
-					for ( RunDTO runDTO : allRuns ) {
 
-						List<RunMessageDTO> runMessages = runDTO.getRunMessages();
-
-						if ( runMessages != null  ) {
-
-							// put the messages in id order
-							
-							Collections.sort( runMessages, new Comparator<RunMessageDTO>() {
-
-								@Override
-								public int compare(RunMessageDTO o1, RunMessageDTO o2) {
-
-									return o1.getId() - o2.getId();
-								}  
-							} );
-						}				
-					}
-				}
-			}
-			
 			
 			
 			////////////////////
