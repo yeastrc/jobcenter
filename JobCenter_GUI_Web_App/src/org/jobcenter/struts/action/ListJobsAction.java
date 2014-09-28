@@ -1,6 +1,8 @@
 
 package org.jobcenter.struts.action;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -21,6 +22,8 @@ import org.jobcenter.constants.GUIWebAppConstants;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RequestTypeDTO;
+import org.jobcenter.dto.RunDTO;
+import org.jobcenter.dto.RunMessageDTO;
 import org.jobcenter.guiclient.GUIConnectionToServerClient;
 import org.jobcenter.guiclient.response.GUIListJobsResponse;
 import org.jobcenter.struts.BaseAction;
@@ -138,6 +141,43 @@ public class ListJobsAction extends  BaseAction  {
 			request.setAttribute("jobCount", jobCount);
 
 			List<Job> jobList = guiListJobsResponse.getJobs();
+			
+			//  Sort run data
+			
+			for ( Job job : jobList ) {
+				
+				List<RunDTO> allRuns = job.getAllRuns();
+				
+				if ( allRuns != null ) {
+					
+					//  Sort runs in reverse order so last run is first in the list
+					
+					Collections.sort( allRuns, new RunDTO.ReverseSortByStartDateComparator() );
+				
+					for ( RunDTO runDTO : allRuns ) {
+
+						List<RunMessageDTO> runMessages = runDTO.getRunMessages();
+
+						if ( runMessages != null  ) {
+
+							// put the messages in id order
+							
+							Collections.sort( runMessages, new Comparator<RunMessageDTO>() {
+
+								@Override
+								public int compare(RunMessageDTO o1, RunMessageDTO o2) {
+
+									return o1.getId() - o2.getId();
+								}  
+							} );
+						}				
+					}
+				}
+			}
+			
+			
+			
+			////////////////////
 				
 			request.setAttribute("jobList", jobList);
 
