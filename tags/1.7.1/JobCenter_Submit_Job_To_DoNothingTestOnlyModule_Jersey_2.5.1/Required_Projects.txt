@@ -1,8 +1,0 @@
-
-Required Projects:
-
-JobCenter_JobSubmissionClient_Jersey_2.5.1
-
-JobCenter_base
-JobCenter_JobSubmissionClient_Interface
-JobCenter_JobSubmissionClient_Base

@@ -1,8 +1,0 @@
-
-
-Jobcenter - possible way to prefer one client over another 
-
-
-If one client could ask for jobs for a specific module name but specify a delay after the job was submitted, then a different client would have a chance of picking up that job first, assuming both clients are checking for jobs at the same rate.
-
-
