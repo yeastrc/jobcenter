@@ -319,7 +319,7 @@ Svn-WorkingCopy-Mixed=${wc_mixed}
 	<!--
 		createInstallables depends on compileAllSubmodules
 	-->
-	<target name="createInstallables" depends="compileAllSubmodules">
+	<target name="createInstallables" depends="compileAllSubmodules,svn_info">
 
 		<!-- Clean out the old create_installables_work_dir -->
 		<delete dir="create_installables_work_dir" />
