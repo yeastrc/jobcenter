@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="US-ASCII" ?>
+<project name="JobCenter_JobSubmissionClient_Interface" default="build_jar" basedir=".">
+
+  <target name="init">
+    <tstamp/>
+
+  	<!-- name of jar or whatever that is copied to deploy -->
+    <property name="deployablename" value="jobcenter_jobsubmissionclient_interface.jar" />
+
+  	<property name="src" value="src" />
+    <property name="build" value="build" />
+    <property name="classes" value="classes" />
+    <property name="deploy" value="deploy" />
+    <property name="config" value="resources" />
+    <property name="runDir" value="." />
+    <property name="local" value="local" />
+    <property name="remote" value="remote" />
+    <property name="lib" value="lib" />
+  </target>
+
+
+
+	<tstamp prefix="build-info">
+		<format property="current-date" pattern="d-MMMM-yyyy" locale="en" />
+		<format property="current-time" pattern="hh:mm:ss a z" locale="en" />
+		<format property="year-month-day" pattern="yyyy-MM-dd" locale="en" />
+	</tstamp>
+	
+	
+	<property name="aa_SVN_Info_Resources__dir_name" value="aa_SVN_Info_Resources" />
+	
+	<property name="aa_Ant_Config__dir_name" value="aa_Ant_Config" />
+
+	
+	<!--  list the two paths to the SVN checkout root that will be tested. 
+			The one that is found to hold  'aa_SVN_Info_Resources' will be used
+	-->
+	
+	<property name="path_to_SVN_checkout_root_1" 
+		value="${basedir}${file.separator}..${file.separator}" />
+
+	<property name="path_to_SVN_checkout_root_2" 
+		value="${basedir}${file.separator}..${file.separator}..${file.separator}" />
+
+	
+	<!--  if root SVN found, use this -->
+	<condition property="path_to_SVN_checkout_root" value="${path_to_SVN_checkout_root_1}">
+       	<available file="${path_to_SVN_checkout_root_1}${file.separator}${aa_SVN_Info_Resources__dir_name}" />
+	</condition>
+	
+	<!--  if root SVN found, use this -->
+	<condition property="path_to_SVN_checkout_root" value="${path_to_SVN_checkout_root_2}">
+       	<available file="${path_to_SVN_checkout_root_2}${file.separator}${aa_SVN_Info_Resources__dir_name}" />
+	</condition>
+	
+	
+	<fail message="ERROR: Test failed for checking path to SVN checkout Root: 'aa_SVN_Info_Resources' directory not found at SVN checkout root, check the path. paths attempted are: ${path_to_SVN_checkout_root_1} and ${path_to_SVN_checkout_root_2}">
+	    <condition>
+	        <not>
+	        	<isset property="path_to_SVN_checkout_root"/>
+	        </not>
+	    </condition>
+	</fail>
+	
+	
+	
+	
+	
+
+	<property name="path_to__aa_SVN_Info_Resources" value="${path_to_SVN_checkout_root}${file.separator}${aa_SVN_Info_Resources__dir_name}" />
+	
+	<property name="path_to__aa_Ant_Config" value="${path_to_SVN_checkout_root}${file.separator}${aa_Ant_Config__dir_name}" />
+
+	
+	<fail message="ERROR: 'aa_Ant_Config' directory not found at SVN checkout root, check the path. path: ${path_to__aa_Ant_Config}">
+	    <condition>
+	        <not>
+	        	<available file="${path_to__aa_Ant_Config}" />
+	        </not>
+	    </condition>
+	</fail>
+	
+		
+	<!-- ================================================================================== -->
+	<!--  SVN repository wide overall Ant properties in overall_build_config.properties -->
+	<!-- ================================================================================== -->
+	
+	
+	<property name="overall_build_config.properties__file_with_path" 
+		value="${path_to__aa_Ant_Config}${file.separator}overall_build_config.properties"/>
+		
+	<fail message="ERROR: 'overall_build_config.properties' file not found, check the path. filename with path: ${overall_build_config.properties__file_with_path}">
+	<condition>
+	    <not>
+	    	<available file="${overall_build_config.properties__file_with_path}" />
+	    </not>
+	</condition>
+	</fail>
+	
+	<!-- This does not fail if the file is not found -->
+	<property file="${overall_build_config.properties__file_with_path}" />
+	
+	
+	
+	<!-- ================================================================================== -->
+	<!-- SVN repository wide overall SVN properties in svn_resources.properties -->
+	<!-- ================================================================================== -->
+	
+	<property name="svn_resources.properties__file_with_path" 
+		value="${path_to__aa_SVN_Info_Resources}${file.separator}svn_resources.properties"/>
+	
+	<fail message="ERROR: 'svn_resources.properties' file not found, check the path. filename with path: ${svn_resources.properties__file_with_path}">
+	    <condition>
+	        <not>
+	        	<available file="${svn_resources.properties__file_with_path}" />
+	        </not>
+	    </condition>
+	</fail>
+	
+	<!-- This does not fail if the file is not found -->
+	<property file="${svn_resources.properties__file_with_path}" />
+
+	
+	
+	
+	<!-- ================================================================================== -->
+	<!-- Setup classpath for svnant -->
+	<!-- ================================================================================== -->
+	<path id= "svnant.classpath" >
+		
+		<fileset dir= "${path_to__aa_SVN_Info_Resources}${file.separator}${svn.jars.dir}" >
+			<include name= "*.jar" />
+		</fileset>
+	</path>
+	
+			  	
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+
+	
+	<target name="test_svn_ant"  description="Prints the Subversion repository URL and working copy revision">
+	     <svn username="${svn.username}" password="${svn.password}">
+	        <wcVersion path= "${basedir}" />
+	     	<info target="${basedir}"/>
+	     </svn>
+	     <echo message= "Subversion repository url: ${repository.url}" />
+		 <echo message= "Working copy revision: ${svn.info.rev}" />
+	</target> 
+		
+	<!-- get the svn working copy info -->
+	<target name="svn_info" >
+		<svn username="${svn.username}" password="${svn.password}">
+			<wcVersion path="${basedir}" prefix="ms_library."/>
+		</svn>
+		<condition property="wc_modified" else="NO" value="YES">
+  			<isset property="ms_library.modified"/>
+  		</condition>
+		<condition property="wc_mixed" else="NO" value="YES">
+  			<isset property="ms_library.mixed"/>
+  		</condition>
+  		<echo message="Project is at revision ${ms_library.revision.max-with-flags}" />
+  		<echo message="Working copy is modifed ${wc_modified}" />
+  		<echo message="Working copy is mixed ${wc_mixed}" />
+	</target>
+	
+	
+	
+
+  <target name="clean" depends="init">
+    <delete dir="${classes}" />
+    <delete dir="${deploy}" />
+  </target>
+
+  <target name="prepare" depends="clean">
+    <mkdir dir="${classes}" />
+    <mkdir dir="${deploy}" />
+  </target>
+
+  <target name="compile" depends="prepare">
+  	<javac srcdir="${src}" destdir="${classes}" debug="true"  
+  		source="${jobcenter.java.compiler.source.version}" 
+  		target="${jobcenter.java.compiler.destination.version}" 
+  		encoding="${jobcenter.java.source.character.set}" >
+		<classpath refid="classpath"/>
+	</javac>
+
+  	<copy  todir="${classes}">
+
+	    <fileset dir="${src}">
+			<exclude name="**/*.java" />
+	    </fileset>
+	</copy>
+
+
+
+  </target>
+	
+	
+	<!-- ================================================================================== -->
+	<!-- Create a Manifest.MF file with the SVN info -->
+	<!-- ================================================================================== -->
+	<target name="manifest" depends="prepare">
+		<manifest file="${basedir}/MANIFEST.MF">
+			<attribute name="Built-By" value="${user.name}"/>
+			<attribute name="Date" value="${build-info.current-date}" />
+			<attribute name="Time" value="${build-info.current-time}" />
+			<attribute name="Svn-Repository-URL" value="${ms_library.repository.url}"/>
+			<attribute name="Svn-Revision" value="${ms_library.revision.max-with-flags}"/>
+			<attribute name="Svn-Revision-Range" value="${ms_library.revision.range}"/>
+			<attribute name="Svn-WorkingCopy-Modified" value="${wc_modified}"/>
+			<attribute name="Svn-WorkingCopy-Mixed" value="${wc_mixed}"/>
+		</manifest>
+	</target>	
+	
+	<!-- ================================================================================== -->
+	<!-- Build the jar -->
+	<!-- ================================================================================== -->
+	<target name="build_jar" depends="compile,svn_info,manifest"
+			description="Packages the project as a jar file">
+		
+		<!--
+		<delete file="${basedir}${file.separator}mslib.jar" />
+		-->
+		
+		<!-- exclude everything in the default packaage-->
+		
+		<!--
+		<jar destfile="${basedir}${file.separator}mslib.jar" 
+			basedir="${basedir}${file.separator}bin"
+			excludes="*.*" 
+			manifest="${basedir}/MANIFEST.MF">
+			
+		</jar>
+		-->
+		
+		<jar destfile="${basedir}${file.separator}${deploy}/${deployablename}" 
+			basedir="${basedir}${file.separator}${classes}"
+			manifest="${basedir}/MANIFEST.MF">
+			
+		</jar>		
+
+	  	<copy file="${basedir}${file.separator}${deploy}/${deployablename}" 
+	  		todir="${basedir}${file.separator}../generated_jars" />		
+		
+	</target>
+	
+	
+
+	<path id="classpath">
+		<fileset dir="../generated_jars/">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+</project>

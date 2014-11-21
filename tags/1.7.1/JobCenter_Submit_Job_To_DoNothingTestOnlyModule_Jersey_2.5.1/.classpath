@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Interface"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Jersey_2.5.1"/>
+	<classpathentry kind="lib" path="lib/apache-log4j-extras-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/asm-all-repackaged-2.2.0-b21.jar"/>
+	<classpathentry kind="lib" path="lib/cglib-2.2.0-b21.jar"/>
+	<classpathentry kind="lib" path="lib/guava-14.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/hk2-api-2.2.0-b21.jar"/>
+	<classpathentry kind="lib" path="lib/hk2-locator-2.2.0-b21.jar"/>
+	<classpathentry kind="lib" path="lib/hk2-utils-2.2.0-b21.jar"/>
+	<classpathentry kind="lib" path="lib/javax.annotation-api-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/javax.inject-2.2.0-b21.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet-api-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/javax.ws.rs-api-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-api-2.2.7.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-client-2.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-common.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-container-servlet-core.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-container-servlet.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-entity-filtering-2.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-media-moxy-2.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-server.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="lib/mail.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.persistence.antlr-2.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.persistence.asm-2.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.persistence.core-2.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.persistence.moxy-2.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/validation-api-1.1.0.Final.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_JobSubmissionClient_Base"/>
+	<classpathentry kind="output" path="Eclipsebin"/>
+</classpath>
