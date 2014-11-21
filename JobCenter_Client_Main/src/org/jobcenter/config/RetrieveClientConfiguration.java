@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.jobcenter.constants.ClientConfigPropertyNamesAndOtherConstants;
 import org.jobcenter.constants.ClientConstants;
 import org.jobcenter.module.ModuleConfigDTO;
 import org.jobcenter.module.ModuleFactory;
@@ -22,24 +23,6 @@ public class RetrieveClientConfiguration {
 
 	private static Logger log = Logger.getLogger(RetrieveClientConfiguration.class);
 
-	private static final String CONFIG_DIR_PROPERTIES_FILE = "config_client_main.properties";
-
-	private static final String client_main_file_path = "jobcenter_client_code/client_main";
-
-	private static final String CONFIG_CLIENT_NODE_NAME  = "client.node.name";
-
-	private static final String CONFIG_MAX_NUMBER_CONCURRENT_JOBS  = "max.number.concurrent.jobs";
-
-	private static final String CONFIG_MAX_NUMBER_JOB_THREADS  = "max.number.job.threads";
-
-	private static final String CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS  = "sleep.time.checking.for.new.jobs";
-
-	private static final String CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS = "sleep.time.checking.for.new.jobs.no.worker.threads";
-
-	private static final String CONFIG_SLEEP_TIME_CHECKING_CONTROL_FILE  = "sleep.time.checking.control.file";
-
-	private static final String CONFIG_LOAD_MODULES_ON_STARTUP  = "load.all.modules.on.startup";
-
 	/**
 	 * load configuration for client and modules into singleton of ClientConfigDTO
 	 * @throws Throwable
@@ -52,20 +35,20 @@ public class RetrieveClientConfiguration {
 
 		BuildURLClassLoader buildURLClassLoader = new BuildURLClassLoader();
 
-		ClassLoader mainClassLoader = buildURLClassLoader.getClassLoaderForBaseDirectorySystemClassLoaderAsParent( client_main_file_path );
+		ClassLoader mainClassLoader = buildURLClassLoader.getClassLoaderForBaseDirectorySystemClassLoaderAsParent( ClientConfigPropertyNamesAndOtherConstants.CLIENT_MAIN_FILE_PATH );
 
-		URL configPropFile = mainClassLoader.getResource( CONFIG_DIR_PROPERTIES_FILE );
+		URL configPropFile = mainClassLoader.getResource( ClientConfigPropertyNamesAndOtherConstants.CONFIG_DIR_PROPERTIES_FILE );
 
 
 		if ( configPropFile == null ) {
 
-			log.error( "Properties file '" + CONFIG_DIR_PROPERTIES_FILE + "' not found " );
+			log.error( "Properties file '" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_DIR_PROPERTIES_FILE + "' not found " );
 		} else {
 
-			log.info( "Properties file '" + CONFIG_DIR_PROPERTIES_FILE + "' load path = " + configPropFile.getFile() + ", classLoader path = " + client_main_file_path );
+			log.info( "Properties file '" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_DIR_PROPERTIES_FILE + "' load path = " + configPropFile.getFile() + ", classLoader path = " + ClientConfigPropertyNamesAndOtherConstants.CLIENT_MAIN_FILE_PATH );
 		}
 
-		InputStream props = mainClassLoader.getResourceAsStream( CONFIG_DIR_PROPERTIES_FILE );
+		InputStream props = mainClassLoader.getResourceAsStream( ClientConfigPropertyNamesAndOtherConstants.CONFIG_DIR_PROPERTIES_FILE );
 
 		if ( props == null ) {
 
@@ -73,15 +56,15 @@ public class RetrieveClientConfiguration {
 
 		} else {
 
-			URL propURL = mainClassLoader.getResource( CONFIG_DIR_PROPERTIES_FILE );
+			URL propURL = mainClassLoader.getResource( ClientConfigPropertyNamesAndOtherConstants.CONFIG_DIR_PROPERTIES_FILE );
 
 			if ( propURL != null ) {
 
-				log.info( "Config Dir file " + CONFIG_DIR_PROPERTIES_FILE + "  propURL.getFile() = " + propURL.getFile() );
+				log.info( "Config Dir file " + ClientConfigPropertyNamesAndOtherConstants.CONFIG_DIR_PROPERTIES_FILE + "  propURL.getFile() = " + propURL.getFile() );
 
-//				System.out.println( "Config Dir file " + CONFIG_DIR_PROPERTIES_FILE + "  propURL.getPath() = " + propURL.getPath() );
+//				System.out.println( "Config Dir file " + ClientConfigPropertyNamesAndOtherConstants.CONFIG_DIR_PROPERTIES_FILE + "  propURL.getPath() = " + propURL.getPath() );
 //
-//				System.out.println( "Config Dir file " + CONFIG_DIR_PROPERTIES_FILE + "  propURL.getContent() = " + propURL.getContent() );
+//				System.out.println( "Config Dir file " + ClientConfigPropertyNamesAndOtherConstants.CONFIG_DIR_PROPERTIES_FILE + "  propURL.getContent() = " + propURL.getContent() );
 			}
 
 			Properties configProps = new Properties();
@@ -89,11 +72,11 @@ public class RetrieveClientConfiguration {
 			configProps.load(props);
 
 
-			String clientNodeName = configProps.getProperty( CONFIG_CLIENT_NODE_NAME );
+			String clientNodeName = configProps.getProperty( ClientConfigPropertyNamesAndOtherConstants.CONFIG_CLIENT_NODE_NAME );
 
 			if (  clientNodeName == null || clientNodeName.isEmpty() ) {
 
-				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_CLIENT_NODE_NAME + "\") = |" + clientNodeName + "|.";
+				String msg = "Exception:  configProps.getProperty(\"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_CLIENT_NODE_NAME + "\") = |" + clientNodeName + "|.";
 
 				log.error( msg );
 
@@ -110,12 +93,12 @@ public class RetrieveClientConfiguration {
 
 			try {
 
-				maxConcurrentJobsForModulesString = configProps.getProperty( CONFIG_MAX_NUMBER_CONCURRENT_JOBS );
+				maxConcurrentJobsForModulesString = configProps.getProperty( ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_CONCURRENT_JOBS );
 
 
 			} catch ( Exception ex ) {
 
-				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxConcurrentJobsForModulesString;
+				String msg = "Exception:  configProps.getProperty(\"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxConcurrentJobsForModulesString;
 
 				log.error( msg, ex );
 
@@ -129,12 +112,12 @@ public class RetrieveClientConfiguration {
 
 			try {
 
-				maxThreadsForModulesString = configProps.getProperty( CONFIG_MAX_NUMBER_JOB_THREADS );
+				maxThreadsForModulesString = configProps.getProperty( ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_JOB_THREADS );
 
 
 			} catch ( Exception ex ) {
 
-				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_JOB_THREADS + "\") = " + maxThreadsForModulesString;
+				String msg = "Exception:  configProps.getProperty(\"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_JOB_THREADS + "\") = " + maxThreadsForModulesString;
 
 				log.error( msg, ex );
 
@@ -148,8 +131,8 @@ public class RetrieveClientConfiguration {
 
 			if ( StringUtils.isEmpty( maxConcurrentJobsForModulesString ) && StringUtils.isEmpty( maxThreadsForModulesString ) ) {
 
-				String msg = "One of these two properties needs a value:\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
-				+ "\" or  \"" + CONFIG_MAX_NUMBER_JOB_THREADS + "\"" + ".  Both properties can be set.";
+				String msg = "One of these two properties needs a value:\"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+				+ "\" or  \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_JOB_THREADS + "\"" + ".  Both properties can be set.";
 
 				log.error( msg );
 
@@ -170,7 +153,7 @@ public class RetrieveClientConfiguration {
 
 				} catch ( Exception ex ) {
 
-					String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_JOB_THREADS + "\") = " + maxThreadsForModulesString;
+					String msg = "Exception:  configProps.getProperty(\"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_JOB_THREADS + "\") = " + maxThreadsForModulesString;
 
 					log.error( msg, ex );
 
@@ -192,7 +175,7 @@ public class RetrieveClientConfiguration {
 
 				} catch ( Exception ex ) {
 
-					String msg = "Exception:  configProps.getProperty(\"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxConcurrentJobsForModulesString;
+					String msg = "Exception:  configProps.getProperty(\"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_CONCURRENT_JOBS + "\") = " + maxConcurrentJobsForModulesString;
 
 					log.error( msg, ex );
 
@@ -207,9 +190,9 @@ public class RetrieveClientConfiguration {
 			if ( StringUtils.isEmpty( maxConcurrentJobsForModulesString ) ) {
 
 				log.warn( "Using the value of \"" + clientConfigDTO.getMaxThreadsForModules()
-						+ "\"  in \"" + CONFIG_MAX_NUMBER_JOB_THREADS
-						+ "\" for the value for \"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
-						+ "\" since the config param \"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+						+ "\"  in \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_JOB_THREADS
+						+ "\" for the value for \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+						+ "\" since the config param \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_CONCURRENT_JOBS
 						+ "\" was not set in the configuration file." );
 
 				//  copy the value to here since maxConcurrentJobsForModules is not set in the configuration
@@ -219,9 +202,9 @@ public class RetrieveClientConfiguration {
 			if ( StringUtils.isEmpty( maxThreadsForModulesString ) ) {
 
 				log.warn( "Using the value of \"" + clientConfigDTO.getMaxConcurrentJobs()
-						+ "\" in \"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
-						+ "\" for the value for \"" + CONFIG_MAX_NUMBER_JOB_THREADS
-						+ "\" since the config param \"" + CONFIG_MAX_NUMBER_JOB_THREADS
+						+ "\" in \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+						+ "\" for the value for \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_JOB_THREADS
+						+ "\" since the config param \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_JOB_THREADS
 						+ "\" was not set in the configuration file." );
 
 
@@ -235,9 +218,9 @@ public class RetrieveClientConfiguration {
 			if ( clientConfigDTO.getMaxConcurrentJobs() > clientConfigDTO.getMaxThreadsForModules() ) {
 
 				String msg = "ERROR:  The value of \"" + clientConfigDTO.getMaxConcurrentJobs()
-						+ "\"  in \"" + CONFIG_MAX_NUMBER_CONCURRENT_JOBS
+						+ "\"  in \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_CONCURRENT_JOBS
 						+ "\" is larger than the value of \"" + clientConfigDTO.getMaxThreadsForModules()
-						+ "\" in \"" + CONFIG_MAX_NUMBER_JOB_THREADS
+						+ "\" in \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_MAX_NUMBER_JOB_THREADS
 						+ "\".";
 
 				log.error( msg );
@@ -251,7 +234,7 @@ public class RetrieveClientConfiguration {
 
 //////////////////////////////////////////////////
 
-			String sleepTimeCheckingForNewJobsString = configProps.getProperty( CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS );
+			String sleepTimeCheckingForNewJobsString = configProps.getProperty( ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS );
 
 			try {
 
@@ -259,7 +242,7 @@ public class RetrieveClientConfiguration {
 
 				if ( sleepTimeCheckingForNewJobs < 1 ) {
 
-					String msg = "Configuration error: Property \"" + CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS + "\") cannot be less than '1', it is = " + sleepTimeCheckingForNewJobsString;
+					String msg = "Configuration error: Property \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS + "\") cannot be less than '1', it is = " + sleepTimeCheckingForNewJobsString;
 
 					log.error( msg );
 
@@ -273,7 +256,7 @@ public class RetrieveClientConfiguration {
 			} catch ( Exception ex ) {
 
 
-				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS + "\") = " + sleepTimeCheckingForNewJobsString;
+				String msg = "Exception:  configProps.getProperty(\"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS + "\") = " + sleepTimeCheckingForNewJobsString;
 
 				log.error( msg, ex );
 
@@ -285,7 +268,7 @@ public class RetrieveClientConfiguration {
 
 			boolean sleepTimeCheckingForNewJobsNoWorkerThreadsStringSet = false;
 
-			String sleepTimeCheckingForNewJobsNoWorkerThreadsString = configProps.getProperty( CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS );
+			String sleepTimeCheckingForNewJobsNoWorkerThreadsString = configProps.getProperty( ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS );
 
 			if ( sleepTimeCheckingForNewJobsNoWorkerThreadsString != null && ! sleepTimeCheckingForNewJobsNoWorkerThreadsString.isEmpty() ) {
 				try {
@@ -294,7 +277,7 @@ public class RetrieveClientConfiguration {
 
 					if ( sleepTimeCheckingForNewJobsNoWorkerThreads < 1 ) {
 
-						String msg = "Configuration error: Property \"" + CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS + "\") cannot be less than '1', it is = " + sleepTimeCheckingForNewJobsNoWorkerThreadsString;
+						String msg = "Configuration error: Property \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS + "\") cannot be less than '1', it is = " + sleepTimeCheckingForNewJobsNoWorkerThreadsString;
 
 						log.error( msg );
 
@@ -311,7 +294,7 @@ public class RetrieveClientConfiguration {
 				} catch ( Exception ex ) {
 
 
-					String msg = "The provided value for config entry \"" + CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS + "\".   cannot be parsed to integer.  Value in file = " + sleepTimeCheckingForNewJobsNoWorkerThreadsString;
+					String msg = "The provided value for config entry \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS + "\".   cannot be parsed to integer.  Value in file = " + sleepTimeCheckingForNewJobsNoWorkerThreadsString;
 
 					log.error( msg, ex );
 
@@ -329,7 +312,7 @@ public class RetrieveClientConfiguration {
 						= sleepTimeCheckingForNewJobs * ClientConstants.MULTIPLE_FOR_COMPUTING_TIME_CHECKING_WITH_NO_WORKER_THREADS;
 
 
-				String msg = "Config entry \"" + CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS + "\" not set, using default of " + sleepTimeCheckingForNewJobsNoWorkerThreads;
+				String msg = "Config entry \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS + "\" not set, using default of " + sleepTimeCheckingForNewJobsNoWorkerThreads;
 
 				log.info( msg );
 
@@ -339,7 +322,7 @@ public class RetrieveClientConfiguration {
 
 
 
-			String sleepTimeCheckingControlFileString = configProps.getProperty( CONFIG_SLEEP_TIME_CHECKING_CONTROL_FILE );
+			String sleepTimeCheckingControlFileString = configProps.getProperty( ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_CONTROL_FILE );
 
 			try {
 
@@ -347,7 +330,7 @@ public class RetrieveClientConfiguration {
 
 				if ( sleepTimeCheckingControlFile < 1 ) {
 
-					String msg = "Configuration error: Property \"" + CONFIG_SLEEP_TIME_CHECKING_CONTROL_FILE + "\") cannot be less than '1', it is = " + sleepTimeCheckingControlFileString;
+					String msg = "Configuration error: Property \"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_CONTROL_FILE + "\") cannot be less than '1', it is = " + sleepTimeCheckingControlFileString;
 
 					log.error( msg );
 
@@ -362,7 +345,7 @@ public class RetrieveClientConfiguration {
 			} catch ( Exception ex ) {
 
 
-				String msg = "Exception:  configProps.getProperty(\"" + CONFIG_SLEEP_TIME_CHECKING_CONTROL_FILE + "\") = " + sleepTimeCheckingForNewJobsString;
+				String msg = "Exception:  configProps.getProperty(\"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_CONTROL_FILE + "\") = " + sleepTimeCheckingForNewJobsString;
 
 				log.error( msg, ex );
 
@@ -377,7 +360,7 @@ public class RetrieveClientConfiguration {
 
 
 
-			String loadModulesOnStartupString = configProps.getProperty( CONFIG_LOAD_MODULES_ON_STARTUP );
+			String loadModulesOnStartupString = configProps.getProperty( ClientConfigPropertyNamesAndOtherConstants.CONFIG_LOAD_MODULES_ON_STARTUP );
 
 			boolean loadModulesOnStartup = false;  // default to false
 

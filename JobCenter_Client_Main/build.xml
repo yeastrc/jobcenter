@@ -121,7 +121,9 @@
 	<property file="${svn_resources.properties__file_with_path}" />
 
 	
+	<echo message= "Dir for 'svnant.classpath': ${path_to__aa_SVN_Info_Resources}${file.separator}${svn.jars.dir}" />
 	
+
 	
 	<!-- ================================================================================== -->
 	<!-- Setup classpath for svnant -->

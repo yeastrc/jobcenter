@@ -72,14 +72,10 @@
 
 
         <logger name="org.jobcenter" additivity="false">
-                <level value="debug"/>
+                <level value="warn"/>
                 <appender-ref ref="ROLL" />
 
                 <appender-ref ref="ROLL_ERROR" />
-<!--
-                <appender-ref ref="EMAIL" />
--->
-
 
         </logger>
 

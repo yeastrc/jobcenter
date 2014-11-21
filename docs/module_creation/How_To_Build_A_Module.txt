@@ -38,7 +38,7 @@ The module will not load if there is not at least one jar under the "main_jar" d
 
   The file "jobcenter_module_config_per_client.properties" is usually copied to the "config" directory to provide installation specific values.
 
-  See the project "JobCenter_Sample_Module" for examples.
+  See the project "JobCenter_Sample_Module" or the project "JobCenter_DoNothingTestOnlyModule" for examples.
 
   -------------
 

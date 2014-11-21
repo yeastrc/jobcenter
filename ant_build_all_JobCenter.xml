@@ -35,7 +35,192 @@
 		<property name="local" value="local" />
 		<property name="remote" value="remote" />
 		<property name="lib" value="lib" />
+		
+		
 	</target>
+	
+	<!--   Not in any 'target'  -->
+		
+		<tstamp prefix="build-info">
+			<format property="current-date" pattern="d-MMMM-yyyy" locale="en" />
+			<format property="current-time" pattern="hh:mm:ss a z" locale="en" />
+			<format property="year-month-day" pattern="yyyy-MM-dd" locale="en" />
+		</tstamp>
+		
+		
+		<property name="aa_SVN_Info_Resources__dir_name" value="aa_SVN_Info_Resources" />
+		
+		<property name="aa_Ant_Config__dir_name" value="aa_Ant_Config" />
+
+		
+		<!--  list the two paths to the SVN checkout root that will be tested. 
+				The one that is found to hold  'aa_SVN_Info_Resources' will be used
+		-->
+		
+		<property name="path_to_SVN_checkout_root_1" 
+			value="${basedir}${file.separator}" />
+
+		<property name="path_to_SVN_checkout_root_2" 
+			value="${basedir}${file.separator}..${file.separator}" />
+
+		
+		<!--  if root SVN found, use this -->
+		<condition property="path_to_SVN_checkout_root" value="${path_to_SVN_checkout_root_1}">
+	       	<available file="${path_to_SVN_checkout_root_1}${file.separator}${aa_SVN_Info_Resources__dir_name}" />
+		</condition>
+		
+		<!--  if root SVN found, use this -->
+		<condition property="path_to_SVN_checkout_root" value="${path_to_SVN_checkout_root_2}">
+	       	<available file="${path_to_SVN_checkout_root_2}${file.separator}${aa_SVN_Info_Resources__dir_name}" />
+		</condition>
+		
+		
+		<fail message="ERROR: Test failed for checking path to SVN checkout Root: 'aa_SVN_Info_Resources' directory not found at SVN checkout root, check the path. paths attempted are: ${path_to_SVN_checkout_root_1} and ${path_to_SVN_checkout_root_2}">
+		    <condition>
+		        <not>
+		        	<isset property="path_to_SVN_checkout_root"/>
+		        </not>
+		    </condition>
+		</fail>
+		
+		
+		
+		
+		
+
+		<property name="path_to__aa_SVN_Info_Resources" value="${path_to_SVN_checkout_root}${file.separator}${aa_SVN_Info_Resources__dir_name}" />
+		
+		<property name="path_to__aa_Ant_Config" value="${path_to_SVN_checkout_root}${file.separator}${aa_Ant_Config__dir_name}" />
+
+		
+		<fail message="ERROR: 'aa_Ant_Config' directory not found at SVN checkout root, check the path. path: ${path_to__aa_Ant_Config}">
+		    <condition>
+		        <not>
+		        	<available file="${path_to__aa_Ant_Config}" />
+		        </not>
+		    </condition>
+		</fail>
+		
+			
+		<!-- ================================================================================== -->
+		<!--  SVN repository wide overall Ant properties in overall_build_config.properties -->
+		<!-- ================================================================================== -->
+		
+		
+		<property name="overall_build_config.properties__file_with_path" 
+			value="${path_to__aa_Ant_Config}${file.separator}overall_build_config.properties"/>
+			
+		<fail message="ERROR: 'overall_build_config.properties' file not found, check the path. filename with path: ${overall_build_config.properties__file_with_path}">
+		<condition>
+		    <not>
+		    	<available file="${overall_build_config.properties__file_with_path}" />
+		    </not>
+		</condition>
+		</fail>
+		
+		<!-- This does not fail if the file is not found -->
+		<property file="${overall_build_config.properties__file_with_path}" />
+		
+		
+		
+		<!-- ================================================================================== -->
+		<!-- SVN repository wide overall SVN properties in svn_resources.properties -->
+		<!-- ================================================================================== -->
+		
+		<property name="svn_resources.properties__file_with_path" 
+			value="${path_to__aa_SVN_Info_Resources}${file.separator}svn_resources.properties"/>
+		
+		<fail message="ERROR: 'svn_resources.properties' file not found, check the path. filename with path: ${svn_resources.properties__file_with_path}">
+		    <condition>
+		        <not>
+		        	<available file="${svn_resources.properties__file_with_path}" />
+		        </not>
+		    </condition>
+		</fail>
+		
+		<!-- This does not fail if the file is not found -->
+		<property file="${svn_resources.properties__file_with_path}" />
+
+		
+		<echo message= "Dir for 'svnant.classpath': ${path_to__aa_SVN_Info_Resources}${file.separator}${svn.jars.dir}" />
+		
+		<!-- ================================================================================== -->
+		<!-- Setup classpath for svnant -->
+		<!-- ================================================================================== -->
+		<!--
+		<path id= "svnant.classpath" >
+			
+			<fileset dir= "${path_to__aa_SVN_Info_Resources}${file.separator}${svn.jars.dir}" >
+				<include name= "*.jar" />
+			</fileset>
+		</path>
+		-->
+		
+		<!-- ================================================================================== -->
+		<!-- Setup classpath for svnant -->
+		<!-- ================================================================================== -->
+		<path id= "svnant.classpath" >
+			
+			<fileset dir= "/ntfs_drives_mounts/SSD_SoftwareDev/Projects/Jobcenter/JobcenterCheckout/aa_SVN_Info_Resources/SVN_1.8_SVNANT_Jars" >
+				<include name= "*.jar" />
+			</fileset>
+		</path>
+		
+				  	
+		<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+
+		
+	
+		<target name="test_svn_ant"  description="Prints the Subversion repository URL and working copy revision">
+		     <svn username="${svn.username}" password="${svn.password}">
+		        <wcVersion path= "${basedir}" />
+		     	<info target="${basedir}"/>
+		     </svn>
+		     <echo message= "Subversion repository url: ${repository.url}" />
+			 <echo message= "Working copy revision: ${svn.info.rev}" />
+		</target> 
+			
+		<!-- get the svn working copy info -->
+		<target name="svn_info" >
+			<svn username="${svn.username}" password="${svn.password}">
+				<wcVersion path="${basedir}" prefix="jobcenter."/>
+			</svn>
+			<condition property="wc_modified" else="NO" value="YES">
+	  			<isset property="jobcenter.modified"/>
+	  		</condition>
+			<condition property="wc_mixed" else="NO" value="YES">
+	  			<isset property="jobcenter.mixed"/>
+	  		</condition>
+	  		<echo message="Project is at revision ${jobcenter.revision.max-with-flags}" />
+	  		<echo message="Working copy is modifed ${wc_modified}" />
+	  		<echo message="Working copy is mixed ${wc_mixed}" />
+			
+			
+			<!-- Create file "version_of_jobcenter.txt" for inclusion in jar "jobcenter_client_installation.jar"   -->
+			
+			<echo file="version_of_jobcenter.txt" append="false">
+Built-By=${user.name}
+Date=${build-info.current-date} 
+Time=${build-info.current-time} 
+Svn-Repository-URL=${jobcenter.repository.url}
+Svn-Revision=${jobcenter.revision.max-with-flags}
+Svn-Revision-Range=${jobcenter.revision.range}
+Svn-WorkingCopy-Modified=${wc_modified}
+Svn-WorkingCopy-Mixed=${wc_mixed}
+			</echo>
+
+			
+						
+			
+		</target>
+	
+	
+	
+		
+
+		
+		
+		
 
 	<!-- Clean depends on init -->
 	<target name="clean" depends="init">
@@ -258,8 +443,11 @@
 
 
 		<!--  Jar up Main JobCenter Client deployable  -->
-		<jar jarfile="${deploy}/${installationJarName}" basedir="create_installables_work_dir/jobcenter_client_installation" />
+		<jar jarfile="${deploy}/${installationJarName}" basedir="create_installables_work_dir/jobcenter_client_installation" >
+			<fileset file="version_of_jobcenter.txt"/>
+		</jar>
 
+			
 		<!-- Make copy of client directory for version with quick install settings  -->
 
 		<copy todir="create_installables_work_dir/jobcenter_client_quick_installation" >
@@ -280,8 +468,10 @@
 
 
 		<!--  Jar up Main JobCenter client  deployable  Quick Install version  -->
-		<jar jarfile="${deploy}/${installationQuickJarName}" basedir="create_installables_work_dir/jobcenter_client_quick_installation" />
-
+		<jar jarfile="${deploy}/${installationQuickJarName}" basedir="create_installables_work_dir/jobcenter_client_quick_installation" >
+			<fileset file="version_of_jobcenter.txt"/>
+		</jar>
+		
 		<copy file="${deploy}/${installationQuickJarName}"
 			tofile="${deploy}/${installationQuickZipName}" />
 
