@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="JobCenter_Server_Jersey">
+        <wb-resource deploy-path="/" source-path="/WebRoot" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src_JobCenter_Client_Module_Interface"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src_JobCenter_base"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src_JobCenter_Server_Core"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src_JobCenter_JobSubmissionClient_Interface"/>
+        <dependent-module archiveName="JobCenter_base.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_base/JobCenter_base">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="JobCenter_Server_Core.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_Server_Core/JobCenter_Server_Core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="JobCenter_JobSubmissionClient_Interface.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_JobSubmissionClient_Interface/JobCenter_JobSubmissionClient_Interface">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="JobCenter_Client_Module_Interface.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_Client_Module_Interface/JobCenter_Client_Module_Interface">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="/JobManager_Server_Jersey"/>
+        <property name="java-output-path" value="/JobCenter_Server_Jersey/WebRoot/WEB-INF/classes"/>
+        <property name="me-merge-utility-modules" value="true"/>
+    </wb-module>
+</project-modules>

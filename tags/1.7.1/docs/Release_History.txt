@@ -1,0 +1,100 @@
+
+
+1.7
+
+Breaking change.
+
+In the Jobcenter client, calls the module makes on the ModuleInterfaceResponse response object
+to add run messages and run output parameters will throw exceptions 
+if the Strings passed cannot be marshaled and unmarshaled as UTF-8 XML.
+
+The existing methods 'addRunMessage' and 'addRunOutputParam' remain on ModuleInterfaceResponse and throw checked exceptions.
+
+New methods have been added to ModuleInterfaceResponse to automatically change the strings 
+
+See the class 
+/JobCenter_Client_Module_Interface/src/org/jobcenter/job_client_module_interface/ModuleInterfaceResponse.java
+for changes to the existing methods adding checked exceptions and the new methods.
+
+New methods for use in modules have been added to ModuleInterfaceClientServices.
+'replaceInvalidCharactersInXMLUTF8InString' and 'replaceNonAsciiCharactersInString'
+can be called to clean Strings.
+See the class 
+JobCenter_Client_Module_Interface/src/org/jobcenter/job_client_module_interface/ModuleInterfaceClientServices.java
+for these changes
+
+
+1.4
+
+Important bug fix.
+
+In rare instances, the job sent to the client was missing it's parameters.
+Now that is detected in the server when it pulls the job for the client and will do a retry after a 5 second delay.
+Other jobs will be sent as requested during that 5 second delay.
+The client will also detect when the number of job parameters does not match the number initially on the job and will do a soft error
+if an error is detected. 
+
+
+New server will work with existing client from 1.0.2 onward, although it is recommended to get the bug fix in the latest client.  
+
+
+If upgrading from version 1.0.1 or before, first run the SQL in the file "schema_upgrades\schema_upgrade_to_1.0.2\schema_upgrade_to_1.0.2"
+
+If upgrading from version 1.1.1 or before, also run the SQL in the file "schema_upgrades\schema_upgrades_to_1.2\schema_upgrade_to_1.2.sql"
+
+If upgrading from version 1.2 or before, run the SQL in the file "schema_upgrades\schema_upgrades_to_1.3\schema_upgrade_to_1.3.sql"
+
+If upgrading from version 1.3, run the SQL in the file "schema_upgrades\schema_upgrades_to_1.4\schema_upgrade_to_1.4.sql"
+
+
+
+1.3
+
+New option to have the current status of all clients emailed daily at 6am.
+Updates are in server code only.
+
+New server will work with existing client from 1.0.2 onward.
+
+
+If upgrading from version 1.0.1 or before, first run the SQL in the file "schema_upgrades\schema_upgrade_to_1.0.2\schema_upgrade_to_1.0.2"
+
+If upgrading from version 1.1.1 or before, also run the SQL in the file "schema_upgrades\schema_upgrades_to_1.2\schema_upgrade_to_1.2.sql"
+
+If upgrading to  version 1.3, run the SQL in the file "schema_upgrades\schema_upgrades_to_1.3\schema_upgrade_to_1.3.sql"
+
+
+
+1.2
+
+Improvements in client tracking and additional email of status.
+Updates are in server code only.
+
+New server will work with existing client from 1.0.2 onward.
+
+
+If upgrading from version 1.0.1 or before, first run the SQL in the file "schema_upgrades\schema_upgrade_to_1.0.2\schema_upgrade_to_1.0.2"
+
+If upgrading to  version 1.2, run the SQL in the file "schema_upgrades\schema_upgrades_to_1.2\schema_upgrade_to_1.2.sql"
+
+
+1.1.1
+
+Bug fixes related to client status.
+Fix is in server code only.  
+New server will work with existing client from 1.0.2 onward.
+
+  This will fix emails getting generated when the client isn't really late.
+  The overage for being late was being set to zero due to missing an int to float conversion.
+
+
+If upgrading from version 1.0.1 or before, first run the SQL in the file "schema_upgrades\schema_upgrade_to_1.0.2\schema_upgrade_to_1.0.2"
+
+
+1.1  
+
+
+Improvements in supporting modules and external programs that can utilize multiple threads.  
+The JobCenter client does not create the threads but tracks the number of threads allocated to (passed to) the module to run a specific job.
+
+
+If upgrading from version 1.0.1 or before, first run the SQL in the file "schema_upgrades\schema_upgrade_to_1.0.2\schema_upgrade_to_1.0.2"
