@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src_JobCenter_Server_Core"/>
+	<classpathentry kind="src" path="src_JobCenter_JobSubmissionClient_Interface"/>
+	<classpathentry kind="src" path="src_JobCenter_Client_Module_Interface"/>
+	<classpathentry kind="src" path="src_JobCenter_base"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.j2eedt.core.MYECLIPSE_JAVAEE_5_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JobCenter_base"/>

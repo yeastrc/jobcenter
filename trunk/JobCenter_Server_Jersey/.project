@@ -56,4 +56,26 @@
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src_JobCenter_Client_Module_Interface</name>
+			<type>2</type>
+			<locationURI>SVN_CHECKOUT_ROOT/JobCenter_Client_Module_Interface/src</locationURI>
+		</link>
+		<link>
+			<name>src_JobCenter_JobSubmissionClient_Interface</name>
+			<type>2</type>
+			<locationURI>SVN_CHECKOUT_ROOT/JobCenter_JobSubmissionClient_Interface/src</locationURI>
+		</link>
+		<link>
+			<name>src_JobCenter_Server_Core</name>
+			<type>2</type>
+			<locationURI>SVN_CHECKOUT_ROOT/JobCenter_Server_Core/src</locationURI>
+		</link>
+		<link>
+			<name>src_JobCenter_base</name>
+			<type>2</type>
+			<locationURI>SVN_CHECKOUT_ROOT/JobCenter_base/src</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

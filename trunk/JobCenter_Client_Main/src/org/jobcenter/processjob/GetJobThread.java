@@ -450,6 +450,7 @@ public class GetJobThread extends Thread  {
 			
 		} else {
 			
+			//  initially set to available thread count
 			maxNumberThreadsToUseToProcessJob = availableThreadCount;			
 
 			ModuleConfigDTO moduleConfigDTO = moduleHolder.getModuleConfigDTO();
@@ -460,6 +461,9 @@ public class GetJobThread extends Thread  {
 
 			if ( moduleMaxNumberThreadsPerJobSet && moduleMaxNumberThreadsPerJob < maxNumberThreadsToUseToProcessJob ) {
 
+				//  "module max threads per job" is set and is < current maxNumberThreadsToUseToProcessJob (availableThreadCount)
+				//     so lower maxNumberThreadsToUseToProcessJob to "module max threads per job"
+				
 				maxNumberThreadsToUseToProcessJob = moduleMaxNumberThreadsPerJob;
 
 				if ( log.isDebugEnabled() ) {

@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.ClientConstants;
 import org.jobcenter.constants.ModuleConfigPropertyFileNames;
+import org.jobcenter.constants.ModuleConfigPropertyNamesAndOtherConstants;
 import org.jobcenter.util.BuildURLClassLoader;
 import org.jobcenter.util.ModuleDirectoryUtil;
 
@@ -23,30 +24,6 @@ public class RetrieveModuleConfig {
 
 	private static Logger log = Logger.getLogger(RetrieveModuleConfig.class);
 
-	private static final String CONFIG_PROPERTY_MODULE_NAME = "module.name";
-
-	private static final String CONFIG_PROPERTY_MODULE_JAVA_CLASS = "module.java.class";
-
-	private static final String CONFIG_PROPERTY_MODULE_VERSION_NUMBER = "module.version.number";
-
-
-	private static final String CONFIG_PROPERTY_MODULE_DEFAULT_MAX_THREADS_PER_JOB = "module.default.max.threads.per.job";
-
-	private static final String CONFIG_PROPERTY_MODULE_DEFAULT_MIN_THREADS_PER_JOB = "module.default.min.threads.per.job";
-
-	
-
-	private static final String CONFIG_PROPERTY_MODULE_MAX_CONCURRENT_JOBS_PER_CLIENT = "module.max.concurrent.jobs.per.client";
-
-	private static final String CONFIG_PROPERTY_MODULE_MAX_THREADS_PER_JOB = "module.max.threads.per.job";
-
-	private static final String CONFIG_PROPERTY_MODULE_MIN_THREADS_PER_JOB = "module.min.threads.per.job";
-
-
-	private static final String UNLIMITED_MAX_THREADS_FIRST_CHARACTER_LOWER_CASE = "u";
-
-
-	private static final int MAX_THREADS_PER_JOB_DEFAULT = 1;
 
 
 
@@ -176,7 +153,7 @@ public class RetrieveModuleConfig {
 		getModuleConfigPerClientData( moduleConfigDTO, moduleInterfaceClassLoader, moduleDir );
 
 
-		setModuleConfigDTODefaults( moduleConfigDTO );
+//		setModuleConfigDTODefaults( moduleConfigDTO );
 
 
 		log.warn( "Contents of moduleConfigDTO (after loading config files and setting defaults) = " + moduleConfigDTO );
@@ -186,22 +163,25 @@ public class RetrieveModuleConfig {
 	}
 
 
-	/**
-	 * @param moduleConfigDTO
-	 */
-	private void setModuleConfigDTODefaults( ModuleConfigDTO moduleConfigDTO ) {
-
-		// default max number of threads to "1" if max not set and not set to unlimited
-
-		if ( ! ( moduleConfigDTO.isMaxNumberThreadsPerJobUnlimited()
-				 || moduleConfigDTO.isMaxNumberThreadsPerJobSet() ) ) {
-
-			moduleConfigDTO.setMaxNumberThreadsPerJob( MAX_THREADS_PER_JOB_DEFAULT );
-			moduleConfigDTO.setMaxNumberThreadsPerJobSet( true );
-
-		}
-
-	}
+//	/**
+//	 * @param moduleConfigDTO
+//	 */
+//	private void setModuleConfigDTODefaults( ModuleConfigDTO moduleConfigDTO ) {
+//
+//		// default max number of threads to "1" if max not set and not set to unlimited  and MaxNumberConcurrentJobsSet is set.
+//		
+//		//  MaxNumberConcurrentJobsSet not set is the old way to say unlimited threads
+//
+//		if ( (     ( ! moduleConfigDTO.isMaxNumberThreadsPerJobUnlimited() )
+//				&& ( ! moduleConfigDTO.isMaxNumberThreadsPerJobSet() )
+//				&& ( moduleConfigDTO.isMaxNumberConcurrentJobsSet() ) ) ) {
+//
+//			moduleConfigDTO.setMaxNumberThreadsPerJob( MAX_THREADS_PER_JOB_DEFAULT );
+//			moduleConfigDTO.setMaxNumberThreadsPerJobSet( true );
+//
+//		}
+//
+//	}
 
 
 
@@ -257,13 +237,13 @@ public class RetrieveModuleConfig {
 
 		configProps.load(props);
 
-		String moduleName =  configProps.getProperty( CONFIG_PROPERTY_MODULE_NAME );
+		String moduleName =  configProps.getProperty( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_NAME );
 
 		if ( StringUtils.isEmpty( moduleName ) ) {
 
 			String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
 			+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
-			+ "  property '" + CONFIG_PROPERTY_MODULE_NAME + "' Cannot be empty."
+			+ "  property '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_NAME + "' Cannot be empty."
 			+ "  " + configFilePath;
 
 			log.error( msg );
@@ -274,18 +254,18 @@ public class RetrieveModuleConfig {
 		moduleConfigDTO.setModuleName( moduleName );
 
 		logLoadedFromConfig.append( "  Property '" );
-		logLoadedFromConfig.append( CONFIG_PROPERTY_MODULE_NAME );
+		logLoadedFromConfig.append( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_NAME );
 		logLoadedFromConfig.append( "' = '" );
 		logLoadedFromConfig.append( moduleName );
 		logLoadedFromConfig.append( "'." );
 
-		String moduleJavaClass =  configProps.getProperty( CONFIG_PROPERTY_MODULE_JAVA_CLASS );
+		String moduleJavaClass =  configProps.getProperty( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_JAVA_CLASS );
 
 		if ( StringUtils.isEmpty( moduleName ) ) {
 
 			String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
 			+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
-			+ "  property '" + CONFIG_PROPERTY_MODULE_JAVA_CLASS + "' Cannot be empty."
+			+ "  property '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_JAVA_CLASS + "' Cannot be empty."
 			+ "  " + configFilePath;
 
 			log.error( msg );
@@ -296,13 +276,13 @@ public class RetrieveModuleConfig {
 		moduleConfigDTO.setModuleJavaClass( moduleJavaClass );
 
 
-		String moduleVersionString = configProps.getProperty( CONFIG_PROPERTY_MODULE_VERSION_NUMBER );
+		String moduleVersionString = configProps.getProperty( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_VERSION_NUMBER );
 
 		if ( StringUtils.isEmpty( moduleVersionString ) ) {
 
 			String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
 			+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
-			+ "  property '" + CONFIG_PROPERTY_MODULE_VERSION_NUMBER + "' Cannot be empty."
+			+ "  property '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_VERSION_NUMBER + "' Cannot be empty."
 			+ "  " + configFilePath;
 
 			log.error( msg );
@@ -322,7 +302,7 @@ public class RetrieveModuleConfig {
 
 			String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
 			+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
-			+ "  Failed to parse number for property '" + CONFIG_PROPERTY_MODULE_VERSION_NUMBER + "'."
+			+ "  Failed to parse number for property '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_VERSION_NUMBER + "'."
 			+ "  " + configFilePath;
 
 			log.error( msg, ex );
@@ -331,84 +311,104 @@ public class RetrieveModuleConfig {
 		}
 
 		logLoadedFromConfig.append( "  Property '" );
-		logLoadedFromConfig.append( CONFIG_PROPERTY_MODULE_VERSION_NUMBER );
+		logLoadedFromConfig.append( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_VERSION_NUMBER );
 		logLoadedFromConfig.append( "' = '" );
 		logLoadedFromConfig.append( moduleVersionString );
 		logLoadedFromConfig.append( "'." );
 
 
-		String maxThreadsPerJobString = configProps.getProperty( CONFIG_PROPERTY_MODULE_DEFAULT_MAX_THREADS_PER_JOB );
+		String maxThreadsPerJobString = configProps.getProperty( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_DEFAULT_MAX_THREADS_PER_JOB );
 
-		if ( ! StringUtils.isEmpty( maxThreadsPerJobString ) ) {
 
-			String maxThreadsPerJobStringToLowerCase = maxThreadsPerJobString.toLowerCase();
+		if ( StringUtils.isEmpty( maxThreadsPerJobString ) ) {
 
-			if ( maxThreadsPerJobStringToLowerCase.startsWith( UNLIMITED_MAX_THREADS_FIRST_CHARACTER_LOWER_CASE ) ) {
+			String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
+			+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
+			+ "  property '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_DEFAULT_MAX_THREADS_PER_JOB + "' Cannot be empty."
+			+ "  " + configFilePath;
 
-				moduleConfigDTO.setMaxNumberThreadsPerJobUnlimited( true );
-				moduleConfigDTO.setMaxNumberThreadsPerJobSet( false );
+			log.error( msg );
 
-			} else {
+			throw new Exception( msg );
+		}
 
-				try {
+		String maxThreadsPerJobStringToLowerCase = maxThreadsPerJobString.toLowerCase();
 
-					int numValue = Integer.parseInt( maxThreadsPerJobString );
+		if ( maxThreadsPerJobStringToLowerCase.startsWith( ModuleConfigPropertyNamesAndOtherConstants.UNLIMITED_MAX_THREADS_FIRST_CHARACTER_LOWER_CASE ) ) {
 
-					moduleConfigDTO.setMaxNumberThreadsPerJob( numValue );
+			moduleConfigDTO.setMaxNumberThreadsPerJobUnlimited( true );
+			moduleConfigDTO.setMaxNumberThreadsPerJobSet( false );
 
-					moduleConfigDTO.setMaxNumberThreadsPerJobSet( true );
+		} else {
 
-					moduleConfigDTO.setMaxNumberThreadsPerJobUnlimited( false );
+			try {
 
-				} catch ( NumberFormatException ex ) {
+				int numValue = Integer.parseInt( maxThreadsPerJobString );
 
-					String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
-					+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
-					+ "  Failed to parse number for propterty '" + CONFIG_PROPERTY_MODULE_DEFAULT_MAX_THREADS_PER_JOB + "'."
-					+ "  " + configFilePath;
+				moduleConfigDTO.setMaxNumberThreadsPerJob( numValue );
 
-					log.error( msg, ex );
+				moduleConfigDTO.setMaxNumberThreadsPerJobSet( true );
 
-					throw ex;
-				}
+				moduleConfigDTO.setMaxNumberThreadsPerJobUnlimited( false );
 
+			} catch ( NumberFormatException ex ) {
+
+				String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
+						+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
+						+ "  Failed to parse number for propterty '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_DEFAULT_MAX_THREADS_PER_JOB + "'."
+						+ "  " + configFilePath;
+
+				log.error( msg, ex );
+
+				throw ex;
 			}
 
 		}
 
 		logLoadedFromConfig.append( "  Property '" );
-		logLoadedFromConfig.append( CONFIG_PROPERTY_MODULE_DEFAULT_MAX_THREADS_PER_JOB );
+		logLoadedFromConfig.append( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_DEFAULT_MAX_THREADS_PER_JOB );
 		logLoadedFromConfig.append( "' = '" );
 		logLoadedFromConfig.append( maxThreadsPerJobString );
 		logLoadedFromConfig.append( "'." );
 
 
-		String minThreadsPerJobString = configProps.getProperty( CONFIG_PROPERTY_MODULE_DEFAULT_MIN_THREADS_PER_JOB );
+		String minThreadsPerJobString = configProps.getProperty( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_DEFAULT_MIN_THREADS_PER_JOB );
 
-		if ( ! StringUtils.isEmpty( minThreadsPerJobString ) ) {
 
-			try {
+		if ( StringUtils.isEmpty( minThreadsPerJobString ) ) {
 
-				int numValue = Integer.parseInt( minThreadsPerJobString );
+			String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
+			+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
+			+ "  property '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_DEFAULT_MIN_THREADS_PER_JOB + "' Cannot be empty."
+			+ "  " + configFilePath;
 
-				moduleConfigDTO.setMinNumberThreadsPerJob( numValue );
+			log.error( msg );
 
-				moduleConfigDTO.setMinNumberThreadsPerJobSet( true );
-
-			} catch ( NumberFormatException ex ) {
-
-				String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
-				+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
-				+ "  Failed to parse number for propterty '" + CONFIG_PROPERTY_MODULE_DEFAULT_MIN_THREADS_PER_JOB + "'."
-				+ "  " + configFilePath;
-
-				log.error( msg, ex );
-			}
+			throw new Exception( msg );
 		}
+		
+		try {
+
+			int numValue = Integer.parseInt( minThreadsPerJobString );
+
+			moduleConfigDTO.setMinNumberThreadsPerJob( numValue );
+
+			moduleConfigDTO.setMinNumberThreadsPerJobSet( true );
+
+		} catch ( NumberFormatException ex ) {
+
+			String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
+					+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
+					+ "  Failed to parse number for propterty '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_DEFAULT_MIN_THREADS_PER_JOB + "'."
+					+ "  " + configFilePath;
+
+			log.error( msg, ex );
+		}
+		
 
 
 		logLoadedFromConfig.append( "  Property '" );
-		logLoadedFromConfig.append( CONFIG_PROPERTY_MODULE_DEFAULT_MIN_THREADS_PER_JOB );
+		logLoadedFromConfig.append( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_DEFAULT_MIN_THREADS_PER_JOB );
 		logLoadedFromConfig.append( "' = '" );
 		logLoadedFromConfig.append( minThreadsPerJobString );
 		logLoadedFromConfig.append( "'." );
@@ -478,7 +478,7 @@ public class RetrieveModuleConfig {
 
 		configProps.load(props);
 
-		String maxNumberConcurrentJobsString = configProps.getProperty( CONFIG_PROPERTY_MODULE_MAX_CONCURRENT_JOBS_PER_CLIENT );
+		String maxNumberConcurrentJobsString = configProps.getProperty( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_MAX_CONCURRENT_JOBS_PER_CLIENT );
 
 		if ( ! StringUtils.isEmpty( maxNumberConcurrentJobsString ) ) {
 
@@ -494,7 +494,7 @@ public class RetrieveModuleConfig {
 
 				String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
 				+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
-				+ "  Failed to parse number for property '" + CONFIG_PROPERTY_MODULE_MAX_CONCURRENT_JOBS_PER_CLIENT + "'."
+				+ "  Failed to parse number for property '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_MAX_CONCURRENT_JOBS_PER_CLIENT + "'."
 				+ "  " + configFilePath;
 
 				log.error( msg, ex );
@@ -504,7 +504,7 @@ public class RetrieveModuleConfig {
 		}
 
 		logLoadedFromConfig.append( "  Property '" );
-		logLoadedFromConfig.append( CONFIG_PROPERTY_MODULE_MAX_CONCURRENT_JOBS_PER_CLIENT );
+		logLoadedFromConfig.append( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_MAX_CONCURRENT_JOBS_PER_CLIENT );
 		logLoadedFromConfig.append( "' = '" );
 		logLoadedFromConfig.append( maxNumberConcurrentJobsString );
 		logLoadedFromConfig.append( "'." );
@@ -512,13 +512,13 @@ public class RetrieveModuleConfig {
 
 
 
-		String maxThreadsPerJobString = configProps.getProperty( CONFIG_PROPERTY_MODULE_MAX_THREADS_PER_JOB );
+		String maxThreadsPerJobString = configProps.getProperty( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_MAX_THREADS_PER_JOB );
 
 		if ( ! StringUtils.isEmpty( maxThreadsPerJobString ) ) {
 
 			String maxThreadsPerJobStringToLowerCase = maxThreadsPerJobString.toLowerCase();
 
-			if ( maxThreadsPerJobStringToLowerCase.startsWith( UNLIMITED_MAX_THREADS_FIRST_CHARACTER_LOWER_CASE ) ) {
+			if ( maxThreadsPerJobStringToLowerCase.startsWith( ModuleConfigPropertyNamesAndOtherConstants.UNLIMITED_MAX_THREADS_FIRST_CHARACTER_LOWER_CASE ) ) {
 
 				moduleConfigDTO.setMaxNumberThreadsPerJobUnlimited( true );
 				moduleConfigDTO.setMaxNumberThreadsPerJobSet( false );
@@ -539,7 +539,7 @@ public class RetrieveModuleConfig {
 
 					String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
 					+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
-					+ "  Failed to parse number for propterty '" + CONFIG_PROPERTY_MODULE_MAX_THREADS_PER_JOB + "'."
+					+ "  Failed to parse number for propterty '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_MAX_THREADS_PER_JOB + "'."
 					+ "  " + configFilePath;
 
 					log.error( msg, ex );
@@ -552,13 +552,13 @@ public class RetrieveModuleConfig {
 		}
 
 		logLoadedFromConfig.append( "  Property '" );
-		logLoadedFromConfig.append( CONFIG_PROPERTY_MODULE_MAX_THREADS_PER_JOB );
+		logLoadedFromConfig.append( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_MAX_THREADS_PER_JOB );
 		logLoadedFromConfig.append( "' = '" );
 		logLoadedFromConfig.append( maxThreadsPerJobString );
 		logLoadedFromConfig.append( "'." );
 
 
-		String minThreadsPerJobString = configProps.getProperty( CONFIG_PROPERTY_MODULE_MIN_THREADS_PER_JOB );
+		String minThreadsPerJobString = configProps.getProperty( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_MIN_THREADS_PER_JOB );
 
 		if ( ! StringUtils.isEmpty( minThreadsPerJobString ) ) {
 
@@ -574,7 +574,7 @@ public class RetrieveModuleConfig {
 
 				String msg = "Error processing config for module '" + moduleConfigDTO.getModuleName()
 				+ "' in subdirectory '" + moduleConfigDTO.getModuleSubDirectory() + "'."
-				+ "  Failed to parse number for propterty '" + CONFIG_PROPERTY_MODULE_MIN_THREADS_PER_JOB + "'."
+				+ "  Failed to parse number for propterty '" + ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_MIN_THREADS_PER_JOB + "'."
 				+ "  " + configFilePath;
 
 				log.error( msg, ex );
@@ -583,7 +583,7 @@ public class RetrieveModuleConfig {
 
 
 		logLoadedFromConfig.append( "  Property '" );
-		logLoadedFromConfig.append( CONFIG_PROPERTY_MODULE_MIN_THREADS_PER_JOB );
+		logLoadedFromConfig.append( ModuleConfigPropertyNamesAndOtherConstants.CONFIG_PROPERTY_MODULE_MIN_THREADS_PER_JOB );
 		logLoadedFromConfig.append( "' = '" );
 		logLoadedFromConfig.append( minThreadsPerJobString );
 		logLoadedFromConfig.append( "'." );

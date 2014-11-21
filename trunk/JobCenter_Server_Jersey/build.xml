@@ -149,17 +149,32 @@
 	<!-- get the svn working copy info -->
 	<target name="svn_info" >
 		<svn username="${svn.username}" password="${svn.password}">
-			<wcVersion path="${basedir}" prefix="ms_library."/>
+			<wcVersion path="${basedir}" prefix="jobcenter."/>
 		</svn>
 		<condition property="wc_modified" else="NO" value="YES">
-  			<isset property="ms_library.modified"/>
+  			<isset property="jobcenter.modified"/>
   		</condition>
 		<condition property="wc_mixed" else="NO" value="YES">
-  			<isset property="ms_library.mixed"/>
+  			<isset property="jobcenter.mixed"/>
   		</condition>
-  		<echo message="Project is at revision ${ms_library.revision.max-with-flags}" />
+  		<echo message="Project is at revision ${jobcenter.revision.max-with-flags}" />
   		<echo message="Working copy is modifed ${wc_modified}" />
   		<echo message="Working copy is mixed ${wc_mixed}" />
+		
+		
+		<!-- Create file "version_of_jobcenter.txt" for web app  -->
+		
+		<echo file="WebRoot/WEB-INF/version_of_jobcenter.txt" append="false">
+Built-By=${user.name}
+Date=${build-info.current-date} 
+Time=${build-info.current-time} 
+Svn-Repository-URL=${jobcenter.repository.url}
+Svn-Revision=${jobcenter.revision.max-with-flags}
+Svn-Revision-Range=${jobcenter.revision.range}
+Svn-WorkingCopy-Modified=${wc_modified}
+Svn-WorkingCopy-Mixed=${wc_mixed}
+		</echo>
+		
 	</target>
 	
 	
@@ -241,9 +256,9 @@
 				<attribute name="Built-By" value="${user.name}"/>
 				<attribute name="Date" value="${build-info.current-date}" />
 				<attribute name="Time" value="${build-info.current-time}" />
-				<attribute name="Svn-Repository-URL" value="${ms_library.repository.url}"/>
-				<attribute name="Svn-Revision" value="${ms_library.revision.max-with-flags}"/>
-				<attribute name="Svn-Revision-Range" value="${ms_library.revision.range}"/>
+				<attribute name="Svn-Repository-URL" value="${jobcenter.repository.url}"/>
+				<attribute name="Svn-Revision" value="${jobcenter.revision.max-with-flags}"/>
+				<attribute name="Svn-Revision-Range" value="${jobcenter.revision.range}"/>
 				<attribute name="Svn-WorkingCopy-Modified" value="${wc_modified}"/>
 				<attribute name="Svn-WorkingCopy-Mixed" value="${wc_mixed}"/>
 			</manifest>			
