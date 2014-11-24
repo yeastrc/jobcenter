@@ -158,23 +158,7 @@
   		<echo message="Project is at revision ${ms_library.revision.max-with-flags}" />
   		<echo message="Working copy is modifed ${wc_modified}" />
   		<echo message="Working copy is mixed ${wc_mixed}" />
-
-		
-		
-		<!-- Create file "version_of_jobcenter.txt" for web app  -->
-		
-		<echo file="WebRoot/WEB-INF/version_of_jobcenter.txt" append="false">
-Built-By=${user.name}
-Date=${build-info.current-date} 
-Time=${build-info.current-time} 
-Svn-Repository-URL=${jobcenter.repository.url}
-Svn-Revision=${jobcenter.revision.max-with-flags}
-Svn-Revision-Range=${jobcenter.revision.range}
-Svn-WorkingCopy-Modified=${wc_modified}
-Svn-WorkingCopy-Mixed=${wc_mixed}
-
-</echo>
-		
+	
 	</target>
 	
 	
