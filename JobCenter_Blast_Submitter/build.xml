@@ -150,6 +150,9 @@
 		
 	<!-- get the svn working copy info -->
 	<target name="svn_info" >
+		
+<!--
+
 		<svn username="${svn.username}" password="${svn.password}">
 			<wcVersion path="${basedir}" prefix="ms_library."/>
 		</svn>
@@ -162,6 +165,9 @@
   		<echo message="Project is at revision ${ms_library.revision.max-with-flags}" />
   		<echo message="Working copy is modifed ${wc_modified}" />
   		<echo message="Working copy is mixed ${wc_mixed}" />
+  		
+-->
+		
 	</target>
 	
 	

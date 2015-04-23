@@ -11,11 +11,19 @@
     <property name="build" value="build" />
     <property name="classes" value="classes" />
     <property name="deploy" value="deploy" />
+  	
+<!--  	Remove since 'resources' dir not exist  	
     <property name="config" value="resources" />
+-->    
+    
     <property name="runDir" value="." />
     <property name="local" value="local" />
     <property name="remote" value="remote" />
-    <property name="lib" value="lib" />
+
+<!--  	Remove since 'lib' dir not exist  	
+  	<property name="lib" value="lib" />
+-->
+  	
   </target>
 
 
@@ -148,6 +156,9 @@
 		
 	<!-- get the svn working copy info -->
 	<target name="svn_info" >
+		
+<!--
+		
 		<svn username="${svn.username}" password="${svn.password}">
 			<wcVersion path="${basedir}" prefix="ms_library."/>
 		</svn>
@@ -160,6 +171,9 @@
   		<echo message="Project is at revision ${ms_library.revision.max-with-flags}" />
   		<echo message="Working copy is modifed ${wc_modified}" />
   		<echo message="Working copy is mixed ${wc_mixed}" />
+		
+-->		
+		
 	</target>
 	
 	
@@ -185,10 +199,14 @@
 
 
 	<!-- Copy resources to the classes directory -->
+  	
+<!--  	Remove since 'resources' dir not exist  	
 	<copy todir="${classes}">
 		<fileset dir="${config}" />
 	</copy>
-	
+-->
+  	
+  	
 	<!-- Copy any resources from source (not .java) to the classes directory -->
 	<copy todir="${classes}">
 		<fileset dir="${src}">
@@ -253,9 +271,13 @@
 		<fileset dir="../generated_jars/">
 			<include name="*.jar" />
 		</fileset>
+		
+<!--  	Remove since 'lib' dir not exist  		
 		<fileset dir="lib">
 			<include name="**/*.jar" />
 		</fileset>
+-->
+		
 	</path>
 
 </project>

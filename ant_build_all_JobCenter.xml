@@ -166,9 +166,9 @@
 			</fileset>
 		</path>
 		
-				  	
+<!--				  	
 		<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
-
+-->
 		
 	
 		<target name="test_svn_ant"  description="Prints the Subversion repository URL and working copy revision">
@@ -182,6 +182,9 @@
 			
 		<!-- get the svn working copy info -->
 		<target name="svn_info" >
+			
+<!--
+						
 			<svn username="${svn.username}" password="${svn.password}">
 				<wcVersion path="${basedir}" prefix="jobcenter."/>
 			</svn>
@@ -195,6 +198,7 @@
 	  		<echo message="Working copy is modifed ${wc_modified}" />
 	  		<echo message="Working copy is mixed ${wc_mixed}" />
 			
+-->
 			
 			<!-- Create file "version_of_jobcenter.txt" for inclusion in jar "jobcenter_client_installation.jar"   -->
 			
