@@ -1,0 +1,42 @@
+#Limitations on Values passed through Jobcenter Framework
+
+# Introduction #
+
+Values passed through Jobcenter Framework are restricted to what is valid
+in XML and UTF-8.
+
+
+# Details #
+
+Jobcenter provides for passing values through the framwork for the following uses:
+
+> Passing submission values from the submitter to the module running in the client.
+
+> Passing values/messages as a result of running the unit of work (job) from the module back to the central Jobcenter server for later retrieval.
+
+
+
+
+Jobcenter uses XML and the UTF-8 character set encoding for passing these values around.
+
+As such, the values passed are required to conform to XML and UTF-8 requirements as specified in:
+
+> http://www.w3.org/TR/xml/#charsets
+
+If the value cannot meet this requirement, it must be encoded in some form so that it can meets this requirement before being passed to Jobcenter. One such encoding scheme is to use base64.
+
+> The included basic Jobcenter web GUI will not decode any values that are encoded and will display the result of the encoding.
+
+> Any tool that is written to retrieve values and/or messages that have been encoded can decode those values before displaying them.
+
+
+> If the characters in the values and messages that do not conform to the XML and UTF-8 standards are not needed and can be replaced with something else, then replacement of the characters is an option.
+Jobcenter will provide functions that can be called that will take a string and a replacement character and for the non-conforming characters with hex values less than x20 will replace them with the provided replacement character.
+
+
+> Each job submission will be XML encoded and then XML parsed. If it fails to XML parse, it will be rejected with an exception as specified on the method call for submitting jobs.
+
+> Each result value and message added by the module as part of the job completion status will be XML encoded and then XML parsed.  If it fails to XML parse, it will be rejected with an exception as specified on the method call for adding the result value or message.
+
+
+
