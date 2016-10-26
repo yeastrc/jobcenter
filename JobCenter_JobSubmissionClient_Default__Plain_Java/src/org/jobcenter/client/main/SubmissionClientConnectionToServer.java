@@ -32,7 +32,6 @@ import org.jobcenter.client_exceptions.JobcenterSubmissionXML_JAXBErrorException
 import org.jobcenter.constants.Constants;
 import org.jobcenter.constants.WebServiceURLConstants;
 import org.jobcenter.coreinterfaces.JobSubmissionInterface;
-import org.jobcenter.coreinterfaces.JobSubmissionJobInterface;
 import org.jobcenter.request.SubmitJobRequest;
 import org.jobcenter.request.SubmitJobsListWithDependenciesRequest;
 import org.jobcenter.response.BaseResponse;
@@ -58,9 +57,9 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 
 			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.SUBMIT_JOB;
 
-	private static final String SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION
-
-			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.SUBMIT_JOBS_LIST_WITH_DEPENDENCIES;
+//	private static final String SUBMIT_JOB_LIST_WITH_DEPENDENCIES_CONNECTION_URL_EXTENSION
+//
+//			= WebServiceURLConstants.WEB_SERVICE_URL_BASE_POST_CONTEXT + WebServiceURLConstants.SUBMIT_JOBS_LIST_WITH_DEPENDENCIES;
 
 
 	private static final String CONTENT_TYPE_SEND_RECEIVE = "application/xml";
@@ -80,6 +79,13 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 	
 	private JAXBContext jaxbContext;
 
+	
+	private volatile byte[] submitJobRequestMarshalledLastSent;
+
+
+	public byte[] getSubmitJobRequestMarshalledLastSent() {
+		return submitJobRequestMarshalledLastSent;
+	}
 
 
 	public static JobSubmissionInterface getInstance() {
@@ -256,6 +262,8 @@ public class SubmissionClientConnectionToServer implements JobSubmissionInterfac
 			marshaller.marshal( submitJobRequest, baos ) ;
 			
 			submitJobRequestMarshalled = baos.toByteArray();
+			
+			submitJobRequestMarshalledLastSent = submitJobRequestMarshalled;
 
 			ByteArrayInputStream bais = new ByteArrayInputStream( submitJobRequestMarshalled );
 
