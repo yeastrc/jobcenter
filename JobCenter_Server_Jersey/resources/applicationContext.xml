@@ -576,12 +576,30 @@
 
 	<!-- ================================== -->
 
+<!--   Internal JDBC DAO services -->
+
+	<bean id="insertJobInternalService" class="org.jobcenter.internal_jdbc_dao_service.InsertJobInternalServiceImpl">
+
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+
+		<property name="jobJDBCDAO">
+			<ref bean="jobJDBCDAO" />
+		</property>
+		
+	</bean>
+
 
 <!--   Internal services -->
 
 
 
 	<bean id="submitJobInternalService" class="org.jobcenter.internalservice.SubmitJobInternalServiceImpl">
+
+		<property name="insertJobInternalService">
+			<ref bean="insertJobInternalService" />
+		</property>
 
 		<property name="jobJDBCDAO">
 			<ref bean="jobJDBCDAO" />

@@ -2,7 +2,6 @@ package org.jobcenter.webservice;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -14,6 +13,7 @@ import org.jobcenter.exception.RecordNotUpdatedException;
 import org.jobcenter.request.*;
 import org.jobcenter.response.*;
 import org.jobcenter.service.*;
+import org.jobcenter.service_response.SubmitJobServiceResponse;
 
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.resource.Singleton;
@@ -62,7 +62,18 @@ public class SubmitJobWebService {
 
 
 		try {
-			SubmitJobResponse submitJobResponse = submitJobService.submitJob( submitJobRequest, remoteHost );
+			SubmitJobServiceResponse submitJobServiceResponse =
+					submitJobService.submitJob( submitJobRequest, remoteHost );
+			
+			SubmitJobResponse submitJobResponse = submitJobServiceResponse.getSubmitJobResponse();
+			
+			if ( ! submitJobResponse.isErrorResponse() ) {
+				
+				int insertedJobId = submitJobServiceResponse.getJobId();
+				
+				
+				
+			}
 
 			return submitJobResponse;
 

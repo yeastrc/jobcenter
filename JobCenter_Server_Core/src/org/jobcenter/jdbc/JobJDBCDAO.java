@@ -1,5 +1,6 @@
 package org.jobcenter.jdbc;
 
+import java.sql.Connection;
 import java.util.List;
 
 import org.jobcenter.dto.*;
@@ -35,12 +36,21 @@ public interface JobJDBCDAO {
 	public  int insertRequest( int requestType );
 
 	public  void insertJob ( Job job );
+	
+	public void insertJob ( final Job job, final Connection connection );
 
 	public  void markJobInsertComplete ( Job job );
+	
+	public  void markJobInsertComplete ( Job job, final Connection connection );
 
 	public  void insertJobParameter ( String key, String value, int jobId );
+
+	public  void insertJobParameter ( String key, String value, int jobId, final Connection connection );
 	
+
 	public  void insertJobDependcy( int jobId, int jobDependency );
+
+	public  void insertJobDependcy( int jobId, int jobDependency, final Connection connection );
 
 	public  void healthCheck ( );
 

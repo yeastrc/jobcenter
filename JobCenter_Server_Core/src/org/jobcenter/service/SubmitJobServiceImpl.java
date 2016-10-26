@@ -17,6 +17,7 @@ import org.jobcenter.jdbc.JobJDBCDAO;
 import org.jobcenter.request.SubmitJobRequest;
 import org.jobcenter.response.BaseResponse;
 import org.jobcenter.response.SubmitJobResponse;
+import org.jobcenter.service_response.SubmitJobServiceResponse;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,7 +72,7 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 	 * @param remoteHost
 	 * @return
 	 */
-	public SubmitJobResponse submitJob( SubmitJobRequest submitJobRequest, String remoteHost )
+	public SubmitJobServiceResponse submitJob( SubmitJobRequest submitJobRequest, String remoteHost )
 	{
 		final String method = "submitJob";
 
@@ -89,10 +90,14 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 		}
 
 		SubmitJobResponse submitJobResponse = new SubmitJobResponse();
+		
+		SubmitJobServiceResponse submitJobServiceResponse = new SubmitJobServiceResponse();
+		
+		submitJobServiceResponse.setSubmitJobResponse( submitJobResponse );
 
 		if ( ! clientNodeNameCheck.validateNodeNameAndNetworkAddress( submitJobResponse, submitJobRequest.getNodeName(), remoteHost ) ) {
 
-			return submitJobResponse;
+			return submitJobServiceResponse;
 		}
 
 
@@ -105,7 +110,7 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 		
 		if ( requestTypeDTO == null ) {
 			
-			return submitJobResponse;
+			return submitJobServiceResponse;
 		}
 
 
@@ -115,13 +120,13 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 		
 		if ( jobType == null ) {
 			
-			return submitJobResponse;
+			return submitJobServiceResponse;
 		}
 		
 		
 		if ( ! submitJobInternalService.validateRequiredExecutionThreads( submitJobRequest.getRequiredExecutionThreads(), jobType.getMaxRequiredExecutionThreads(), submitJobResponse ) ) {
 			
-			return submitJobResponse;
+			return submitJobServiceResponse;
 		}
 		
 
@@ -139,7 +144,9 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 		submitJobInternalService.insertJob( job );
 
 		submitJobResponse.setRequestId( requestId );
+		
+		submitJobServiceResponse.setJobId( job.getId() );
 
-		return submitJobResponse;
+		return submitJobServiceResponse;
 	}
 }

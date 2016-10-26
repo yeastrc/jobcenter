@@ -1,7 +1,5 @@
 package org.jobcenter.internalservice;
 
-
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,6 +10,7 @@ import org.jobcenter.dao.RequestTypeDAO;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RequestTypeDTO;
+import org.jobcenter.internal_jdbc_dao_service.InsertJobInternalService;
 import org.jobcenter.jdbc.JobJDBCDAO;
 import org.jobcenter.nondbdto.SubmittedJobAndDependencies;
 import org.jobcenter.request.SubmitJobRequest;
@@ -45,6 +44,18 @@ public class SubmitJobInternalServiceImpl implements SubmitJobInternalService  {
 	private static Logger log = Logger.getLogger(SubmitJobInternalServiceImpl.class);
 
 
+
+	//  Insert Job Internal Service
+	
+	private InsertJobInternalService insertJobInternalService;
+
+	public InsertJobInternalService getInsertJobInternalService() {
+		return insertJobInternalService;
+	}
+	public void setInsertJobInternalService(
+			InsertJobInternalService insertJobInternalService) {
+		this.insertJobInternalService = insertJobInternalService;
+	}
 
 
 	//  Hibernate DAO
@@ -350,36 +361,8 @@ public class SubmitJobInternalServiceImpl implements SubmitJobInternalService  {
 		}
 		
 		job.setJobParameterCount( jobParameterCount );
-
-		jobJDBCDAO.insertJob( job );
-
-		if ( jobParameters != null && ( ! jobParameters.isEmpty() ) ) {
-
-			for ( Map.Entry<String, String> entry : jobParameters.entrySet() ) {
-
-				jobJDBCDAO.insertJobParameter( entry.getKey(), entry.getValue(), job.getId() );
-
-			}
-		}
 		
-		List<Integer> jobDependencies = job.getJobDependencies();
-
-		if ( jobDependencies != null && ( ! jobDependencies.isEmpty() ) ) {
-
-			for ( Integer jobDependency : jobDependencies ) {
-
-				jobJDBCDAO.insertJobDependcy( job.getId(), jobDependency  );
-
-			}
-		}
-		
-		
-
-		//  set field "insert_complete" to "T" so that the job can be sent to the client
-
-		job.setInsertComplete( DBConstantsServerCore.JobTableInsertCompleteT );
-
-		jobJDBCDAO.markJobInsertComplete( job );
+		insertJobInternalService.insertJob( job );
 
 		return job.getId();
 	}
