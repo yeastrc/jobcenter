@@ -168,6 +168,16 @@
         </logger>
 		-->
 
+        <!-- set debugging at debug level to submitted Job parameters -->
+
+		<!--  
+        <logger name="org.jobcenter.webservice.SubmitJobWebService" additivity="false">
+                <level value="debug"/>
+                <appender-ref ref="ROLL" />
+                <appender-ref ref="ROLL_ERROR" />
+        </logger>
+		-->
+
 		<!--  
         <logger name="org.jobcenter.jdbc.GetNextJobForClientJDBCDAOImpl" additivity="false">
                 <level value="debug"/>

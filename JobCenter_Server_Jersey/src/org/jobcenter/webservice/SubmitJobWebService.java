@@ -1,5 +1,7 @@
 package org.jobcenter.webservice;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -51,6 +53,42 @@ public class SubmitJobWebService {
 		if ( log.isInfoEnabled() ) {
 
 			log.info( "submitJob: getNodeName(): " + submitJobRequest.getNodeName()  );
+		}
+		
+		if ( log.isDebugEnabled() ) {
+			
+			StringBuilder msgSB = new StringBuilder( 5000 );
+
+			msgSB.append( "submitJob: " );
+
+			if ( submitJobRequest.getJobParameters() == null ) {
+				
+				msgSB.append( " Job Parameters Map is null " );
+			
+			} else if ( submitJobRequest.getJobParameters().isEmpty() ) {
+
+				msgSB.append( " Job Parameters Map is empty " );
+				
+			} else {
+
+				msgSB.append( " Job Parameters: [ " );
+			
+				for ( Map.Entry<String, String> entry : submitJobRequest.getJobParameters().entrySet() ) {
+					
+					msgSB.append( "key: |" );
+					msgSB.append( entry.getKey() );
+					msgSB.append( "|, value: |" );
+					msgSB.append( entry.getValue() );
+					msgSB.append( "|," );
+				}
+				
+				msgSB.append( " ] " );	
+				
+			}
+			
+			String msg = msgSB.toString();
+			
+			log.debug( msg );
 		}
 
 		String remoteHost = request.getRemoteHost();
