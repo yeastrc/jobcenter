@@ -81,7 +81,18 @@ public class InsertJobInternalServiceImpl extends JDBCBaseDAO implements InsertJ
 
 	        	jobJDBCDAO.insertJob( job, connection );
 
-	        	if ( jobParameters != null && ( ! jobParameters.isEmpty() ) ) {
+	        	if ( jobParameters == null ) {
+
+		        	if ( log.isDebugEnabled() ) {
+		        		log.debug( "Method: " + method + ": jobParameters == null" );
+		        	}
+	        		
+	        	} else if ( jobParameters.isEmpty() ) {
+
+		        	if ( log.isDebugEnabled() ) {
+		        		log.debug( "Method: " + method + ": jobParameters is empty" );
+		        	}
+	        	} else {
 
 	        		for ( Map.Entry<String, String> entry : jobParameters.entrySet() ) {
 

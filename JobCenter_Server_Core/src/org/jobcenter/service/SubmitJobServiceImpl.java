@@ -146,6 +146,39 @@ public class SubmitJobServiceImpl implements SubmitJobService {
 		submitJobResponse.setRequestId( requestId );
 		
 		submitJobServiceResponse.setJobId( job.getId() );
+		
+
+		if ( log.isDebugEnabled() ) {
+			StringBuilder msgSB = new StringBuilder( 5000 );
+			msgSB.append( "SubmitJobServiceImpl: AFTER save the job: " );
+			msgSB.append(  " NodeName: |" );
+			msgSB.append( submitJobRequest.getNodeName() );
+			msgSB.append( "|, JobTypeName: |" );
+			msgSB.append( submitJobRequest.getJobTypeName() );
+			msgSB.append( "|.  Data from job object: Saved Job ID: " );
+			msgSB.append( Integer.toString( job.getId() ) );
+			msgSB.append( ", " );
+			
+			if ( job.getJobParameters() == null ) {
+				msgSB.append( " Job Parameters Map is null " );
+			} else if ( job.getJobParameters().isEmpty() ) {
+				msgSB.append( " Job Parameters Map is empty " );
+			} else {
+				msgSB.append( " Job Parameters: size: " + job.getJobParameters().size() 
+						+ " [ " );
+				for ( Map.Entry<String, String> entry : job.getJobParameters().entrySet() ) {
+					msgSB.append( "key: |" );
+					msgSB.append( entry.getKey() );
+					msgSB.append( "|, value: |" );
+					msgSB.append( entry.getValue() );
+					msgSB.append( "|," );
+				}
+				msgSB.append( " ] " );	
+			}
+			String msg = msgSB.toString();
+			log.debug( msg );
+		}
+
 
 		return submitJobServiceResponse;
 	}

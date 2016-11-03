@@ -176,7 +176,26 @@
                 <appender-ref ref="ROLL" />
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
+
+        <logger name="org.jobcenter.service.SubmitJobServiceImpl" additivity="false">
+                <level value="debug"/>
+                <appender-ref ref="ROLL" />
+                <appender-ref ref="ROLL_ERROR" />
+        </logger>
+
+        <logger name="org.jobcenter.internalservice.SubmitJobInternalServiceImpl" additivity="false">
+                <level value="debug"/>
+                <appender-ref ref="ROLL" />
+                <appender-ref ref="ROLL_ERROR" />
+        </logger>
+        
+        <logger name="org.jobcenter.internal_jdbc_dao_service.InsertJobInternalServiceImpl" additivity="false">
+                <level value="debug"/>
+                <appender-ref ref="ROLL" />
+                <appender-ref ref="ROLL_ERROR" />
+        </logger>
 		-->
+
 
 		<!--  
         <logger name="org.jobcenter.jdbc.GetNextJobForClientJDBCDAOImpl" additivity="false">
