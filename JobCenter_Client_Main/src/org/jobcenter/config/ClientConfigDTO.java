@@ -40,6 +40,15 @@ public class ClientConfigDTO {
 	private int sleepTimeCheckingForNewJobsNoWorkerThreads;
 
 	/**
+	 * Only pick up jobs after this delay from the submission time stamp, in seconds
+	 * 
+	 * Used to make this Jobcenter client a "non-primary" for retrieving jobs.
+	 * If other Jobcenter clients are also retrieving the same module names, 
+	 * they will pick the job before this delay is exceeded. 
+	 */
+	private Integer delayFromJobsubmission;
+
+	/**
 	 * Sleep time to check the control file
 	 */
 	private int sleepTimeCheckingControlFile;
@@ -108,6 +117,15 @@ public class ClientConfigDTO {
 			int sleepTimeCheckingForNewJobsNoWorkerThreads) {
 		this.sleepTimeCheckingForNewJobsNoWorkerThreads = sleepTimeCheckingForNewJobsNoWorkerThreads;
 	}
+
+	public Integer getDelayFromJobsubmission() {
+		return delayFromJobsubmission;
+	}
+
+	public void setDelayFromJobsubmission(Integer delayFromJobsubmission) {
+		this.delayFromJobsubmission = delayFromJobsubmission;
+	}
+
 
 	public boolean isLoadModulesOnStartup() {
 		return loadModulesOnStartup;

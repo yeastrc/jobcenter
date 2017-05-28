@@ -26,7 +26,24 @@ public class JobRequest extends BaseRequest {
 	private int totalNumberThreadsConfiguredOnClient;
 
 	private int totalNumberJobsConfiguredOnClient;
+	 
+	/**
+	 * Only pick up jobs after this delay from the submission time stamp, in seconds
+	 * 
+	 * Used to make this Jobcenter client a "non-primary" for retrieving jobs.
+	 * If other Jobcenter clients are also retrieving the same module names, 
+	 * they will pick the job before this delay is exceeded. 
+	 */
+	private Integer delayFromJobsubmission;
 
+
+	public Integer getDelayFromJobsubmission() {
+		return delayFromJobsubmission;
+	}
+
+	public void setDelayFromJobsubmission(Integer delayFromJobsubmission) {
+		this.delayFromJobsubmission = delayFromJobsubmission;
+	}
 
 	public int getTotalNumberThreadsConfiguredOnClient() {
 		return totalNumberThreadsConfiguredOnClient;

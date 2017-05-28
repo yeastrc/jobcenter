@@ -133,6 +133,7 @@ public class GetJob {
 		String nodeName = ClientConfigDTO.getSingletonInstance().getClientNodeName();
 		int totalNumberThreadsConfiguredOnClient = ClientConfigDTO.getSingletonInstance().getMaxThreadsForModules();
 		int totalNumberJobsConfiguredOnClient =ClientConfigDTO.getSingletonInstance().getMaxConcurrentJobs(); 
+		Integer delayFromJobsubmission = ClientConfigDTO.getSingletonInstance().getDelayFromJobsubmission();
 		
 		jobRequest.setNodeName( nodeName );
 		
@@ -142,7 +143,7 @@ public class GetJob {
 		jobRequest.setTotalNumberJobsConfiguredOnClient( totalNumberJobsConfiguredOnClient );
 		jobRequest.setTotalNumberThreadsConfiguredOnClient( totalNumberThreadsConfiguredOnClient );
 		
-		
+		jobRequest.setDelayFromJobsubmission( delayFromJobsubmission );
 		
 
 		List<JobRequestModuleInfo> clientModules = new ArrayList<JobRequestModuleInfo>();

@@ -319,7 +319,22 @@ public class RetrieveClientConfiguration {
 				clientConfigDTO.setSleepTimeCheckingForNewJobsNoWorkerThreads( sleepTimeCheckingForNewJobsNoWorkerThreads );
 			}
 
+			String delayFromJobsubmissionString = configProps.getProperty( ClientConfigPropertyNamesAndOtherConstants.CONFIG_DELAY_FROM_JOB_SUBMISSION_TIMESTAMP );
+					
+			if ( StringUtils.isNotEmpty( delayFromJobsubmissionString) ) {
+				try {
+					Integer delayFromJobsubmission = Integer.parseInt( delayFromJobsubmissionString );
+					clientConfigDTO.setDelayFromJobsubmission( delayFromJobsubmission );
+					
+				} catch ( Exception ex ) {
+					String msg = "Exception:  configProps.getProperty(\"" + ClientConfigPropertyNamesAndOtherConstants.CONFIG_DELAY_FROM_JOB_SUBMISSION_TIMESTAMP + "\") = " 
+							+ delayFromJobsubmissionString;
+					log.error( msg, ex );
+					System.out.println( msg );
+					throw new Exception( msg, ex );
+				}
 
+			}
 
 
 			String sleepTimeCheckingControlFileString = configProps.getProperty( ClientConfigPropertyNamesAndOtherConstants.CONFIG_SLEEP_TIME_CHECKING_CONTROL_FILE );

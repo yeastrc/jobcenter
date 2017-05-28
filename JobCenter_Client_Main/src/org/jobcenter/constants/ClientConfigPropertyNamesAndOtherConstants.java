@@ -17,6 +17,8 @@ public class ClientConfigPropertyNamesAndOtherConstants {
 
 	public static final String CONFIG_SLEEP_TIME_CHECKING_FOR_NEW_JOBS_NO_WORKER_THREADS = "sleep.time.checking.for.new.jobs.no.worker.threads";
 
+	public static final String CONFIG_DELAY_FROM_JOB_SUBMISSION_TIMESTAMP = "delay.from.job.submission.timestamp";
+	
 	public static final String CONFIG_SLEEP_TIME_CHECKING_CONTROL_FILE  = "sleep.time.checking.control.file";
 
 	public static final String CONFIG_LOAD_MODULES_ON_STARTUP  = "load.all.modules.on.startup";

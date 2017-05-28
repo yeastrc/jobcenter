@@ -114,11 +114,12 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 //		+     " AND ( \n";
 
 
-	private static String
-	getJobForJobRequestQuerySqlStringOrderBy
-		= " \n ) \n "
-		+ " ORDER BY job.priority , job.submit_date  \n"
-		+ " LIMIT 1 FOR UPDATE  \n" ;
+	private static String getJobForJobRequestQuerySqlStringCloseModules =
+			" \n ) \n ";
+		
+	private static String getJobForJobRequestQuerySqlStringOrderBy =
+			" ORDER BY job.priority , job.submit_date, job.id  \n"
+					+ " LIMIT 1 FOR UPDATE  \n" ;
 
 
 
@@ -199,6 +200,16 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 	        		//  was
 //	        		sql.append( "\n ( jt.module_name = ? AND jt.minimum_module_version <= ?  " );
 //	        		sql.append     ( "AND ( jt.required_execution_threads IS NULL OR jt.required_execution_threads <= ? ) ) " );
+	        	}
+	        	
+	        	sql.append( getJobForJobRequestQuerySqlStringCloseModules );
+	        	
+	        	if ( jobRequest.getDelayFromJobsubmission() != null ) {
+	        		//  Now must be > job.submit_date + DelayFromJobsubmission (in seconds)
+	        		sql.append( " AND NOW() > ADDTIME( job.submit_date, '0 0:0:" );
+	        		//  WARNING, if change DelayFromJobsubmission to String, change this to a bind variable
+	        		sql.append( Integer.toString( jobRequest.getDelayFromJobsubmission() ) );
+	        		sql.append( "' ) \n " );
 	        	}
 	        	
 	        	sql.append( getJobForJobRequestQuerySqlStringOrderBy );
