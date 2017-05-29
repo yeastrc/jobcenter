@@ -388,6 +388,18 @@ public class RetrieveClientConfiguration {
 
 
 		}
+		
+		log.warn( "Client Main Config load complete:"
+				+ "\n ClientNodeName: " + clientConfigDTO.getClientNodeName()
+				+ "\n maxConcurrentJobs: " + clientConfigDTO.getMaxConcurrentJobs()
+				+ "\n maxThreadsForModules: " + clientConfigDTO.getMaxThreadsForModules()
+				+ "\n sleepTimeCheckingForNewJobs: " + clientConfigDTO.getSleepTimeCheckingForNewJobs()
+				+ "\n sleepTimeCheckingForNewJobsNoWorkerThreads: " + clientConfigDTO.getSleepTimeCheckingForNewJobsNoWorkerThreads()
+				+ "\n delayFromJobsubmission: " + clientConfigDTO.getDelayFromJobsubmission()
+				+ "\n sleepTimeCheckingControlFile: " + clientConfigDTO.getSleepTimeCheckingControlFile()
+				+ "\n loadModulesOnStartup: " + clientConfigDTO.isLoadModulesOnStartup()
+				);
+		
 
 		RetrieveModuleConfig retrieveModuleConfig = new RetrieveModuleConfig();
 

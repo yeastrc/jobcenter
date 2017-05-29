@@ -35,3 +35,4 @@
 /deploy
 /generated_jars
 /JobCenter_Client_Module_Interface/deploy
+/JobCenter_Server_Core/classes
