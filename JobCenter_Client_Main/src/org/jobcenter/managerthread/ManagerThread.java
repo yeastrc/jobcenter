@@ -6,7 +6,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.Writer;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -272,6 +271,8 @@ public class ManagerThread extends Thread {
 			try {
 
 				replaceWorkerThreadsIfDead();
+				
+				getJobThread.checkupFromManagerThread(); // Call so getJobThread can check up on itself
 
 				if ( keepRunning && ! stopRetrievingJobs ) {
 					checkForStopProcessingJobsRequest();

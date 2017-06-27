@@ -9,6 +9,7 @@ import org.jobcenter.client.timecontrol.TimeControl;
 import org.jobcenter.config.ClientConfigDTO;
 import org.jobcenter.constants.JobStatusValuesConstants;
 import org.jobcenter.constants.RunMessageTypesConstants;
+import org.jobcenter.constants.WaitTimesForLoggingAndInterruptConstants;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RunDTO;
@@ -56,6 +57,12 @@ public class GetJobThread extends Thread  {
 
 
 	private volatile boolean exittedWaitDueToAwakenNotify = false;
+	
+	
+	/**
+	 * Set right before GetJob is called and then cleared after
+	 */
+	private volatile Long currentTimeMillisBeforeCallGetJob;
 
 
 	/**
@@ -124,6 +131,36 @@ public class GetJobThread extends Thread  {
 		}
 
 	}
+	
+	
+	
+	/**
+	 * Call From Manager Thread whenever it wakes up
+	 */
+	public void checkupFromManagerThread() {
+		interruptIfGetJobTimeExceeded();
+	}
+	
+	/**
+	 * Interrupt this thread if Get Job time Exceeded
+	 */
+	private void interruptIfGetJobTimeExceeded() {
+		
+		if ( currentTimeMillisBeforeCallGetJob == null ) {
+			// Not currently in get next job so just exit
+			return;  //  EARLY EXIT
+		}
+		long currentTimeMillis = System.currentTimeMillis();
+		long currentTimeMillisDiff = currentTimeMillis - currentTimeMillisBeforeCallGetJob;
+		
+		if ( currentTimeMillisDiff > WaitTimesForLoggingAndInterruptConstants.CLIENT_WAIT_TO_INTERRUPT_GET_NEXT_JOB_THREAD ) {
+			String msg = "Current time minus time efore call GetJob exceeds allowed time, calling interrupt on this thread."
+					+ "  currentTimeMillis: " + currentTimeMillis + ", currentTimeMillisBeforeCallGetJob: " + currentTimeMillisBeforeCallGetJob
+					+ ", difference limit: " + WaitTimesForLoggingAndInterruptConstants.CLIENT_WAIT_TO_INTERRUPT_GET_NEXT_JOB_THREAD;
+			log.error( msg );
+			this.interrupt();
+		}
+	}
 
 
 
@@ -191,9 +228,15 @@ public class GetJobThread extends Thread  {
 
 					} else {
 						
-						int availableJobCount = getAvailableJobCount();
+						try {
+							currentTimeMillisBeforeCallGetJob = System.currentTimeMillis();
 
-						getJob( availableThreadCount, availableJobCount );
+							int availableJobCount = getAvailableJobCount();
+
+							getJob( availableThreadCount, availableJobCount );
+						} finally {
+							currentTimeMillisBeforeCallGetJob = null;
+						}
 					}
 				}
 

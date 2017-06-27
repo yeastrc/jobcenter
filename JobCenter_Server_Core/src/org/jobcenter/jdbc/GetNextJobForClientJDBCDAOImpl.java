@@ -9,8 +9,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.JobStatusValuesConstants;
+import org.jobcenter.constants.WaitTimesForLoggingAndInterruptConstants;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.JobType;
+import org.jobcenter.exception.JobcenterGetNextJobTimeExceededException;
 import org.jobcenter.jdbc.JDBCBaseDAO;
 import org.jobcenter.request.JobRequest;
 import org.jobcenter.request.JobRequestModuleInfo;
@@ -125,9 +127,10 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 
 	/**
 	 * @return
+	 * @throws JobcenterGetNextJobTimeExceededException 
 	 */
 	@Override
-	public Job retrieveNextJobRecordForJobRequest( final JobRequest jobRequest )
+	public Job retrieveNextJobRecordForJobRequest( final JobRequest jobRequest ) throws JobcenterGetNextJobTimeExceededException
 	{
 
 		//  Declare array to store result in.
@@ -135,6 +138,7 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 		final Job jobResult[] = { null };
 		
 		
+		long currentTimeAtStartOfMethod = System.currentTimeMillis();
 		
 		
 		
@@ -373,6 +377,16 @@ public class GetNextJobForClientJDBCDAOImpl extends JDBCBaseDAO implements GetNe
 		
 		
 		//  Outside the call to do work, the jobResult[0] has been updated.
+
+		//  Log error if time exceeds allowed time
+		long currentTimeAtEndOfMethod = System.currentTimeMillis();
+		long currentTimeDiff = currentTimeAtEndOfMethod - currentTimeAtStartOfMethod;
+		if ( currentTimeDiff > WaitTimesForLoggingAndInterruptConstants.SERVER_LOG_GET_NEXT_JOB_EXCEEDED ) {
+			String msg = "Time for get next job exceeded allowed time (in millis): " 
+					+ WaitTimesForLoggingAndInterruptConstants.SERVER_LOG_GET_NEXT_JOB_EXCEEDED;
+			log.error( msg );
+			throw new JobcenterGetNextJobTimeExceededException( msg );
+		}
 		
     	return jobResult[0];
 		
