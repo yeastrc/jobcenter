@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <faceted-project>
-  <runtime name="com.genuitec.runtime.generic.jee50"/>
+  <runtime name="com.genuitec.runtime.generic.j2ee14"/>
   <fixed facet="jst.utility"/>
   <fixed facet="java"/>
   <installed facet="java" version="1.6"/>

@@ -2,22 +2,7 @@
     <wb-module deploy-name="JobCenter_GUI_Web_App">
         <wb-resource deploy-path="/" source-path="/WebRoot" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/resources"/>
-        <dependent-module archiveName="JobCenter_base.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_base/JobCenter_base">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="JobCenter_Client_Module_Interface.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_Client_Module_Interface/JobCenter_Client_Module_Interface">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="JobCenter_JobSubmissionClient_Interface.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_JobSubmissionClient_Interface/JobCenter_JobSubmissionClient_Interface">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="JobCenter_GUIClient.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JobCenter_GUIClient/JobCenter_GUIClient">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <property name="context-root" value="/jobcenter"/>
+        <property name="context-root" value="JobCenter_GUI_Web_App"/>
         <property name="java-output-path" value="/JobCenter_GUI_Web_App/WebRoot/WEB-INF/classes"/>
-        <property name="me-merge-utility-modules" value="true"/>
-        <property name="me-struts-base-pkg" value="org.jobcenter.struts"/>
     </wb-module>
 </project-modules>

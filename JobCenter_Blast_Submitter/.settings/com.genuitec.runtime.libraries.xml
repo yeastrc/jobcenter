@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project>
+  <disabled-container path="com.genuitec.runtime.library/com.genuitec.struts_1.1"/>
+  <disabled-container path="com.genuitec.runtime.library/com.genuitec.struts_1.2"/>
+  <disabled-container path="com.genuitec.runtime.library/com.genuitec.struts_1.3"/>
+</project>

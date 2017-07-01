@@ -7,3 +7,4 @@ performed.operation.me.install.jstl=1.0
 performed.operation.me.migrate.strutsnature=1.0
 performed.operation.me.migrate.webnature=1.0
 performed.operation.migrate.container.ids=1.0
+performed.operation.rad.disable.strutscontainers=1.0

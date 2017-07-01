@@ -1,13 +1,10 @@
 
 package org.jobcenter.struts.action;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -15,8 +12,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.jobcenter.constants.GUIWebAppConstants;
-import org.jobcenter.constants.JobStatusValuesConstants;
-import org.jobcenter.dto.Job;
 import org.jobcenter.guiclient.GUICallStatus;
 import org.jobcenter.guiclient.GUIConnectionToServerClient;
 import org.jobcenter.struts.BaseAction;
