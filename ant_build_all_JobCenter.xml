@@ -249,6 +249,9 @@ Svn-WorkingCopy-Mixed=${wc_mixed}
 		<!-- build module for running GUIClient-->
 		<ant dir="JobCenter_GUIClient" antfile="build.xml" target="clean" />
 
+		<!-- build module for running GUIClient Plain Java version-->
+		<ant dir="JobCenter_GUIClient_Default_Plain_Java" antfile="build.xml" target="clean" />
+
 		<!-- build module for running GUI_Web_App-->
 		<ant dir="JobCenter_GUI_Web_App" antfile="build.xml" target="clean" />
 
@@ -298,6 +301,9 @@ Svn-WorkingCopy-Mixed=${wc_mixed}
 
 		<!-- build module for running GUIClient-->
 		<ant dir="JobCenter_GUIClient" antfile="build.xml" />
+
+		<!-- build module for running GUIClient Plain Java version-->
+		<ant dir="JobCenter_GUIClient_Default_Plain_Java" antfile="build.xml"/>
 
 		<!-- build module for running GUI_Web_App-->
 		<ant dir="JobCenter_GUI_Web_App" antfile="build.xml" />

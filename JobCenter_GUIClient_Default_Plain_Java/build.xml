@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="US-ASCII" ?>
-<project name="JobCenter_GUI_Web_App" default="package_war" basedir="." >
+<project name="JobCenter_GUIClient_Plain_Java" default="build_jar" basedir=".">
 
   <target name="init">
     <tstamp/>
 
   	<!-- name of jar or whatever that is copied to deploy -->
-    <property name="deployablename" value="jobcenter.war" />
+    <property name="deployablename" value="jobcenter_gui_client_plain_java.jar" />
 
     <property name="src" value="src" />
-    <property name="build_dir" value="build_dir" />
     <property name="build" value="build" />
-    <property name="classeswebgui" value="build_dir/WEB-INF/classes" />
+    <property name="classes" value="classes" />
     <property name="deploy" value="deploy" />
     <property name="config" value="resources" />
     <property name="runDir" value="." />
     <property name="local" value="local" />
     <property name="remote" value="remote" />
-    <property name="libwebgui" value="build_dir/WEB-INF/lib" />
+  	<!--
+    <property name="lib" value="lib" />
+    -->
   </target>
-
 
 	<tstamp prefix="build-info">
 		<format property="current-date" pattern="d-MMMM-yyyy" locale="en" />
@@ -152,98 +152,44 @@
 <!--
 		
 		<svn username="${svn.username}" password="${svn.password}">
-			<wcVersion path="${basedir}" prefix="jobcenter."/>
+			<wcVersion path="${basedir}" prefix="ms_library."/>
 		</svn>
 		<condition property="wc_modified" else="NO" value="YES">
-  			<isset property="jobcenter.modified"/>
+  			<isset property="ms_library.modified"/>
   		</condition>
 		<condition property="wc_mixed" else="NO" value="YES">
-  			<isset property="jobcenter.mixed"/>
+  			<isset property="ms_library.mixed"/>
   		</condition>
-  		<echo message="Project is at revision ${jobcenter.revision.max-with-flags}" />
+  		<echo message="Project is at revision ${ms_library.revision.max-with-flags}" />
   		<echo message="Working copy is modifed ${wc_modified}" />
   		<echo message="Working copy is mixed ${wc_mixed}" />
 		
+-->
 		
--->		
-  			
-  			
-  			<!-- Create file "version_of_jobcenter.txt" for web app  -->
-  			
-  		<echo file="WebRoot/WEB-INF/version_of_jobcenter.txt" append="false">
-Built-By=${user.name}
-Date=${build-info.current-date} 
-Time=${build-info.current-time} 
-Svn-Repository-URL=${jobcenter.repository.url}
-Svn-Revision=${jobcenter.revision.max-with-flags}
-Svn-Revision-Range=${jobcenter.revision.range}
-Svn-WorkingCopy-Modified=${wc_modified}
-Svn-WorkingCopy-Mixed=${wc_mixed}
-  		</echo>
-  		
-  		
-  				
 	</target>
 	
 	
 	
-		
-	
+
   <target name="clean" depends="init">
-    <delete dir="${classeswebgui}" />
-  	<delete dir="${build_dir}" />
+    <delete dir="${classes}" />
     <delete dir="${deploy}" />
   </target>
 
   <target name="prepare" depends="clean">
-  	<mkdir dir="${build_dir}" />
-    <mkdir dir="${classeswebgui}" />
+    <mkdir dir="${classes}" />
     <mkdir dir="${deploy}" />
   </target>
 
   <target name="compile" depends="prepare">
-
-  	<!--   Prep Build area  -->
-
-
-  	<!--  Copy in everything under WebRoot except under 'classes' -->
-
-	<copy  todir="build_dir">
-	    <fileset dir="WebRoot">
-			<exclude name="WEB-INF/classes/**" />
-			<exclude name="META-INF/**" />
-	    </fileset>
-	</copy>
-
-  	<!--  Copy in the needed jar files generated from the source in the other projects -->
-
-	<copy file="../generated_jars/jobcenter_base.jar" todir="${libwebgui}" />
-	<copy file="../generated_jars/jobcenter_client_module_interface.jar" todir="${libwebgui}" />
-	<copy file="../generated_jars/jobcenter_jobsubmissionclient_interface.jar" todir="${libwebgui}" />
-	<copy file="../generated_jars/jobcenter_gui_client_plain_java.jar" todir="${libwebgui}" />
-
-
-	<!--  Build the Java code   -->
-  	
-  	<javac srcdir="${src}" destdir="${classeswebgui}" debug="true"  
+  	<javac srcdir="${src}" destdir="${classes}" debug="true"  
   		source="${jobcenter.java.compiler.source.version}" 
   		target="${jobcenter.java.compiler.destination.version}" 
   		encoding="${jobcenter.java.source.character.set}" >
 		<classpath refid="classpath"/>
 	</javac>
-  	
 
-
-  	<!--  Copy in the files in the 'resources' directory  -->
-
-	<copy  todir="${classeswebgui}">
-	    <fileset dir="${config}">
-	    </fileset>
-	</copy>
-
-  	<!--  Copy in the files in the 'src' directory that are not Java files -->
-
-  	<copy  todir="${classeswebgui}">
+  	<copy  todir="${classes}">
 
 	    <fileset dir="${src}">
 			<exclude name="**/*.java" />
@@ -252,71 +198,68 @@ Svn-WorkingCopy-Mixed=${wc_mixed}
 
 
 
-
-    <!-- Create the Web Archive (WAR) file -->
-  	
-  	<!--
-     <war jarfile="${deploy}/${deployablename}" webxml="build_dir/WEB-INF/web.xml" >
-    	<fileset dir="build_dir">
-
-     	</fileset>
-     </war>
-
-    <delete dir="../deploy/sample_web_GUI" />
-
-    <mkdir dir="../deploy/sample_web_GUI" />
-
-  	<copy file="${deploy}/${deployablename}" todir="../deploy/sample_web_GUI" />
-  	-->
-
   </target>
-
 	
-
-	<target name="package_war" depends="compile,svn_info"
-		description="Packages the project as a deployable war file">
-
-		<war jarfile="${deploy}/${deployablename}" webxml="build_dir/WEB-INF/web.xml">
-			<manifest>
-				<attribute name="Built-By" value="${user.name}"/>
-				<attribute name="Date" value="${build-info.current-date}" />
-				<attribute name="Time" value="${build-info.current-time}" />
-				<attribute name="Svn-Repository-URL" value="${jobcenter.repository.url}"/>
-				<attribute name="Svn-Revision" value="${jobcenter.revision.max-with-flags}"/>
-				<attribute name="Svn-Revision-Range" value="${jobcenter.revision.range}"/>
-				<attribute name="Svn-WorkingCopy-Modified" value="${wc_modified}"/>
-				<attribute name="Svn-WorkingCopy-Mixed" value="${wc_mixed}"/>
-			</manifest>			
 	
-	    	<fileset dir="build_dir">
-
-	     	</fileset>
+	<!-- ================================================================================== -->
+	<!-- Create a Manifest.MF file with the SVN info -->
+	<!-- ================================================================================== -->
+	<target name="manifest" depends="prepare">
+		<manifest file="${basedir}/MANIFEST.MF">
+			<attribute name="Built-By" value="${user.name}"/>
+			<attribute name="Date" value="${build-info.current-date}" />
+			<attribute name="Time" value="${build-info.current-time}" />
+			<attribute name="Svn-Repository-URL" value="${ms_library.repository.url}"/>
+			<attribute name="Svn-Revision" value="${ms_library.revision.max-with-flags}"/>
+			<attribute name="Svn-Revision-Range" value="${ms_library.revision.range}"/>
+			<attribute name="Svn-WorkingCopy-Modified" value="${wc_modified}"/>
+			<attribute name="Svn-WorkingCopy-Mixed" value="${wc_mixed}"/>
+		</manifest>
+	</target>	
 	
-		</war>
+	<!-- ================================================================================== -->
+	<!-- Build the jar -->
+	<!-- ================================================================================== -->
+	<target name="build_jar" depends="compile,svn_info,manifest"
+			description="Packages the project as a jar file">
 		
+		<!--
+		<delete file="${basedir}${file.separator}mslib.jar" />
+		-->
+		
+		<!-- exclude everything in the default packaage-->
+		
+		<!--
+		<jar destfile="${basedir}${file.separator}mslib.jar" 
+			basedir="${basedir}${file.separator}bin"
+			excludes="*.*" 
+			manifest="${basedir}/MANIFEST.MF">
+			
+		</jar>
+		-->
+		
+		<jar destfile="${basedir}${file.separator}${deploy}/${deployablename}" 
+			basedir="${basedir}${file.separator}${classes}"
+			manifest="${basedir}/MANIFEST.MF">
+			
+		</jar>		
 
-	    <delete dir="../deploy/sample_web_GUI" />
-
-	    <mkdir dir="../deploy/sample_web_GUI" />
-
-	  	<copy file="${deploy}/${deployablename}" todir="../deploy/sample_web_GUI" />	
+	  	<copy file="${basedir}${file.separator}${deploy}/${deployablename}" 
+	  		todir="${basedir}${file.separator}../generated_jars" />		
 		
 	</target>
-		
+	
 	
 
 	<path id="classpath">
-
-		<fileset dir="build_dir/WEB-INF/lib">
-			<include name="**/*.jar"/>
+		<fileset dir="../generated_jars/">
+			<include name="*.jar" />
 		</fileset>
-
-		<fileset dir="../AppServerJars">
-			<include name="**/*.jar"/>
+		<!--
+		<fileset dir="lib">
+			<include name="**/*.jar" />
 		</fileset>
-
+		-->
 	</path>
-
-
 
 </project>
