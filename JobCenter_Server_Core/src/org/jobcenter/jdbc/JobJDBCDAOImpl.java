@@ -2086,6 +2086,18 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 			sqlSB.append( " ) " );
 
 		}
+		
+
+		String submitter = listJobsRequest.getSubmitter();
+		if ( StringUtils.isNotEmpty( submitter ) ) {
+			if ( first ) {
+				first = false;
+				sqlSB.append( " where " );
+			} else {
+				sqlSB.append( " AND " );
+			}
+			sqlSB.append( " job.submitter = ? " );
+		}
 
 		if ( ! getCount ) {
 
@@ -2123,6 +2135,11 @@ public class JobJDBCDAOImpl extends JDBCBaseDAO implements JobJDBCDAO {
 				paramCounter++;
 				pstmt.setString( paramCounter,  requestTypeName  );
 			}
+		}
+		
+		if ( StringUtils.isNotEmpty( submitter ) ) {
+			paramCounter++;
+			pstmt.setString( paramCounter,  submitter  );
 		}
 
 

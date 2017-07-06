@@ -5,7 +5,7 @@ BODY    {
                 background-color: #FFFFFF;
                 color: #000000;
                 font-family: verdana, helvetica, arial;
-                font-size:8pt;
+                font-size:10pt;
                 font-style:normal;
                 font-weight:500;
         }
@@ -33,6 +33,33 @@ INPUT.button {
 	color:#FFFFFF;
 }
 
+label:hover { background-color: #CCCCCC }
+
+
+/*
+		These pages have special settings on the *-outer-container to lock the footer to the bottom of the page
+*/
+
+	/*  Whole Page level  */
+
+body.jobcenter-page-main .jobcenter-page-main-outermost-div { /*  lock the footer to the bottom of the page */	min-height:100%; position:relative; }
+
+body.jobcenter-page-main .project-text-link { font-size: 12px; text-decoration: none; color: black; font-weight: bold; opacity:0.7;filter:alpha(opacity=70);  }
+
+.table-no-border-no-cell-spacing-no-cell-padding { border-width:0px; padding: 0px; border-spacing : 0px; }
+
+.table-no-border-no-cell-spacing-no-cell-padding tbody, 
+.table-no-border-no-cell-spacing-no-cell-padding tr, 
+.table-no-border-no-cell-spacing-no-cell-padding th, 
+.table-no-border-no-cell-spacing-no-cell-padding td,
+tr.table-no-border-no-cell-spacing-no-cell-padding, 
+td.table-no-border-no-cell-spacing-no-cell-padding { padding-top: 0px; padding-bottom: 0px; border-spacing : 0px; }
+		
+tr.table-no-border-no-cell-spacing-no-cell-padding, .table-no-border-no-cell-spacing-no-cell-padding , .table-no-border-no-cell-spacing-no-cell-padding td {
+	padding-top: 0px; padding-bottom: 0px;
+	border-spacing : 0px;
+}
+					
 
 .contentbold {
 

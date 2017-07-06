@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.*;
 import org.jobcenter.constants.GUIWebAppConstants;
+import org.jobcenter.gui_connection_to_server_client_factory.GUIConnectionToServerClientFactory;
 import org.jobcenter.guiclient.GUICallStatus;
 import org.jobcenter.guiclient.GUIConnectionToServerClient;
 import org.jobcenter.struts.BaseAction;
@@ -62,13 +63,8 @@ public class UpdateJobPriorityAction extends BaseAction {
 			
 			if ( jobId > 0 && newPriority > 0 ) {
 
-				GUIConnectionToServerClient connToServer = null;
-
 				try {
-
-					connToServer = new GUIConnectionToServerClient();
-
-					connToServer.init( GUIWebAppConstants.URL_TO_SERVER );
+					GUIConnectionToServerClient connToServer = GUIConnectionToServerClientFactory.getInstance().getGUIConnectionToServerClient();
 					
 					//  To not enforce dbRecordVersionNumber, pass null instead
 
@@ -106,14 +102,6 @@ public class UpdateJobPriorityAction extends BaseAction {
 
 
 				} finally {
-
-					if ( connToServer != null ) {
-						try {
-							connToServer.destroy();
-						} catch (Throwable ex) {
-
-						}
-					}
 				}
 
 			}

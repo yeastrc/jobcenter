@@ -13,18 +13,31 @@
   </form-beans>
 
   <global-exceptions />
-  <global-forwards />
+  
+  
+  <global-forwards>
+  		<forward name="welcome" path="/home.do" redirect="false" />
+  </global-forwards>
+  
   <action-mappings >
-    <action
-      name="listJobsForm"
-      path="/listJobs"
-      scope="request"
-      type="org.jobcenter.struts.action.ListJobsAction"
-      validate="true">
-      <set-property property="cancellable" value="true" />
-      <forward name="success" path="def.template.listJobs" />
-    </action>
+  
 
+	<action
+	   path="/home"
+	   forward="/WEB-INF/jsp/home.jsp">
+	</action>		
+	  
+	<action
+	   path="/listJobs"
+	   forward="/WEB-INF/jsp/listJobs.jsp">
+	</action>		
+	
+	<action
+	   path="/viewJob"
+	   forward="/WEB-INF/jsp/viewJob.jsp">
+	</action>		
+	
+		
     <action
       name="listRequestsForm"
       path="/listRequests"
@@ -40,15 +53,7 @@
       <set-property property="cancellable" value="true" />
       <forward name="success" path="def.template.listNodes" />
     </action>
-    <action
-      name="viewJobForm"
-      path="/viewJob"
-      scope="request"
-      type="org.jobcenter.struts.action.ViewJobAction"
-      validate="false">
-      <set-property property="cancellable" value="true" />
-      <forward name="success" path="def.template.viewJob" />
-    </action>
+
     <action
       name="viewRunForm"
       path="/viewRun"

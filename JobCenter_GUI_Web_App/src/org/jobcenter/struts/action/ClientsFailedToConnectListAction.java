@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -20,7 +19,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.jobcenter.constants.ClientStatusUpdateTypeEnum;
-import org.jobcenter.constants.GUIWebAppConstants;
+import org.jobcenter.gui_connection_to_server_client_factory.GUIConnectionToServerClientFactory;
 import org.jobcenter.guiclient.GUIConnectionToServerClient;
 import org.jobcenter.nondbdto.ClientConnectedDTO;
 import org.jobcenter.nondbdto.ClientIdentifierDTO;
@@ -53,9 +52,7 @@ public class ClientsFailedToConnectListAction extends BaseAction {
 
 		try {
 
-			connToServer = new GUIConnectionToServerClient();
-
-			connToServer.init( GUIWebAppConstants.URL_TO_SERVER );
+			connToServer = GUIConnectionToServerClientFactory.getInstance().getGUIConnectionToServerClient();
 
 			List<ClientConnectedDTO> clientsConnectedList = connToServer.retrieveClientsFailedToConnectTrackingList();
 			
@@ -111,17 +108,6 @@ public class ClientsFailedToConnectListAction extends BaseAction {
 
 		} finally {
 
-			if ( connToServer != null ) {
-
-				try {
-
-					connToServer.destroy();
-
-				} catch (Throwable ex) {
-
-					log.error( " Exception calling connToServer.destroy(): " + ex.getMessage(), ex );
-				}
-			}
 		}
 
 

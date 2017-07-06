@@ -2,6 +2,10 @@
     <wb-module deploy-name="JobCenter_GUI_Web_App">
         <wb-resource deploy-path="/" source-path="/WebRoot" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src_JobCenter_GUIClient_Default_Plain_Java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src_JobCenter_base"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/resources__Local_Config_Only"/>
         <property name="context-root" value="JobCenter_GUI_Web_App"/>
         <property name="java-output-path" value="/JobCenter_GUI_Web_App/WebRoot/WEB-INF/classes"/>
     </wb-module>

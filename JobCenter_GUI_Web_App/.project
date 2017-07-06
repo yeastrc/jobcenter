@@ -33,4 +33,27 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src-2</name>
+			<type>2</type>
+			<location>/data/code_checkouts/Github/Jobcenter_Checkout/jobcenter/JobCenter_base/src</location>
+		</link>
+		<link>
+			<name>src_JobCenter_GUIClient_Default_Plain_Java</name>
+			<type>2</type>
+			<locationURI>GIT_Clone_HOME/JobCenter_GUIClient_Default_Plain_Java/src</locationURI>
+		</link>
+		<link>
+			<name>src_JobCenter_base</name>
+			<type>2</type>
+			<locationURI>GIT_Clone_HOME/JobCenter_base/src</locationURI>
+		</link>
+	</linkedResources>
+	<variableList>
+		<variable>
+			<name>GIT_Clone_HOME</name>
+			<value>file:/data/code_checkouts/Github/Jobcenter_Checkout/jobcenter</value>
+		</variable>
+	</variableList>
 </projectDescription>

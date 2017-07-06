@@ -3,7 +3,10 @@ package org.jobcenter.listener;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import org.jobcenter.constants.GUIWebAppConstants;
+import org.jobcenter.config_property_files.JobcenterGUIConfigPropertyFileContents;
+import org.jobcenter.config_property_files.ServerConnectionConfigPropertyFileContents;
+import org.jobcenter.constants.WebConstants;
+import org.jobcenter.gui_connection_to_server_client_factory.GUIConnectionToServerClientFactory;
 
 
 public class ServletContextAppListener extends HttpServlet implements ServletContextListener {
@@ -23,9 +26,36 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 
 		String contextPath = context.getContextPath();
 
-		context.setAttribute( "contextPath", contextPath );
+		context.setAttribute( WebConstants.APP_CONTEXT_CONTEXT_PATH, contextPath );
 		
-		context.setAttribute( "serverURL", GUIWebAppConstants.URL_TO_SERVER );
+		
+		JobcenterGUIConfigPropertyFileContents jobcenterGUIConfigPropertyFileContents = 
+				JobcenterGUIConfigPropertyFileContents.getInstance();
+		try {
+			jobcenterGUIConfigPropertyFileContents.init();
+		} catch ( Exception e ) {
+			throw new RuntimeException( e );
+		}
+		
+		ServerConnectionConfigPropertyFileContents serverConnectionConfigPropertyFileContents =
+				ServerConnectionConfigPropertyFileContents.getInstance();
+		
+		try {
+			serverConnectionConfigPropertyFileContents.init();
+		} catch ( Exception e ) {
+			throw new RuntimeException( e );
+		}
+		
+		try {
+			GUIConnectionToServerClientFactory.getInstance().init();
+		} catch ( Exception e ) {
+			throw new RuntimeException( e );
+		}
+
+		context.setAttribute( WebConstants.APP_CONTEXT_SERVER_URL, serverConnectionConfigPropertyFileContents.getJobcenterServerURL() );
+		
+		context.setAttribute( WebConstants.APP_CONTEXT_CONFIG_OBJECT, jobcenterGUIConfigPropertyFileContents );
+		
 	}
 
 	/* (non-Javadoc)
@@ -35,6 +65,7 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 
 		ServletContext context = event.getServletContext();
 
+		GUIConnectionToServerClientFactory.getInstance().destroyGUIConnectionToServerClient();
 
 	}
 }

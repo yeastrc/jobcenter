@@ -16,10 +16,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.jobcenter.constants.GUIWebAppConstants;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.RunDTO;
 import org.jobcenter.dto.RunMessageDTO;
+import org.jobcenter.gui_connection_to_server_client_factory.GUIConnectionToServerClientFactory;
 import org.jobcenter.guiclient.GUIConnectionToServerClient;
 import org.jobcenter.struts.BaseAction;
 import org.jobcenter.struts.form.ViewJobForm;
@@ -49,14 +49,8 @@ public class ViewJobAction extends  BaseAction  {
 
 			if ( jobId > 0 ) {
 
-
-				GUIConnectionToServerClient connToServer = null;
-
 				try {
-
-					connToServer = new GUIConnectionToServerClient();
-
-					connToServer.init( GUIWebAppConstants.URL_TO_SERVER );
+					GUIConnectionToServerClient connToServer = GUIConnectionToServerClientFactory.getInstance().getGUIConnectionToServerClient();
 
 					Job job = connToServer.viewJob( jobId );
 					
@@ -97,14 +91,6 @@ public class ViewJobAction extends  BaseAction  {
 
 
 				} finally {
-
-					if ( connToServer != null ) {
-						try {
-							connToServer.destroy();
-						} catch (Throwable ex) {
-
-						}
-					}
 				}
 			}
 

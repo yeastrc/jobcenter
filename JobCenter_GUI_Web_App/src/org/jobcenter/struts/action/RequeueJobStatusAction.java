@@ -11,7 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.jobcenter.constants.GUIWebAppConstants;
+import org.jobcenter.gui_connection_to_server_client_factory.GUIConnectionToServerClientFactory;
 import org.jobcenter.guiclient.GUICallStatus;
 import org.jobcenter.guiclient.GUIConnectionToServerClient;
 import org.jobcenter.struts.BaseAction;
@@ -47,15 +47,9 @@ public class RequeueJobStatusAction extends BaseAction {
 			int dbRecordVersionNumber = updateJobStatusForm.getJobRecordVersionId();
 
 			if ( jobId > 0 ) {
-
-				GUIConnectionToServerClient connToServer = null;
-
 				try {
-
-					connToServer = new GUIConnectionToServerClient();
-
-					connToServer.init( GUIWebAppConstants.URL_TO_SERVER );
-
+					GUIConnectionToServerClient connToServer = GUIConnectionToServerClientFactory.getInstance().getGUIConnectionToServerClient();
+					
 					//  To not enforce dbRecordVersionNumber, pass null instead
 
 					GUICallStatus status = connToServer.requeueJob( jobId, dbRecordVersionNumber );
@@ -102,13 +96,6 @@ public class RequeueJobStatusAction extends BaseAction {
 
 				} finally {
 
-					if ( connToServer != null ) {
-						try {
-							connToServer.destroy();
-						} catch (Throwable ex) {
-
-						}
-					}
 				}
 
 			}

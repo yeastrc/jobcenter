@@ -1,8 +1,6 @@
 
 package org.jobcenter.struts.action;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,7 +8,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -18,12 +16,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.jobcenter.constants.GUIWebAppConstants;
 import org.jobcenter.dto.Job;
 import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RequestTypeDTO;
-import org.jobcenter.dto.RunDTO;
-import org.jobcenter.dto.RunMessageDTO;
+import org.jobcenter.gui_connection_to_server_client_factory.GUIConnectionToServerClientFactory;
 import org.jobcenter.guiclient.GUIConnectionToServerClient;
 import org.jobcenter.guiclient.response.GUIListJobsResponse;
 import org.jobcenter.struts.BaseAction;
@@ -52,9 +48,7 @@ public class ListJobsAction extends  BaseAction  {
 			
 			ListJobsForm form = (ListJobsForm) actionForm;
 
-			connToServer = new GUIConnectionToServerClient();
-
-			connToServer.init( GUIWebAppConstants.URL_TO_SERVER );
+			connToServer = GUIConnectionToServerClientFactory.getInstance().getGUIConnectionToServerClient();
 
 			Integer requestId = null;
 			String submitter = null;
@@ -168,17 +162,6 @@ public class ListJobsAction extends  BaseAction  {
 
 		} finally {
 
-			if ( connToServer != null ) {
-
-				try {
-
-					connToServer.destroy();
-
-				} catch (Throwable ex) {
-
-					log.error( "ListJobsAction: Exception calling connToServer.destroy(): " + ex.getMessage(), ex );
-				}
-			}
 		}
 
 		String forwardTo = "success";
