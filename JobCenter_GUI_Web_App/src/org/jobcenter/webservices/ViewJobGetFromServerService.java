@@ -1,5 +1,9 @@
 package org.jobcenter.webservices;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,6 +17,8 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.jobcenter.constants.WebServiceErrorMessageConstants;
 import org.jobcenter.dto.Job;
+import org.jobcenter.dto.RunDTO;
+import org.jobcenter.dto.RunMessageDTO;
 import org.jobcenter.gui_connection_to_server_client_factory.GUIConnectionToServerClientFactory;
 import org.jobcenter.guiclient.GUIConnectionToServerClient;
 import org.jobcenter.utils.GetJobForGUIFromJobFromServer;
@@ -51,6 +57,26 @@ public class ViewJobGetFromServerService {
 				= connToServer.viewJob( jobId );
 
 			if ( jobFromServer != null ) {
+				
+				// put the messages in id order
+				List<RunDTO> allRuns = jobFromServer.getAllRuns();
+				//  This solution for sorting only works if paging is not required
+				if ( allRuns != null && ( ! allRuns.isEmpty() ) ) {
+					Collections.sort( allRuns, new RunDTO.ReverseSortByStartDateComparator() );
+					for ( RunDTO runDTO : allRuns ) {
+						List<RunMessageDTO> runMessages = runDTO.getRunMessages();
+						if ( runMessages != null  ) {
+							// put the messages in id order
+							Collections.sort( runMessages, new Comparator<RunMessageDTO>() {
+								@Override
+								public int compare(RunMessageDTO o1, RunMessageDTO o2) {
+									return o1.getId() - o2.getId();
+								}  
+							} );
+						}				
+					}
+				}
+				
 				JobForGUI jobForGUI = 
 						GetJobForGUIFromJobFromServer.getInstance()
 						.getJobForGUIFromJobFromServer( jobFromServer, GetJobForGUIFromJobFromServer.PopulateRuns.YES );
