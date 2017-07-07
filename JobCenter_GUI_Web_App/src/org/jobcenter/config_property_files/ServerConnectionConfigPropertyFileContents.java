@@ -21,6 +21,7 @@ public class ServerConnectionConfigPropertyFileContents {
 
 	private static String PROPERTY_NAME__JOBCENTER_SERVER_URL = "jobcenter.server.url";
 
+	private static String PROPERTY_NAME__JOBCENTER_GUI_CLIENT_NODE_NAME = "jobcenter.gui.client.node.name";
 	
 	private static final ServerConnectionConfigPropertyFileContents instance = new ServerConnectionConfigPropertyFileContents();
 	
@@ -29,6 +30,7 @@ public class ServerConnectionConfigPropertyFileContents {
 	}
 	
 	private String jobcenterServerURL;
+	private String guiClientNodeName;
 	
 	/**
 	 * @throws Exception
@@ -58,12 +60,27 @@ public class ServerConnectionConfigPropertyFileContents {
 //				throw new JobcenterGUIConfigException( msg );
 			}
 			Properties configProps = new Properties();
+
+			log.warn( "INFO: Starting reading configuration from file: " + CONFIG_FILENAME );
+
 			configProps.load(propertiesFileAsStream);
 			String propertyValue = null;
+			
 			propertyValue = configProps.getProperty( PROPERTY_NAME__JOBCENTER_SERVER_URL );
 			if ( StringUtils.isNotEmpty( propertyValue ) ) {
 				jobcenterServerURL = propertyValue;
+				log.warn( "INFO:  property '" + PROPERTY_NAME__JOBCENTER_SERVER_URL 
+						+ "' has value: " + propertyValue );
 			}
+			propertyValue = configProps.getProperty( PROPERTY_NAME__JOBCENTER_GUI_CLIENT_NODE_NAME );
+			if ( StringUtils.isNotEmpty( propertyValue ) ) {
+				guiClientNodeName = propertyValue;
+				log.warn( "INFO:  property '" + PROPERTY_NAME__JOBCENTER_GUI_CLIENT_NODE_NAME 
+						+ "' has value: " + propertyValue );
+			}
+
+			log.warn( "INFO: Finished reading configuration from file: " + CONFIG_FILENAME );
+			
 		} catch ( RuntimeException e ) {
 			log.error( "Error processing Properties file '" + CONFIG_FILENAME + "', exception: " + e.toString(), e );
 			throw e;
@@ -77,6 +94,10 @@ public class ServerConnectionConfigPropertyFileContents {
 
 	public String getJobcenterServerURL() {
 		return jobcenterServerURL;
+	}
+
+	public String getGuiClientNodeName() {
+		return guiClientNodeName;
 	}
 	
 }

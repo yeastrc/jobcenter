@@ -301,6 +301,7 @@ public class GUIConnectionToServerClient {
 
 			String msg = "Retrieval of list of jobs failed.  Error code = " + listJobsResponse.getErrorCode() + ", error code desc = " + listJobsResponse.getErrorCodeDescription()
 				+ ", the client's IP address as seen by the server = " + listJobsResponse.getClientIPAddressAtServer()
+				+ ", the node name sent to the server: " + guiNodeName
 				+ "\n  requestTypeNames = " + requestTypeNamesString + ", requestId = " + requestId + ", jobTypeName = " + jobTypeNamesString + ".";
 
 //			log.error( msg );
@@ -409,6 +410,7 @@ public class GUIConnectionToServerClient {
 
 			String msg = "Retrieval of list of requests failed.  Error code = " + listRequestsResponse.getErrorCode() + ", error code desc = " + listRequestsResponse.getErrorCodeDescription()
 				+ ", the client's IP address as seen by the server = " + listRequestsResponse.getClientIPAddressAtServer()
+				+ ", the node name sent to the server: " + guiNodeName
 				+ "\n  requestTypeName = |" + requestTypeName + "|, requestId = " + requestId + ", jobTypeName = |" + jobTypeName + "|.";
 
 //			log.error( msg );
@@ -480,6 +482,7 @@ public class GUIConnectionToServerClient {
 
 			String msg = "Retrieval of job failed.  Error code = " + viewJobResponse.getErrorCode() + ", error code desc = " + viewJobResponse.getErrorCodeDescription()
 				+ ", the client's IP address as seen by the server = " + viewJobResponse.getClientIPAddressAtServer()
+				+ ", the node name sent to the server: " + guiNodeName
 				+ "\n  job id = |" + jobId + "|.";
 
 //			log.error( msg );
@@ -645,6 +648,7 @@ public class GUIConnectionToServerClient {
 			} else {
 				String msg = "Requeue of job failed.  Error code = " + requeueJobResponse.getErrorCode() + ", error code desc = " + requeueJobResponse.getErrorCodeDescription()
 					+ ", the client's IP address as seen by the server = " + requeueJobResponse.getClientIPAddressAtServer()
+					+ ", the node name sent to the server: " + guiNodeName
 				+ "\n  job id = |" + jobId + "|.";
 
 //				log.error( msg );
@@ -739,6 +743,7 @@ public class GUIConnectionToServerClient {
 			} else {
 				String msg = "Cancel of job failed.  Error code = " + cancelJobResponse.getErrorCode() + ", error code desc = " + cancelJobResponse.getErrorCodeDescription()
 					+ ", the client's IP address as seen by the server = " + cancelJobResponse.getClientIPAddressAtServer()
+					+ ", the node name sent to the server: " + guiNodeName
 					+ "\n  job id = |" + jobId + "|.";
 
 //				log.error( msg );
@@ -830,6 +835,7 @@ public class GUIConnectionToServerClient {
 
 				String msg = "Update of job priority failed.  Error code = " + jobChangePriorityResponse.getErrorCode() + ", error code desc = " + jobChangePriorityResponse.getErrorCodeDescription()
 					+ ", the client's IP address as seen by the server = " + jobChangePriorityResponse.getClientIPAddressAtServer()
+					+ ", the node name sent to the server: " + guiNodeName
 				+ "\n  job id = |" + jobId + "|.";
 
 //				log.error( msg );
@@ -906,7 +912,8 @@ public class GUIConnectionToServerClient {
 		if ( listJobTypesResponse.isErrorResponse() ) {
 
 			String msg = "Retrieval of job types failed.  Error code = " + listJobTypesResponse.getErrorCode() + ", error code desc = " + listJobTypesResponse.getErrorCodeDescription()
-			+ ", the client's IP address as seen by the server = " + listJobTypesResponse.getClientIPAddressAtServer();
+			+ ", the client's IP address as seen by the server = " + listJobTypesResponse.getClientIPAddressAtServer()
+			+ ", the node name sent to the server: " + guiNodeName;
 
 //			log.error( msg );
 
@@ -971,7 +978,8 @@ public class GUIConnectionToServerClient {
 		if ( listRequestTypesResponse.isErrorResponse() ) {
 
 			String msg = "Retrieval of request types failed.  Error code = " + listRequestTypesResponse.getErrorCode() + ", error code desc = " + listRequestTypesResponse.getErrorCodeDescription()
-							+ ", the client's IP address as seen by the server = " + listRequestTypesResponse.getClientIPAddressAtServer();
+							+ ", the client's IP address as seen by the server = " + listRequestTypesResponse.getClientIPAddressAtServer()
+							+ ", the node name sent to the server: " + guiNodeName;
 
 //			log.error( msg );
 
@@ -1037,7 +1045,8 @@ public class GUIConnectionToServerClient {
 		if ( listClientsStatusResponse.isErrorResponse() ) {
 
 			String msg = "Retrieval of clients status failed.  Error code = " + listClientsStatusResponse.getErrorCode() + ", error code desc = " + listClientsStatusResponse.getErrorCodeDescription()
-							+ ", the client's IP address as seen by the server = " + listClientsStatusResponse.getClientIPAddressAtServer();
+							+ ", the client's IP address as seen by the server = " + listClientsStatusResponse.getClientIPAddressAtServer()
+							+ ", the node name sent to the server: " + guiNodeName;
 
 //			log.error( msg );
 
@@ -1103,7 +1112,8 @@ public class GUIConnectionToServerClient {
 		if ( getClientsConnectedListResponse.isErrorResponse() ) {
 
 			String msg = "Retrieval of clients connected failed.  Error code = " + getClientsConnectedListResponse.getErrorCode() + ", error code desc = " + getClientsConnectedListResponse.getErrorCodeDescription()
-							+ ", the client's IP address as seen by the server = " + getClientsConnectedListResponse.getClientIPAddressAtServer() ;
+							+ ", the client's IP address as seen by the server = " + getClientsConnectedListResponse.getClientIPAddressAtServer()
+							+ ", the node name sent to the server: " + guiNodeName ;
 
 //			log.error( msg );
 
@@ -1167,7 +1177,8 @@ public class GUIConnectionToServerClient {
 		if ( getClientsConnectedListResponse.isErrorResponse() ) {
 
 			String msg = "Retrieval of clients connected failed.  Error code = " + getClientsConnectedListResponse.getErrorCode() + ", error code desc = " + getClientsConnectedListResponse.getErrorCodeDescription()
-							+ ", the client's IP address as seen by the server = " + getClientsConnectedListResponse.getClientIPAddressAtServer();
+							+ ", the client's IP address as seen by the server = " + getClientsConnectedListResponse.getClientIPAddressAtServer()
+							+ ", the node name sent to the server: " + guiNodeName;
 
 //			log.error( msg );
 
@@ -1233,7 +1244,8 @@ public class GUIConnectionToServerClient {
 		if ( getClientsConnectedListResponse.isErrorResponse() ) {
 
 			String msg = "Retrieval of clients connected failed.  Error code = " + getClientsConnectedListResponse.getErrorCode() + ", error code desc = " + getClientsConnectedListResponse.getErrorCodeDescription()
-							+ ", the client's IP address as seen by the server = " + getClientsConnectedListResponse.getClientIPAddressAtServer();
+							+ ", the client's IP address as seen by the server = " + getClientsConnectedListResponse.getClientIPAddressAtServer()
+							+ ", the node name sent to the server: " + guiNodeName;
 
 //			log.error( msg );
 

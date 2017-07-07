@@ -39,6 +39,10 @@ public class GUIConnectionToServerClientFactory {
 			}
 			guiConnectionToServerClient = new GUIConnectionToServerClient();
 			guiConnectionToServerClient.init( jobcenterServerURL );
+			String guiClientNodeNameInConfig = ServerConnectionConfigPropertyFileContents.getInstance().getGuiClientNodeName();
+			if ( StringUtils.isNotEmpty( guiClientNodeNameInConfig ) ) {
+				guiConnectionToServerClient.setNodeName( guiClientNodeNameInConfig );
+			}
 		} catch ( Exception e ) {
 			String msg = "Failed to init GUIConnectionToServerClient.";
 			log.error( msg, e );

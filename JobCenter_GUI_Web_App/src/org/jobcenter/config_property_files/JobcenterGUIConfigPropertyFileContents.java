@@ -85,7 +85,7 @@ public class JobcenterGUIConfigPropertyFileContents {
 //				throw new JobcenterGUIConfigException( msg );
 			}
 
-			log.warn( "Starting loading configuration from file: " + CONFIG_FILENAME );
+			log.warn( "INFO: Starting reading configuration from file: " + CONFIG_FILENAME );
 
 			Properties configProps = new Properties();
 			configProps.load(propertiesFileAsStream);
@@ -178,7 +178,7 @@ public class JobcenterGUIConfigPropertyFileContents {
 				}
 				jobTypeNamesAllowed = Collections.unmodifiableSet( jobTypesAllowedLocal );
 				
-				log.warn( "Job Types allowed: " + jobTypeNamesAllowed );
+				log.warn( "INFO: Job Types allowed: " + jobTypeNamesAllowed );
 			}
 
 			propertyValue = configProps.getProperty( PROPERTY_NAME__REQUEST_TYPES_ALLOWED );
@@ -190,10 +190,10 @@ public class JobcenterGUIConfigPropertyFileContents {
 				}
 				requestTypeNamesAllowed = Collections.unmodifiableSet( requestTypesAllowedLocal );
 
-				log.warn( "Request Types allowed: " + requestTypeNamesAllowed );
+				log.warn( "INFO: Request Types allowed: " + requestTypeNamesAllowed );
 			}
 
-			log.warn( "Finished loading configuration from file: " + CONFIG_FILENAME );
+			log.warn( "INFO: Finished reading configuration from file: " + CONFIG_FILENAME );
 					
 		} catch ( RuntimeException e ) {
 			log.error( "Error processing Properties file '" + CONFIG_FILENAME + "', exception: " + e.toString(), e );
