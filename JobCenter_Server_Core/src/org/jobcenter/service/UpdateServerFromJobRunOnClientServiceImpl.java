@@ -15,11 +15,13 @@ import org.jobcenter.dao.JobDAO;
 import org.jobcenter.dao.RunDAO;
 import org.jobcenter.dao.StatusDAO;
 import org.jobcenter.dto.Job;
+import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RunDTO;
 import org.jobcenter.dto.RunMessageDTO;
 import org.jobcenter.dto.StatusDTO;
 import org.jobcenter.internalservice.ClientNodeNameCheck;
 import org.jobcenter.internalservice.GetValueFromConfigService;
+import org.jobcenter.internalservice.SendEmailOnJobRunFail_MaxOncePer24hours_Service;
 import org.jobcenter.jdbc.JobJDBCDAO;
 import org.jobcenter.request.UpdateServerFromJobRunOnClientRequest;
 import org.jobcenter.response.UpdateServerFromJobRunOnClientResponse;
@@ -61,6 +63,7 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 
 	private ClientNodeNameCheck clientNodeNameCheck;
 	private GetValueFromConfigService getValueFromConfigService;
+	private SendEmailOnJobRunFail_MaxOncePer24hours_Service sendEmailOnJobRunFail_MaxOncePer24hours_Service;
 
 	
 	public ClientNodeNameCheck getClientNodeNameCheck() {
@@ -76,6 +79,14 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 			GetValueFromConfigService getValueFromConfigService) {
 		this.getValueFromConfigService = getValueFromConfigService;
 	}
+	public SendEmailOnJobRunFail_MaxOncePer24hours_Service getSendEmailOnJobRunFail_MaxOncePer24hours_Service() {
+		return sendEmailOnJobRunFail_MaxOncePer24hours_Service;
+	}
+	public void setSendEmailOnJobRunFail_MaxOncePer24hours_Service(
+			SendEmailOnJobRunFail_MaxOncePer24hours_Service sendEmailOnJobRunFail_MaxOncePer24hours_Service) {
+		this.sendEmailOnJobRunFail_MaxOncePer24hours_Service = sendEmailOnJobRunFail_MaxOncePer24hours_Service;
+	}
+
 
 	//  DAO
 
@@ -241,6 +252,20 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 					job.setDelayJobUntil( delayJobUntil );
 				}
 			}
+			
+			JobType jobType = job.getJobType();
+			
+			if ( jobType == null ) {
+				String msg = "job.getJobType() is null";
+				log.error( msg );
+				throw new RuntimeException(msg);
+			}
+			
+			if ( newStatusIdForJob == JobStatusValuesConstants.JOB_STATUS_HARD_ERROR ) {
+				
+				sendEmailOnJobRunFail_MaxOncePer24hours_Service.sendEmailOnJobRunFailed( jobType );
+			}
+			
 
 			StatusDTO newStatus = statusDAO.findById( newStatusIdForJob );
 
@@ -316,7 +341,6 @@ public class UpdateServerFromJobRunOnClientServiceImpl implements UpdateServerFr
 
 		return updateServerFromJobRunOnClientResponse;
 	}
-
 
 
 

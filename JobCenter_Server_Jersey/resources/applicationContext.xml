@@ -319,6 +319,9 @@
 		<property name="getValueFromConfigService">
 			<ref bean="getValueFromConfigService" />
 		</property>
+		<property name="sendEmailOnJobRunFail_MaxOncePer24hours_Service">
+			<ref bean="sendEmailOnJobRunFail_MaxOncePer24hours_Service" />
+		</property>
 
 		<property name="jobDAO">
 			<ref bean="jobDAO" />
@@ -730,9 +733,21 @@
 		<property name="getMailConfig">
 			<ref bean="getMailConfig" />
 		</property>
-		
-		
 	</bean>
+	
+
+
+	<bean id="sendEmailOnJobRunFail_MaxOncePer24hours_Service" class="org.jobcenter.internalservice.SendEmailOnJobRunFail_MaxOncePer24hours_ServiceImpl">
+
+		<property name="sendEmailService">
+			<ref bean="sendEmailService" />
+		</property>
+		<property name="getMailConfig">
+			<ref bean="getMailConfig" />
+		</property>
+	</bean>
+	
+		
 
 	<bean id="sendEmailService" class="org.jobcenter.internalservice.SendEmailServiceImpl">
 	</bean>
