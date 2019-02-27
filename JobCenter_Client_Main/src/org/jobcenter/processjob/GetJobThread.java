@@ -59,10 +59,12 @@ public class GetJobThread extends Thread  {
 	private volatile boolean exittedWaitDueToAwakenNotify = false;
 	
 	
+	private final long currentTimeMillisBeforeCallGetJob_NOTSET = 0;
+	
 	/**
 	 * Set right before GetJob is called and then cleared after
 	 */
-	private volatile Long currentTimeMillisBeforeCallGetJob;
+	private volatile long currentTimeMillisBeforeCallGetJob = currentTimeMillisBeforeCallGetJob_NOTSET;
 
 
 	/**
@@ -146,7 +148,7 @@ public class GetJobThread extends Thread  {
 	 */
 	private void interruptIfGetJobTimeExceeded() {
 		
-		if ( currentTimeMillisBeforeCallGetJob == null ) {
+		if ( currentTimeMillisBeforeCallGetJob == currentTimeMillisBeforeCallGetJob_NOTSET ) {
 			// Not currently in get next job so just exit
 			return;  //  EARLY EXIT
 		}
@@ -154,7 +156,7 @@ public class GetJobThread extends Thread  {
 		long currentTimeMillisDiff = currentTimeMillis - currentTimeMillisBeforeCallGetJob;
 		
 		if ( currentTimeMillisDiff > WaitTimesForLoggingAndInterruptConstants.CLIENT_WAIT_TO_INTERRUPT_GET_NEXT_JOB_THREAD ) {
-			String msg = "Current time minus time efore call GetJob exceeds allowed time, calling interrupt on this thread."
+			String msg = "Current time minus time before call GetJob exceeds allowed time, calling interrupt on this thread."
 					+ "  currentTimeMillis: " + currentTimeMillis + ", currentTimeMillisBeforeCallGetJob: " + currentTimeMillisBeforeCallGetJob
 					+ ", difference limit: " + WaitTimesForLoggingAndInterruptConstants.CLIENT_WAIT_TO_INTERRUPT_GET_NEXT_JOB_THREAD;
 			log.error( msg );
@@ -235,7 +237,7 @@ public class GetJobThread extends Thread  {
 
 							getJob( availableThreadCount, availableJobCount );
 						} finally {
-							currentTimeMillisBeforeCallGetJob = null;
+							currentTimeMillisBeforeCallGetJob = currentTimeMillisBeforeCallGetJob_NOTSET;
 						}
 					}
 				}
