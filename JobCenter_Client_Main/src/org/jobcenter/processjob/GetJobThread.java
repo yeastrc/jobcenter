@@ -158,6 +158,7 @@ public class GetJobThread extends Thread  {
 		if ( currentTimeMillisDiff > WaitTimesForLoggingAndInterruptConstants.CLIENT_WAIT_TO_INTERRUPT_GET_NEXT_JOB_THREAD ) {
 			String msg = "Current time minus time before call GetJob exceeds allowed time, calling interrupt on this thread."
 					+ "  currentTimeMillis: " + currentTimeMillis + ", currentTimeMillisBeforeCallGetJob: " + currentTimeMillisBeforeCallGetJob
+					+ ", currentTimeMillisDiff: " + currentTimeMillisDiff
 					+ ", difference limit: " + WaitTimesForLoggingAndInterruptConstants.CLIENT_WAIT_TO_INTERRUPT_GET_NEXT_JOB_THREAD;
 			log.error( msg );
 			this.interrupt();
@@ -231,8 +232,6 @@ public class GetJobThread extends Thread  {
 					} else {
 						
 						try {
-							currentTimeMillisBeforeCallGetJob = System.currentTimeMillis();
-
 							int availableJobCount = getAvailableJobCount();
 
 							getJob( availableThreadCount, availableJobCount );
@@ -320,6 +319,7 @@ public class GetJobThread extends Thread  {
 
 		log.info( "getJob(): getting a job" );
 
+		currentTimeMillisBeforeCallGetJob = System.currentTimeMillis();
 
 		//  get job
 
@@ -333,6 +333,9 @@ public class GetJobThread extends Thread  {
 			log.error( "Exception in getJob(), calling GetJob.getInstance().getNextJob( ), setting jobResponse to null, Exception: " + t.toString(), t );
 
 			jobResponse = null;
+
+		} finally {
+			currentTimeMillisBeforeCallGetJob = currentTimeMillisBeforeCallGetJob_NOTSET;
 		}
 
 		if ( jobResponse == null ) {
