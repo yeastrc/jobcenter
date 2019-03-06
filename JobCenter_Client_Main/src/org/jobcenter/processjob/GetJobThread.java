@@ -236,6 +236,7 @@ public class GetJobThread extends Thread  {
 
 							getJob( availableThreadCount, availableJobCount );
 						} finally {
+
 							currentTimeMillisBeforeCallGetJob = currentTimeMillisBeforeCallGetJob_NOTSET;
 						}
 					}
@@ -335,6 +336,22 @@ public class GetJobThread extends Thread  {
 			jobResponse = null;
 
 		} finally {
+
+			long currentTimeMillis = System.currentTimeMillis();
+			long currentTimeMillisDiff = currentTimeMillis - currentTimeMillisBeforeCallGetJob;
+			
+			try {
+				if ( currentTimeMillisDiff > WaitTimesForLoggingAndInterruptConstants.CLIENT_WAIT_TO_INTERRUPT_GET_NEXT_JOB_THREAD ) {
+					String msg = "Time taken to call GetJob.getInstance().getNextJob(...) exceeded allowed time."
+							+ "  currentTimeMillis: " + currentTimeMillis + ", currentTimeMillisBeforeCallGetJob: " + currentTimeMillisBeforeCallGetJob
+							+ ", currentTimeMillisDiff: " + currentTimeMillisDiff
+							+ ", difference limit: " + WaitTimesForLoggingAndInterruptConstants.CLIENT_WAIT_TO_INTERRUPT_GET_NEXT_JOB_THREAD;
+					log.warn( msg );
+				}
+			} catch ( Throwable t ) {
+				log.error( "Error tracking time to call GetJob.getInstance().getNextJob(...).", t );
+			}
+			
 			currentTimeMillisBeforeCallGetJob = currentTimeMillisBeforeCallGetJob_NOTSET;
 		}
 
