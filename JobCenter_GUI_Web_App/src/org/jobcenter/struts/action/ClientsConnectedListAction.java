@@ -81,11 +81,29 @@ public class ClientsConnectedListAction extends BaseAction {
 					Date lastStatusUpdatedTime = new Date( entry.getLastStatusUpdatedTime() );
 
 					Date nextExpectedStatusUpdatedTime = new Date( entry.getNextExpectedStatusUpdatedTime() );
+					
+					String lastGetJobStartProcessingTime = "No Value Set";
+					String lastGetJobEndProcessingTime = "No Value Set";
+							
+					if ( entry.getLastGetJobStartProcessingTime() != 0 ) {
+						lastGetJobStartProcessingTime = new Date( entry.getLastGetJobStartProcessingTime() ).toString();
+					}
+					if ( entry.getLastGetJobEndProcessingTime() != 0 ) {
+						lastGetJobEndProcessingTime = new Date( entry.getLastGetJobEndProcessingTime() ).toString();
+					}
+					
+					log.error( "entry.getLastGetJobStartProcessingTime(): " 
+							+ entry.getLastGetJobStartProcessingTime()
+							+ ", entry.getLastGetJobEndProcessingTime(): " 
+							+ entry.getLastGetJobEndProcessingTime() );
 
 					displayEntry.setStartTime( startTime );
 					displayEntry.setLastStatusUpdatedTime( lastStatusUpdatedTime );
 					displayEntry.setNextExpectedStatusUpdatedTime( nextExpectedStatusUpdatedTime );
 
+					displayEntry.setLastGetJobStartProcessingTime( lastGetJobStartProcessingTime );
+					displayEntry.setLastGetJobEndProcessingTime( lastGetJobEndProcessingTime );
+					
 					clientsConnectedListDisplay.add( displayEntry );
 				}
 
@@ -137,7 +155,10 @@ public class ClientsConnectedListAction extends BaseAction {
 		private Date lastStatusUpdatedTime;
 
 		private Date nextExpectedStatusUpdatedTime;
-		
+
+		private String lastGetJobStartProcessingTime;
+		private String lastGetJobEndProcessingTime;
+
 
 		public ClientIdentifierDTO getClientIdentifierDTO() {
 			return clientIdentifierDTO;
@@ -193,6 +214,22 @@ public class ClientsConnectedListAction extends BaseAction {
 
 		public void setNextExpectedStatusUpdatedTime(Date nextExpectedStatusUpdatedTime) {
 			this.nextExpectedStatusUpdatedTime = nextExpectedStatusUpdatedTime;
+		}
+
+		public String getLastGetJobStartProcessingTime() {
+			return lastGetJobStartProcessingTime;
+		}
+
+		public void setLastGetJobStartProcessingTime(String lastGetJobStartProcessingTime) {
+			this.lastGetJobStartProcessingTime = lastGetJobStartProcessingTime;
+		}
+
+		public String getLastGetJobEndProcessingTime() {
+			return lastGetJobEndProcessingTime;
+		}
+
+		public void setLastGetJobEndProcessingTime(String lastGetJobEndProcessingTime) {
+			this.lastGetJobEndProcessingTime = lastGetJobEndProcessingTime;
 		}
 
 	}

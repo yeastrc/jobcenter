@@ -108,10 +108,80 @@ public class ClientsConnectedTrackingServiceImpl implements ClientsConnectedTrac
 				return;
 			}
 		}
-
-
-
-
-
 	}
+
+	/**
+	 * @param clientIdentifierDTO
+	 */
+	@Override
+	public synchronized void updateClientGetJobStartTimestamp( ClientIdentifierDTO clientIdentifierDTO ) {
+
+		final String method = "updateClientGetJobStartTimestamp";
+		
+		if ( clientIdentifierDTO == null ) {
+			throw new IllegalArgumentException( method + "Parameter clientIdentifierDTO cannot == null" );
+		}
+
+		if ( log.isDebugEnabled() ) {
+			log.debug( method + " called, clientConnectedList current contents: " );
+			for ( ClientConnectedDTO clientConnectedDTO: clientsConnectedList ) {
+					log.debug( method + " called, clientConnectedDTO = " + clientConnectedDTO );
+			}
+		}
+		if ( log.isInfoEnabled() ) {
+			log.info( method + " called, clientConnectedList Item to update" );
+		}
+
+		//  Find entry in list to update and update it
+		for ( ClientConnectedDTO clientConnectedDTO: clientsConnectedList ) {
+
+			if ( clientIdentifierDTO.equals( clientConnectedDTO.getClientIdentifierDTO() ) ) {
+
+				clientConnectedDTO.setLastGetJobStartProcessingTime( System.currentTimeMillis() );
+
+				if ( log.isInfoEnabled() ) {
+					log.info( method + " called, clientConnectedDTO updated = " + clientConnectedDTO );
+				}
+				return;
+			}
+		}
+	}
+
+	/**
+	 * @param clientIdentifierDTO
+	 */
+	@Override
+	public synchronized void updateClientGetJobEndTimestamp( ClientIdentifierDTO clientIdentifierDTO ) {
+
+		final String method = "updateClientGetJobEndTimestamp";
+
+		if ( clientIdentifierDTO == null ) {
+			throw new IllegalArgumentException( method + "Parameter clientIdentifierDTO cannot == null" );
+		}
+
+		if ( log.isDebugEnabled() ) {
+			log.debug( method + " called, clientConnectedList current contents: " );
+			for ( ClientConnectedDTO clientConnectedDTO: clientsConnectedList ) {
+					log.debug( method + " called, clientConnectedDTO = " + clientConnectedDTO );
+			}
+		}
+		if ( log.isInfoEnabled() ) {
+			log.info( method + " called, clientConnectedList Item to update" );
+		}
+
+		//  Find entry in list to update and update it
+		for ( ClientConnectedDTO clientConnectedDTO: clientsConnectedList ) {
+
+			if ( clientIdentifierDTO.equals( clientConnectedDTO.getClientIdentifierDTO() ) ) {
+
+				clientConnectedDTO.setLastGetJobEndProcessingTime( System.currentTimeMillis() );
+
+				if ( log.isInfoEnabled() ) {
+					log.info( method + " called, clientConnectedDTO updated = " + clientConnectedDTO );
+				}
+				return;
+			}
+		}
+	}
+	
 }

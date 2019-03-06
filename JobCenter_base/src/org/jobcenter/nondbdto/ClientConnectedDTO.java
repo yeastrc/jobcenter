@@ -21,16 +21,18 @@ public class ClientConnectedDTO {
 	private long lastStatusUpdatedTime;
 
 	private long nextExpectedStatusUpdatedTime;
-
+	
+	//  Start and End time of last GetJob call
+	private long lastGetJobStartProcessingTime;
+	private long lastGetJobEndProcessingTime;
 
 	@Override
 	public String toString() {
-		return "ClientConnectedDTO [clientIdentifierDTO=" + clientIdentifierDTO
-				+ ", clientStatus=" + clientStatus + ", lastStatusUpdatedTime="
-				+ lastStatusUpdatedTime + ", nextExpectedStatusUpdatedTime="
-				+ nextExpectedStatusUpdatedTime + ", nodeName=" + nodeName
-				+ ", remoteIPAddress=" + remoteIPAddress + ", startTime="
-				+ startTime + "]";
+		return "ClientConnectedDTO [clientIdentifierDTO=" + clientIdentifierDTO + ", nodeName=" + nodeName
+				+ ", clientStatus=" + clientStatus + ", remoteIPAddress=" + remoteIPAddress + ", startTime=" + startTime
+				+ ", lastStatusUpdatedTime=" + lastStatusUpdatedTime + ", nextExpectedStatusUpdatedTime="
+				+ nextExpectedStatusUpdatedTime + ", lastGetJobStartProcessingTime=" + lastGetJobStartProcessingTime
+				+ ", lastGetJobEndProcessingTime=" + lastGetJobEndProcessingTime + "]";
 	}
 
 
@@ -75,6 +77,18 @@ public class ClientConnectedDTO {
 	}
 	public void setNextExpectedStatusUpdatedTime(long nextExpectedStatusUpdatedTime) {
 		this.nextExpectedStatusUpdatedTime = nextExpectedStatusUpdatedTime;
+	}
+	public long getLastGetJobStartProcessingTime() {
+		return lastGetJobStartProcessingTime;
+	}
+	public void setLastGetJobStartProcessingTime(long lastGetJobStartProcessingTime) {
+		this.lastGetJobStartProcessingTime = lastGetJobStartProcessingTime;
+	}
+	public long getLastGetJobEndProcessingTime() {
+		return lastGetJobEndProcessingTime;
+	}
+	public void setLastGetJobEndProcessingTime(long lastGetJobEndProcessingTime) {
+		this.lastGetJobEndProcessingTime = lastGetJobEndProcessingTime;
 	}
 
 }

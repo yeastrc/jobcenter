@@ -21,9 +21,11 @@ import org.jobcenter.dto.JobType;
 import org.jobcenter.dto.RunDTO;
 import org.jobcenter.dto.RunMessageDTO;
 import org.jobcenter.internalservice.ClientNodeNameCheck;
+import org.jobcenter.internalservice.ClientsConnectedTrackingService;
 import org.jobcenter.internalservice.GetValueFromConfigService;
 import org.jobcenter.internalservice.SaveJobSentToClientService;
 import org.jobcenter.jdbc.*;
+import org.jobcenter.nondbdto.ClientIdentifierDTO;
 import org.jobcenter.request.JobRequest;
 import org.jobcenter.request.JobRequestModuleInfo;
 import org.jobcenter.response.JobResponse;
@@ -74,6 +76,7 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 
 	private ClientNodeNameCheck clientNodeNameCheck;
 	private GetValueFromConfigService getValueFromConfigService;
+	private ClientsConnectedTrackingService clientsConnectedTrackingService;
 
 	private SaveJobSentToClientService saveJobSentToClientService;
 
@@ -97,6 +100,13 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 			GetValueFromConfigService getValueFromConfigService) {
 		this.getValueFromConfigService = getValueFromConfigService;
 	}
+	public ClientsConnectedTrackingService getClientsConnectedTrackingService() {
+		return clientsConnectedTrackingService;
+	}
+	public void setClientsConnectedTrackingService(ClientsConnectedTrackingService clientsConnectedTrackingService) {
+		this.clientsConnectedTrackingService = clientsConnectedTrackingService;
+	}
+
 	
 	//  Hibernate DAO
 	
@@ -171,6 +181,8 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 
 			throw new IllegalArgumentException( "remoteHost == null" );
 		}
+		
+		ClientIdentifierDTO clientIdentifierDTO = jobRequest.getClientIdentifierDTO();
 
 		if ( log.isDebugEnabled() ) {
 
@@ -193,10 +205,42 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 
 		Integer nodeId = clientNodeNameCheck.getNodeIdForNodeName( jobRequest.getNodeName() );
 
+		GetJobServiceResponse getJobServiceResponse = null;
+		
+		if ( log.isDebugEnabled() ) {
+			log.debug( "clientIdentifierDTO: " + clientIdentifierDTO );
+		}
+		
+		try {
+			try {
+				if ( clientIdentifierDTO != null ) {
+					if ( log.isDebugEnabled() ) {
+						log.debug( "Calling clientsConnectedTrackingService.updateClientGetJobStartTimestamp(...) with: clientIdentifierDTO: " + clientIdentifierDTO );
+					}
+					clientsConnectedTrackingService.updateClientGetJobStartTimestamp( clientIdentifierDTO );
+				} else {
+					if ( log.isDebugEnabled() ) {
+						log.debug( "NOT Calling since clientIdentifierDTO == null: clientsConnectedTrackingService.updateClientGetJobStartTimestamp(...) with: clientIdentifierDTO: " + clientIdentifierDTO );
+					}
+				}
+			} catch ( Throwable t ) {
+				log.error("Failed calling clientsConnectedTrackingService.updateClientGetJobStartTimestamp( clientIdentifierDTO );", t );
+			}
 
-
-
-		GetJobServiceResponse getJobServiceResponse = getNextJobForClient( jobRequest, nodeId, remoteHost );
+			getJobServiceResponse = getNextJobForClient( jobRequest, nodeId, remoteHost );
+			
+		} finally {
+			try {
+				if ( clientIdentifierDTO != null ) {
+					if ( log.isDebugEnabled() ) {
+						log.debug( "Calling clientsConnectedTrackingService.updateClientGetJobEndTimestamp(...) with: clientIdentifierDTO: " + clientIdentifierDTO );
+					}
+					clientsConnectedTrackingService.updateClientGetJobEndTimestamp( clientIdentifierDTO );
+				}
+			} catch ( Throwable t ) {
+				log.error("Failed calling clientsConnectedTrackingService.updateClientGetJobEndTimestamp( clientIdentifierDTO );", t );
+			}
+		}
 
 		return getJobServiceResponse;
 	}

@@ -225,6 +225,9 @@
 		<property name="getValueFromConfigService">
 			<ref bean="getValueFromConfigService" />
 		</property>
+		<property name="clientsConnectedTrackingService">
+			<ref bean="clientsConnectedTrackingService" />
+		</property>
 		<property name="saveJobSentToClientService">
 			<ref bean="saveJobSentToClientService" />
 		</property>

@@ -16,6 +16,8 @@ clientsConnectedList.jsp<br/>
 	<th nowrap="nowrap">Client Start Time</th>
 	<th nowrap="nowrap">Client Last Checkin Time</th>
 	<th nowrap="nowrap">Client next expected checkin time</th>
+	<th nowrap="nowrap">Client Last Get Job call (Start of Processing)</th>
+	<th nowrap="nowrap">Client Last Get Job call (End of Processing)</th>
   </tr>
 
  <c:forEach var="item" items="${ results }">
@@ -43,6 +45,12 @@ clientsConnectedList.jsp<br/>
 	</td>
 	<td nowrap="nowrap">
 		<c:out value="${ item.nextExpectedStatusUpdatedTime }"></c:out>
+	</td>
+	<td nowrap="nowrap">
+		<c:out value="${ item.lastGetJobStartProcessingTime }"></c:out>
+	</td>
+	<td nowrap="nowrap">
+		<c:out value="${ item.lastGetJobEndProcessingTime }"></c:out>
 	</td>
 
   </tr>

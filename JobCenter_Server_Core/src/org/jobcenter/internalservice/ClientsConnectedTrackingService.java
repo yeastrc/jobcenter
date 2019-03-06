@@ -27,5 +27,14 @@ public interface ClientsConnectedTrackingService {
 	 * @param updateType
 	 */
 	public void updateClientStatusAndInfo( ClientIdentifierDTO clientIdentifierDTO, ClientStatusUpdateTypeEnum updateType );
-	
+
+	/**
+	 * @param clientIdentifierDTO
+	 */
+	public void updateClientGetJobStartTimestamp( ClientIdentifierDTO clientIdentifierDTO );
+
+	/**
+	 * @param clientIdentifierDTO
+	 */
+	public void updateClientGetJobEndTimestamp( ClientIdentifierDTO clientIdentifierDTO );
 }
