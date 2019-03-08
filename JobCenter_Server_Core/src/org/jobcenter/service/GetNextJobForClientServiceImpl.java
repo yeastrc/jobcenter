@@ -211,6 +211,8 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 			log.debug( "clientIdentifierDTO: " + clientIdentifierDTO );
 		}
 		
+		long getNextJob_StartTimestamp = 0;
+		
 		try {
 			try {
 				if ( clientIdentifierDTO != null ) {
@@ -226,6 +228,8 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 			} catch ( Throwable t ) {
 				log.error("Failed calling clientsConnectedTrackingService.updateClientGetJobStartTimestamp( clientIdentifierDTO );", t );
 			}
+			
+			getNextJob_StartTimestamp = System.currentTimeMillis();
 
 			getJobServiceResponse = getNextJobForClient( jobRequest, nodeId, remoteHost );
 			
@@ -239,6 +243,21 @@ public class GetNextJobForClientServiceImpl implements GetNextJobForClientServic
 				}
 			} catch ( Throwable t ) {
 				log.error("Failed calling clientsConnectedTrackingService.updateClientGetJobEndTimestamp( clientIdentifierDTO );", t );
+			}
+			
+			try {
+				if ( clientIdentifierDTO != null ) {
+					if ( getNextJob_StartTimestamp != 0 ) {
+						long getNextJob_EndTimestamp = System.currentTimeMillis();
+						long current_GetJobProcessingTime = getNextJob_EndTimestamp - getNextJob_StartTimestamp;
+						if ( current_GetJobProcessingTime == 0 ) {
+							current_GetJobProcessingTime = 1; // Fake set to 1 so not zero
+						}
+						clientsConnectedTrackingService.updateClient_Tracking_GetJobMaxProcessingTimeSinceLastGUIQuery( current_GetJobProcessingTime, clientIdentifierDTO );
+					}
+				}
+			} catch ( Throwable t ) {
+				log.error("Failed calling clientsConnectedTrackingService.updateClient_Tracking_GetJobMaxProcessingTimeSinceLastGUIQuery( current_GetJobProcessingTime, clientIdentifierDTO );", t );
 			}
 		}
 

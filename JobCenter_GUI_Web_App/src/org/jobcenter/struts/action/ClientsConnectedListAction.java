@@ -4,6 +4,7 @@
  */
 package org.jobcenter.struts.action;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,6 +67,8 @@ public class ClientsConnectedListAction extends BaseAction {
 			List<DisplayClass> clientsConnectedListDisplay = new ArrayList<DisplayClass>( newSize );
 			
 			if ( clientsConnectedList != null ) {
+				
+				NumberFormat numberFormat = NumberFormat.getInstance();
 
 				for ( ClientConnectedDTO entry : clientsConnectedList ) {
 
@@ -92,17 +95,16 @@ public class ClientsConnectedListAction extends BaseAction {
 						lastGetJobEndProcessingTime = new Date( entry.getLastGetJobEndProcessingTime() ).toString();
 					}
 					
-					log.error( "entry.getLastGetJobStartProcessingTime(): " 
-							+ entry.getLastGetJobStartProcessingTime()
-							+ ", entry.getLastGetJobEndProcessingTime(): " 
-							+ entry.getLastGetJobEndProcessingTime() );
-
+					String display_GetJobMaxProcessingTimeSinceLastGUIQuery = numberFormat.format( entry.getDisplay_GetJobMaxProcessingTimeSinceLastGUIQuery() );
+					
 					displayEntry.setStartTime( startTime );
 					displayEntry.setLastStatusUpdatedTime( lastStatusUpdatedTime );
 					displayEntry.setNextExpectedStatusUpdatedTime( nextExpectedStatusUpdatedTime );
 
 					displayEntry.setLastGetJobStartProcessingTime( lastGetJobStartProcessingTime );
 					displayEntry.setLastGetJobEndProcessingTime( lastGetJobEndProcessingTime );
+					
+					displayEntry.setDisplay_GetJobMaxProcessingTimeSinceLastGUIQuery( display_GetJobMaxProcessingTimeSinceLastGUIQuery );
 					
 					clientsConnectedListDisplay.add( displayEntry );
 				}
@@ -158,6 +160,8 @@ public class ClientsConnectedListAction extends BaseAction {
 
 		private String lastGetJobStartProcessingTime;
 		private String lastGetJobEndProcessingTime;
+		
+		private String display_GetJobMaxProcessingTimeSinceLastGUIQuery;
 
 
 		public ClientIdentifierDTO getClientIdentifierDTO() {
@@ -230,6 +234,15 @@ public class ClientsConnectedListAction extends BaseAction {
 
 		public void setLastGetJobEndProcessingTime(String lastGetJobEndProcessingTime) {
 			this.lastGetJobEndProcessingTime = lastGetJobEndProcessingTime;
+		}
+
+		public String getDisplay_GetJobMaxProcessingTimeSinceLastGUIQuery() {
+			return display_GetJobMaxProcessingTimeSinceLastGUIQuery;
+		}
+
+		public void setDisplay_GetJobMaxProcessingTimeSinceLastGUIQuery(
+				String display_GetJobMaxProcessingTimeSinceLastGUIQuery) {
+			this.display_GetJobMaxProcessingTimeSinceLastGUIQuery = display_GetJobMaxProcessingTimeSinceLastGUIQuery;
 		}
 
 	}

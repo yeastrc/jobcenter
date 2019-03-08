@@ -28,6 +28,14 @@ public class ClientsConnectedTrackingServiceImpl implements ClientsConnectedTrac
 	@Override
 	public synchronized List<ClientConnectedDTO> retrieveClientsConnectedList() {
 		
+		//  First call copyTrackingToDisplayAndClearTracking_GetJobMaxProcessingTimeSinceLastGUIQuery() on each element
+		
+		if ( ! clientsConnectedList.isEmpty() ) {
+			for ( ClientConnectedDTO item : clientsConnectedList ) {
+				item.copyTrackingToDisplayAndClearTracking_GetJobMaxProcessingTimeSinceLastGUIQuery();
+			}
+		}
+		
 		return clientsConnectedList;
 	}
 	
@@ -183,5 +191,44 @@ public class ClientsConnectedTrackingServiceImpl implements ClientsConnectedTrac
 			}
 		}
 	}
+	
+
+	/**
+	 * @param clientIdentifierDTO
+	 */
+	@Override
+	public synchronized void updateClient_Tracking_GetJobMaxProcessingTimeSinceLastGUIQuery( long current_GetJobProcessingTime, ClientIdentifierDTO clientIdentifierDTO ) {
+
+		final String method = "updateClient_Tracking_GetJobMaxProcessingTimeSinceLastGUIQuery";
+
+		if ( clientIdentifierDTO == null ) {
+			throw new IllegalArgumentException( method + "Parameter clientIdentifierDTO cannot == null" );
+		}
+
+		if ( log.isDebugEnabled() ) {
+			log.debug( method + " called, clientConnectedList current contents: " );
+			for ( ClientConnectedDTO clientConnectedDTO: clientsConnectedList ) {
+					log.debug( method + " called, clientConnectedDTO = " + clientConnectedDTO );
+			}
+		}
+		if ( log.isInfoEnabled() ) {
+			log.info( method + " called, clientConnectedList Item to update" );
+		}
+
+		//  Find entry in list to update and update it
+		for ( ClientConnectedDTO clientConnectedDTO: clientsConnectedList ) {
+
+			if ( clientIdentifierDTO.equals( clientConnectedDTO.getClientIdentifierDTO() ) ) {
+
+				clientConnectedDTO.updateTracking_GetJobMaxProcessingTimeSinceLastGUIQuery( current_GetJobProcessingTime );
+
+				if ( log.isInfoEnabled() ) {
+					log.info( method + " called, clientConnectedDTO updated = " + clientConnectedDTO );
+				}
+				return;
+			}
+		}
+	}
+	
 	
 }

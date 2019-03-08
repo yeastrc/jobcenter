@@ -25,14 +25,40 @@ public class ClientConnectedDTO {
 	//  Start and End time of last GetJob call
 	private long lastGetJobStartProcessingTime;
 	private long lastGetJobEndProcessingTime;
+	
+	private long tracking_GetJobMaxProcessingTimeSinceLastGUIQuery; // For tracking the next max value (cleared when queried) 
+	private long display_GetJobMaxProcessingTimeSinceLastGUIQuery;  // For display of current max value (copied from Tracking when queried)
+	
+	/**
+	 * Set tracking_GetJobMaxProcessingTimeSinceLastGUIQuery to current_GetJobProcessingTime if current_GetJobProcessingTime is larger
+	 * @param current_GetJobProcessingTime
+	 */
+	public synchronized void updateTracking_GetJobMaxProcessingTimeSinceLastGUIQuery( long current_GetJobProcessingTime ) {
+		if ( current_GetJobProcessingTime > tracking_GetJobMaxProcessingTimeSinceLastGUIQuery ) {
+			tracking_GetJobMaxProcessingTimeSinceLastGUIQuery = current_GetJobProcessingTime;
+		}
+	}
 
+	/**
+	 * Copy tracking_GetJobMaxProcessingTimeSinceLastGUIQuery to display_GetJobMaxProcessingTimeSinceLastGUIQuery
+	 * and set tracking_GetJobMaxProcessingTimeSinceLastGUIQuery to zero
+	 */
+	public synchronized void copyTrackingToDisplayAndClearTracking_GetJobMaxProcessingTimeSinceLastGUIQuery() {
+		display_GetJobMaxProcessingTimeSinceLastGUIQuery = tracking_GetJobMaxProcessingTimeSinceLastGUIQuery;
+		tracking_GetJobMaxProcessingTimeSinceLastGUIQuery = 0;
+	}
+	
 	@Override
 	public String toString() {
 		return "ClientConnectedDTO [clientIdentifierDTO=" + clientIdentifierDTO + ", nodeName=" + nodeName
 				+ ", clientStatus=" + clientStatus + ", remoteIPAddress=" + remoteIPAddress + ", startTime=" + startTime
 				+ ", lastStatusUpdatedTime=" + lastStatusUpdatedTime + ", nextExpectedStatusUpdatedTime="
 				+ nextExpectedStatusUpdatedTime + ", lastGetJobStartProcessingTime=" + lastGetJobStartProcessingTime
-				+ ", lastGetJobEndProcessingTime=" + lastGetJobEndProcessingTime + "]";
+				+ ", lastGetJobEndProcessingTime=" + lastGetJobEndProcessingTime
+				+ ", tracking_GetJobMaxProcessingTimeSinceLastGUIQuery="
+				+ tracking_GetJobMaxProcessingTimeSinceLastGUIQuery
+				+ ", display_GetJobMaxProcessingTimeSinceLastGUIQuery="
+				+ display_GetJobMaxProcessingTimeSinceLastGUIQuery + "]";
 	}
 
 
@@ -89,6 +115,19 @@ public class ClientConnectedDTO {
 	}
 	public void setLastGetJobEndProcessingTime(long lastGetJobEndProcessingTime) {
 		this.lastGetJobEndProcessingTime = lastGetJobEndProcessingTime;
+	}
+	public long getTracking_GetJobMaxProcessingTimeSinceLastGUIQuery() {
+		return tracking_GetJobMaxProcessingTimeSinceLastGUIQuery;
+	}
+	public void setTracking_GetJobMaxProcessingTimeSinceLastGUIQuery(
+			long tracking_GetJobMaxProcessingTimeSinceLastGUIQuery) {
+		this.tracking_GetJobMaxProcessingTimeSinceLastGUIQuery = tracking_GetJobMaxProcessingTimeSinceLastGUIQuery;
+	}
+	public long getDisplay_GetJobMaxProcessingTimeSinceLastGUIQuery() {
+		return display_GetJobMaxProcessingTimeSinceLastGUIQuery;
+	}
+	public void setDisplay_GetJobMaxProcessingTimeSinceLastGUIQuery(long display_GetJobMaxProcessingTimeSinceLastGUIQuery) {
+		this.display_GetJobMaxProcessingTimeSinceLastGUIQuery = display_GetJobMaxProcessingTimeSinceLastGUIQuery;
 	}
 
 }

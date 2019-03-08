@@ -37,4 +37,10 @@ public interface ClientsConnectedTrackingService {
 	 * @param clientIdentifierDTO
 	 */
 	public void updateClientGetJobEndTimestamp( ClientIdentifierDTO clientIdentifierDTO );
+	
+	/**
+	 * @param current_GetJobProcessingTime
+	 * @param clientIdentifierDTO
+	 */
+	public void updateClient_Tracking_GetJobMaxProcessingTimeSinceLastGUIQuery( long current_GetJobProcessingTime, ClientIdentifierDTO clientIdentifierDTO );
 }
