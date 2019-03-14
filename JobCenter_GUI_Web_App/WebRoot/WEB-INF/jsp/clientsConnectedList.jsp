@@ -18,7 +18,7 @@ clientsConnectedList.jsp<br/>
 	<th nowrap="nowrap">Client next expected checkin time</th>
 	<th nowrap="nowrap">Client Last Get Job call (Start of Processing)</th>
 	<th nowrap="nowrap">Client Last Get Job call (End of Processing)</th>
-	<th nowrap="nowrap">Client Max Get Job call processing time (Cleared after queried by this web app)</th>
+	<th nowrap="nowrap">Client Max Get Job call processing time, in milliseconds (Cleared after queried by this web app)</th>
   </tr>
 
  <c:forEach var="item" items="${ results }">
