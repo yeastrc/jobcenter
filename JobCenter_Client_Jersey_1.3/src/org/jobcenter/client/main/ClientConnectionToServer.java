@@ -49,6 +49,8 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 
 
 	private Client jersey_JAX_RS_Client = null;
+	
+	private ClientConnectionToServer_PlainJava clientConnectionToServer_PlainJava;
 
 
 
@@ -83,6 +85,9 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 			}
 
 			jersey_JAX_RS_Client = Client.create();
+			
+			clientConnectionToServer_PlainJava = new ClientConnectionToServer_PlainJava();
+			clientConnectionToServer_PlainJava.init( connectionURL );
 
 		} catch ( RuntimeException e ) {
 
@@ -373,6 +378,11 @@ public class ClientConnectionToServer implements ClientConnectionToServerIF {
 		if ( jersey_JAX_RS_Client == null ) {
 
 			throw new IllegalStateException( "jerseyClient == null" );
+		}
+		
+		if ( clientConnectionToServer_PlainJava != null ) {
+			
+			return clientConnectionToServer_PlainJava.getNextJobToProcess( jobRequest );
 		}
 
 
