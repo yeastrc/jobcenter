@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -133,6 +134,8 @@ class ClientConnectionToServer_PlainJava {
 		
 		long methodTracking_Start = System.nanoTime();
 		
+		Date methodStartDate_Now = new Date();
+		
 		if ( log.isInfoEnabled() ) {
 	
 			log.info( "method callActualWebserviceOnServer(...) entered" );
@@ -207,7 +210,7 @@ class ClientConnectionToServer_PlainJava {
 			if ( connectTimeout != CONNECT_TIMEOUT_HttpURLConnection_MILLISECONDS ) {
 				log.warn( "httpURLConnection.setConnectTimeout(...) failed to set connect timeout.  httpURLConnection.getConnectTimeout() returned: "
 						+ connectTimeout 
-						+ ", httpURLConnection.setConnectTimeout(...) was passedL "
+						+ ", httpURLConnection.setConnectTimeout(...) was passed: "
 						+ CONNECT_TIMEOUT_HttpURLConnection_MILLISECONDS );
 			}
 		}
@@ -217,7 +220,7 @@ class ClientConnectionToServer_PlainJava {
 			if ( readTimeout != READ_TIMEOUT_HttpURLConnection_MILLISECONDS ) {
 				log.warn( "httpURLConnection.setReadTimeout(...) failed to set read timeout.  httpURLConnection.getReadTimeout() returned: "
 						+ readTimeout 
-						+ ", httpURLConnection.setReadTimeout(...) was passedL "
+						+ ", httpURLConnection.setReadTimeout(...) was passed: "
 						+ READ_TIMEOUT_HttpURLConnection_MILLISECONDS );
 			}
 		}
@@ -237,6 +240,7 @@ class ClientConnectionToServer_PlainJava {
 				//  Connection Time out
 			
 				String msg = "SocketTimeoutException opening connection to server. CONNECT_TIMEOUT_HttpURLConnection_MILLISECONDS: " + CONNECT_TIMEOUT_HttpURLConnection_MILLISECONDS
+						+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 						+ ", webserviceURL: " + webserviceURL;
 				log.error( msg );
 				throw new Exception( msg, e );
@@ -252,6 +256,7 @@ class ClientConnectionToServer_PlainJava {
 					String msg = "Time taken for open connection exceeds 5000 milliseconds. Time taken for open connection: " 
 							+ timeDiff
 							+ ".  NOT throwing Exception, allowing processing to continue."
+							+ " callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 							+ " webserviceURL: " + webserviceURL;
 					log.error( msg );
 				}
@@ -272,6 +277,7 @@ class ClientConnectionToServer_PlainJava {
 				//  Connection Time out
 				
 				String msg = "SocketTimeoutException sending request to server. READ_TIMEOUT_HttpURLConnection_MILLISECONDS: " + READ_TIMEOUT_HttpURLConnection_MILLISECONDS
+						+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 						+ ", webserviceURL: " + webserviceURL;
 				log.error( msg );
 				throw new Exception( msg, e );
@@ -282,7 +288,9 @@ class ClientConnectionToServer_PlainJava {
 					errorStreamContents= getErrorStreamContents( httpURLConnection );
 				} catch ( Exception ex ) {
 				}
-				log.error("Failed send to server.  errorStreamContents: " + errorStreamContents, e );
+				log.error("Failed send to server. "
+						+ " callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
+						+ ", errorStreamContents: " + errorStreamContents, e );
 				throw e;
 			} finally {
 				if ( bufferedOutputStream != null ) {
@@ -294,7 +302,9 @@ class ClientConnectionToServer_PlainJava {
 							errorStreamContents= getErrorStreamContents( httpURLConnection );
 						} catch ( Exception ex ) {
 						}
-						log.error("Failed send to server (Failed to close connection after failed send).  errorStreamContents: " 
+						log.error("Failed send to server (Failed to close connection after failed send).  "
+								+ " callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
+								+ ", errorStreamContents: " 
 								+ errorStreamContents, e );
 					}
 				}
@@ -307,7 +317,8 @@ class ClientConnectionToServer_PlainJava {
 					String msg = "Time take for send request exceeds 5000 milliseconds. Time taken for send: " 
 							+ timeDiff
 							+ ".  NOT throwing Exception, allowing processing to continue."
-							+ " webserviceURL: " + webserviceURL;
+							+ " callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
+							+ ", webserviceURL: " + webserviceURL;
 					log.error( msg );
 				}
 			}
@@ -319,7 +330,8 @@ class ClientConnectionToServer_PlainJava {
 					String msg = "Time after send request exceeds total allowed connection time.  Time allowed, in milliseconds: "
 							+ TOTAL_CONNECTION_TIMEOUT_HttpURLConnection_MILLISECONDS
 							+ ", Time taken so far: " 
-							+ timeDiff;
+							+ timeDiff
+							+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now;
 					log.error( msg );
 					throw new Exception( msg );
 				}
@@ -333,6 +345,7 @@ class ClientConnectionToServer_PlainJava {
 					} catch ( Exception ex ) {
 					}
 					String msg = ( "HTTP response code not '" + SUCCESS_HTTP_RETURN_CODE + "', is: " + httpResponseCode 
+							+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 							+ ", errorStreamContents: " + errorStreamContents );
 					log.error( msg );
 					throw new Exception(msg);
@@ -343,6 +356,7 @@ class ClientConnectionToServer_PlainJava {
 				//  Connection Time out
 				
 				String msg = "SocketTimeoutException reading HTTP Status Code from server. READ_TIMEOUT_HttpURLConnection_MILLISECONDS: " + READ_TIMEOUT_HttpURLConnection_MILLISECONDS
+						+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 						+ ", webserviceURL: " + webserviceURL;
 				log.error( msg );
 				throw new Exception( msg, e );
@@ -354,6 +368,7 @@ class ClientConnectionToServer_PlainJava {
 				} catch ( Exception ex ) {
 				}
 				String msg = ( "IOException getting HTTP response code from server at URL: " + webserviceURL
+						+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 						+ ", errorStreamContents: " + errorStreamContents  );
 				log.error( msg );
 				throw new Exception(msg, e);
@@ -365,7 +380,8 @@ class ClientConnectionToServer_PlainJava {
 					String msg = "Time after Get HTTP Status Code exceeds total allowed connection time.  Time allowed, in milliseconds: "
 							+ TOTAL_CONNECTION_TIMEOUT_HttpURLConnection_MILLISECONDS
 							+ ", Time taken so far: " 
-							+ timeDiff;
+							+ timeDiff
+							+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now;
 					log.error( msg );
 					throw new Exception( msg );
 				}
@@ -395,6 +411,7 @@ class ClientConnectionToServer_PlainJava {
 									+ timeDiff
 									+ ", readCount: " + readCount
 									+ ", readZeroLengthCount (# bytes read was zero): " + readZeroLengthCount
+									+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 									+ ", webserviceURL: " + webserviceURL;
 							log.error( msg );
 							throw new Exception( msg );
@@ -407,6 +424,7 @@ class ClientConnectionToServer_PlainJava {
 				//  Connection Time out
 				
 				String msg = "SocketTimeoutException reading response from server. READ_TIMEOUT_HttpURLConnection_MILLISECONDS: " + READ_TIMEOUT_HttpURLConnection_MILLISECONDS
+						+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 						+ ", webserviceURL: " + webserviceURL;
 				log.error( msg );
 				throw new Exception( msg, e );
@@ -418,6 +436,7 @@ class ClientConnectionToServer_PlainJava {
 				} catch ( Exception ex ) {
 				}
 				String msg = ( "IOException receiving XML from server at URL: " + webserviceURL
+						+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 						+ ", errorStreamContents: " + errorStreamContents );
 				log.error( msg );
 				throw new Exception(msg, e);
@@ -432,6 +451,7 @@ class ClientConnectionToServer_PlainJava {
 						} catch ( Exception ex ) {
 						}
 						String msg = ( "IOException closing input Stream from server at URL: " + webserviceURL
+								+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now
 								+ ", errorStreamContents: " + errorStreamContents  );
 						log.error( msg );
 						throw new Exception(msg, e);
@@ -450,8 +470,15 @@ class ClientConnectionToServer_PlainJava {
 				XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new StreamSource( inputStreamBufferOfServerResponse ) );
 				webserviceResponseAsObject = unmarshaller.unmarshal( xmlStreamReader );
 			} catch ( JAXBException e ) {
-				String msg = ( "JAXBException unmarshalling XML received from server at URL: " + webserviceURL );
-				log.error( msg );
+				String msg = ( "JAXBException unmarshalling XML received from server at URL: " + webserviceURL
+						+ ", callActualWebserviceOnServer(...):Method Enter Date/Time: " + methodStartDate_Now );
+				String logMsg = msg;
+				try {
+					logMsg += ", serverResponseByteArray as String " + new String( serverResponseByteArray, XML_ENCODING_CHARACTER_SET ); 
+				} catch ( Throwable t ) {
+					//  Eat Exception
+				}
+				log.error( logMsg );
 				throw new Exception(msg, e);
 			}
 			
@@ -484,20 +511,21 @@ class ClientConnectionToServer_PlainJava {
 	 */
 	private byte[] getErrorStreamContents(HttpURLConnection httpURLConnection) throws IOException {
 		
-		InputStream inputStream = httpURLConnection.getErrorStream();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		int byteArraySize = 5000;
-		byte[] data = new byte[ byteArraySize ];
-		while (true) {
-			int bytesRead = inputStream.read( data );
-			if ( bytesRead == -1 ) {  // end of input
-				break;
+		try ( InputStream inputStream = httpURLConnection.getErrorStream() ) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			int byteArraySize = 5000;
+			byte[] data = new byte[ byteArraySize ];
+			while (true) {
+				int bytesRead = inputStream.read( data );
+				if ( bytesRead == -1 ) {  // end of input
+					break;
+				}
+				if ( bytesRead > 0 ) {
+					baos.write( data, 0, bytesRead );
+				}
 			}
-			if ( bytesRead > 0 ) {
-				baos.write( data, 0, bytesRead );
-			}
+			return baos.toByteArray();
 		}
-		return baos.toByteArray();
 	}
 	
 
