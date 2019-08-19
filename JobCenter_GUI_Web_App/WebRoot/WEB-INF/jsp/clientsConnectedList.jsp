@@ -19,6 +19,7 @@ clientsConnectedList.jsp<br/>
 	<th nowrap="nowrap">Client Last Get Job call (Start of Processing)</th>
 	<th nowrap="nowrap">Client Last Get Job call (End of Processing)</th>
 	<th nowrap="nowrap">Client Max Get Job call processing time, in milliseconds (Cleared after queried by this web app)</th>
+	<th nowrap="nowrap">Client Date/Time of Max Get Job call processing time (Cleared after queried by this web app)</th>
   </tr>
 
  <c:forEach var="item" items="${ results }">
@@ -56,6 +57,10 @@ clientsConnectedList.jsp<br/>
 	<td nowrap="nowrap">
 		<c:out value="${ item.display_GetJobMaxProcessingTimeSinceLastGUIQuery }"></c:out>
 	</td>
+	<td nowrap="nowrap">
+		<c:out value="${ item.display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery }"></c:out>
+	</td>	
+	
 
   </tr>
 

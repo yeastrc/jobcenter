@@ -1,5 +1,7 @@
 package org.jobcenter.nondbdto;
 
+import java.util.Date;
+
 import org.jobcenter.constants.ClientStatusUpdateTypeEnum;
 import org.jobcenter.nondbdto.ClientIdentifierDTO;
 
@@ -26,8 +28,12 @@ public class ClientConnectedDTO {
 	private long lastGetJobStartProcessingTime;
 	private long lastGetJobEndProcessingTime;
 	
-	private long tracking_GetJobMaxProcessingTimeSinceLastGUIQuery; // For tracking the next max value (cleared when queried) 
+	private long tracking_GetJobMaxProcessingTimeSinceLastGUIQuery; // For tracking the next max value (cleared when queried)
+	private Date tracking_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery; // Date/Time tracking_GetJobMaxProcessingTimeSinceLastGUIQuery last set
+	
 	private long display_GetJobMaxProcessingTimeSinceLastGUIQuery;  // For display of current max value (copied from Tracking when queried)
+	private Date display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery; // Date/Time tracking_GetJobMaxProcessingTimeSinceLastGUIQuery last set
+	
 	
 	/**
 	 * Set tracking_GetJobMaxProcessingTimeSinceLastGUIQuery to current_GetJobProcessingTime if current_GetJobProcessingTime is larger
@@ -36,6 +42,7 @@ public class ClientConnectedDTO {
 	public synchronized void updateTracking_GetJobMaxProcessingTimeSinceLastGUIQuery( long current_GetJobProcessingTime ) {
 		if ( current_GetJobProcessingTime > tracking_GetJobMaxProcessingTimeSinceLastGUIQuery ) {
 			tracking_GetJobMaxProcessingTimeSinceLastGUIQuery = current_GetJobProcessingTime;
+			tracking_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery = new Date();
 		}
 	}
 
@@ -46,6 +53,8 @@ public class ClientConnectedDTO {
 	public synchronized void copyTrackingToDisplayAndClearTracking_GetJobMaxProcessingTimeSinceLastGUIQuery() {
 		display_GetJobMaxProcessingTimeSinceLastGUIQuery = tracking_GetJobMaxProcessingTimeSinceLastGUIQuery;
 		tracking_GetJobMaxProcessingTimeSinceLastGUIQuery = 0;
+		display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery = tracking_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery;
+		tracking_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery = null;
 	}
 	
 	@Override
@@ -128,6 +137,15 @@ public class ClientConnectedDTO {
 	}
 	public void setDisplay_GetJobMaxProcessingTimeSinceLastGUIQuery(long display_GetJobMaxProcessingTimeSinceLastGUIQuery) {
 		this.display_GetJobMaxProcessingTimeSinceLastGUIQuery = display_GetJobMaxProcessingTimeSinceLastGUIQuery;
+	}
+
+	public Date getDisplay_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery() {
+		return display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery;
+	}
+
+	public void setDisplay_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery(
+			Date display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery) {
+		this.display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery = display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery;
 	}
 
 }

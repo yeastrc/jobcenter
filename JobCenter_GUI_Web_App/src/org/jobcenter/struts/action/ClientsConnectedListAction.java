@@ -105,6 +105,7 @@ public class ClientsConnectedListAction extends BaseAction {
 					displayEntry.setLastGetJobEndProcessingTime( lastGetJobEndProcessingTime );
 					
 					displayEntry.setDisplay_GetJobMaxProcessingTimeSinceLastGUIQuery( display_GetJobMaxProcessingTimeSinceLastGUIQuery );
+					displayEntry.setDisplay_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery( entry.getDisplay_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery() );
 					
 					clientsConnectedListDisplay.add( displayEntry );
 				}
@@ -162,6 +163,8 @@ public class ClientsConnectedListAction extends BaseAction {
 		private String lastGetJobEndProcessingTime;
 		
 		private String display_GetJobMaxProcessingTimeSinceLastGUIQuery;
+
+		private Date display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery;
 
 
 		public ClientIdentifierDTO getClientIdentifierDTO() {
@@ -243,6 +246,15 @@ public class ClientsConnectedListAction extends BaseAction {
 		public void setDisplay_GetJobMaxProcessingTimeSinceLastGUIQuery(
 				String display_GetJobMaxProcessingTimeSinceLastGUIQuery) {
 			this.display_GetJobMaxProcessingTimeSinceLastGUIQuery = display_GetJobMaxProcessingTimeSinceLastGUIQuery;
+		}
+
+		public Date getDisplay_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery() {
+			return display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery;
+		}
+
+		public void setDisplay_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery(
+				Date display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery) {
+			this.display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery = display_dateOf_GetJobMaxProcessingTimeSinceLastGUIQuery;
 		}
 
 	}
